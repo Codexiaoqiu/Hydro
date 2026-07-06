@@ -1,0 +1,1 @@
+export const THEME_INIT_SCRIPT = `(function(){var s=null;try{s=localStorage.getItem('hydro.theme');}catch(e){}var t=s||(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');document.documentElement.setAttribute('data-theme',t);})();`;
