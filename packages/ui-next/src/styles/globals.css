@@ -1,0 +1,41 @@
+html { background: var(--bg-0); }
+body {
+  background: var(--bg-0);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  transition: background-color var(--motion-slow), color var(--motion-slow);
+}
+
+/* dark-only background ornament */
+html:not([data-theme="light"]) body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background:
+    radial-gradient(900px 600px at 15% -10%, rgba(94,234,212,0.18), transparent 60%),
+    radial-gradient(800px 500px at 95% 10%, rgba(196,181,253,0.16), transparent 60%),
+    radial-gradient(700px 600px at 50% 110%, rgba(125,211,252,0.14), transparent 60%);
+  pointer-events: none; z-index: 0;
+}
+html:not([data-theme="light"]) body::after {
+  content: '';
+  position: fixed; inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(circle at 50% 30%, black 0%, transparent 80%);
+  -webkit-mask-image: radial-gradient(circle at 50% 30%, black 0%, transparent 80%);
+  pointer-events: none; z-index: 0;
+}
+#root { position: relative; z-index: 1; }
+
+/* scrollbar */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--bg-1); }
+::-webkit-scrollbar-thumb { background: var(--surface-2); border-radius: var(--radius-pill); }
+::-webkit-scrollbar-thumb:hover { background: var(--border-strong); }
