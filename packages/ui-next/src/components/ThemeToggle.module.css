@@ -1,0 +1,15 @@
+.toggle {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 38px; height: 38px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text-soft);
+  transition: color var(--motion-base), border-color var(--motion-base), background-color var(--motion-base);
+}
+.toggle:hover { color: var(--text); border-color: var(--border-strong); }
+.icon { width: 18px; height: 18px; }
+.moon { display: block; }
+.sun  { display: none; }
+:global(html[data-theme="light"]) .moon { display: none; }
+:global(html[data-theme="light"]) .sun  { display: block; }
