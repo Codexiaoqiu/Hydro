@@ -1,0 +1,6 @@
+.cta { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); padding: var(--space-4); background: linear-gradient(135deg, rgba(94,234,212,0.1), rgba(196,181,253,0.1)); border: 1px solid rgba(94,234,212,0.25); border-radius: var(--radius-lg); margin-bottom: var(--space-2); transition: all var(--motion-slow); }
+.text { font-size: var(--text-sm); }
+.text b { display: block; font-size: var(--text-base); font-weight: 600; }
+.text small { color: var(--text-mute); font-size: var(--text-xs); }
+.btn { background: var(--text); color: var(--bg-0); border: 0; border-radius: var(--radius-md); padding: 9px var(--space-4); font-weight: 600; font-size: var(--text-sm); transition: opacity var(--motion-base); }
+.btn:hover { opacity: 0.9; }
