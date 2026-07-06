@@ -1,0 +1,5 @@
+.samples { display: grid; grid-template-columns: 1fr 28px 1fr; gap: 0; align-items: stretch; margin: var(--space-4) 0 var(--space-2); }
+.col { display: flex; flex-direction: column; gap: var(--space-2); }
+.h { font-size: var(--text-xs); color: var(--text-mute); text-transform: uppercase; letter-spacing: 0.14em; font-weight: 600; display: flex; align-items: center; gap: var(--space-2); }
+.num { width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; background: var(--surface-2); border-radius: 6px; font-family: var(--font-mono); font-size: var(--text-xs); color: var(--text); }
+.arrow { align-self: center; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; color: var(--violet); font-size: 18px; }
