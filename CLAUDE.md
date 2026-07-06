@@ -73,6 +73,15 @@ yarn start
 
 # interactive CLI (db / addon / diagnosis / install / patch)
 yarn hydrooj <command>
+
+# ui-next component tests (vitest + happy-dom + testing-library)
+yarn workspace @hydrooj/ui-next test          # single-shot (22 tests across 5 components)
+yarn workspace @hydrooj/ui-next test:watch    # watch mode
+
+# ui-next visual regression (Playwright, requires `playwright install chromium` once)
+yarn workspace @hydrooj/ui-next build                 # build production bundle first
+yarn workspace @hydrooj/ui-next test:visual            # compare against baselines
+yarn workspace @hydrooj/ui-next test:visual:update     # regenerate baselines
 ```
 
 The `tsconfig.json` files in each package are **generated** by `build/prepare.js`. If you see a stale tsconfig, run `node build/prepare.js` (or just `yarn`).
