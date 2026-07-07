@@ -1,0 +1,964 @@
+<html lang="zh-CN" data-immersive-translate-page-theme="dark"><head>
+<meta charset="UTF-8">
+<title>#H1000. A + B Problem · Hydra</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg-0: #07080d;
+    --bg-1: #0c0f1a;
+    --bg-2: #121728;
+    --surface: rgba(255,255,255,0.03);
+    --surface-2: rgba(255,255,255,0.06);
+    --border: rgba(255,255,255,0.08);
+    --border-strong: rgba(255,255,255,0.16);
+    --text: #e8ecf3;
+    --text-soft: #a7b0c2;
+    --text-mute: #6b748a;
+    --cyan: #5eead4;
+    --blue: #7dd3fc;
+    --violet: #c4b5fd;
+    --pink: #f0abfc;
+    --amber: #fcd34d;
+    --green: #86efac;
+    --red: #fca5a5;
+  }
+  html, body {
+    background: var(--bg-0);
+    color: var(--text);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.55;
+    overflow-x: hidden;
+    transition: background-color .35s ease, color .35s ease;
+  }
+  .nav, .card, .side-card, .stat-card, .hero-left, .chip, .ide, .contest,
+  .author, .tag-cloud span, .lang-tabs, .lang-pill, .cta {
+    transition: background-color .35s ease, border-color .35s ease, color .35s ease, box-shadow .35s ease;
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(900px 600px at 15% -10%, rgba(94,234,212,0.18), transparent 60%),
+      radial-gradient(800px 500px at 95% 10%, rgba(196,181,253,0.16), transparent 60%),
+      radial-gradient(700px 600px at 50% 110%, rgba(125,211,252,0.14), transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 56px 56px;
+    mask-image: radial-gradient(circle at 50% 30%, black 0%, transparent 80%);
+    -webkit-mask-image: radial-gradient(circle at 50% 30%, black 0%, transparent 80%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* layout */
+  .shell {
+    position: relative;
+    z-index: 1;
+    max-width: 1320px;
+    margin: 0 auto;
+    padding: 0 28px;
+  }
+
+  /* top nav */
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    background: rgba(7,8,13,0.65);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-inner {
+    display: flex;
+    align-items: center;
+    gap: 36px;
+    height: 68px;
+  }
+  .brand {
+    display: flex; align-items: center; gap: 10px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700; font-size: 20px;
+    letter-spacing: -0.02em;
+  }
+  .brand-mark {
+    width: 30px; height: 30px;
+    border-radius: 8px;
+    background: conic-gradient(from 220deg at 50% 50%, var(--cyan), var(--violet), var(--pink), var(--blue), var(--cyan));
+    position: relative;
+    box-shadow: 0 0 24px rgba(125,211,252,0.4);
+  }
+  .brand-mark::after {
+    content: ''; position: absolute; inset: 5px;
+    background: var(--bg-0); border-radius: 4px;
+  }
+  .nav-links {
+    display: flex; gap: 4px; align-items: center;
+    font-size: 14px;
+  }
+  .nav-link {
+    color: var(--text-soft);
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all .2s ease;
+    text-decoration: none;
+  }
+  .nav-link:hover { color: var(--text); background: var(--surface-2); }
+  .nav-link.active {
+    color: var(--text);
+    background: var(--surface-2);
+    position: relative;
+  }
+  .nav-link.active::after {
+    content: ''; position: absolute;
+    left: 14px; right: 14px; bottom: -1px;
+    height: 2px;
+    background: linear-gradient(90deg, var(--cyan), var(--violet));
+    border-radius: 2px;
+  }
+  .nav-spacer { flex: 1; }
+  .nav-right { display: flex; align-items: center; gap: 12px; font-size: 14px; color: var(--text-soft); }
+  .btn-ghost { padding: 7px 14px; border-radius: 8px; cursor: pointer; }
+  .btn-ghost:hover { background: var(--surface-2); color: var(--text); }
+  .btn-primary {
+    padding: 7px 16px; border-radius: 8px; cursor: pointer;
+    background: linear-gradient(135deg, var(--cyan), var(--blue));
+    color: #062b29; font-weight: 600;
+    box-shadow: 0 6px 24px -8px rgba(94,234,212,0.6);
+  }
+  .lang-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 12px; border-radius: 8px;
+    border: 1px solid var(--border);
+    font-size: 13px;
+  }
+
+  /* hero */
+  .hero {
+    padding: 56px 0 32px;
+    display: grid;
+    grid-template-columns: 1.6fr 1fr;
+    gap: 28px;
+  }
+  .hero-left {
+    background:
+      linear-gradient(135deg, rgba(94,234,212,0.08), rgba(196,181,253,0.06) 60%, transparent),
+      var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    padding: 36px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-left::before {
+    content: '';
+    position: absolute;
+    top: -120px; right: -80px;
+    width: 360px; height: 360px;
+    background: radial-gradient(circle, rgba(196,181,253,0.18), transparent 70%);
+    filter: blur(20px);
+  }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--cyan);
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    padding: 6px 12px;
+    border: 1px solid rgba(94,234,212,0.3);
+    border-radius: 999px;
+    background: rgba(94,234,212,0.06);
+  }
+  .eyebrow .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--cyan);
+    box-shadow: 0 0 8px var(--cyan);
+  }
+  .hero-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 64px;
+    line-height: 1.05;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    margin: 22px 0 8px;
+  }
+  .hero-title .id {
+    background: linear-gradient(135deg, var(--cyan) 0%, var(--blue) 40%, var(--violet) 80%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    margin-right: 16px;
+  }
+  .hero-subtitle {
+    color: var(--text-soft);
+    font-size: 16px;
+    max-width: 640px;
+  }
+  .hero-meta {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    margin-top: 26px;
+  }
+  .chip {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 8px 14px;
+    border-radius: 10px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    font-size: 13px;
+    color: var(--text-soft);
+  }
+  .chip strong { color: var(--text); font-weight: 600; }
+  .chip svg { width: 14px; height: 14px; opacity: .8; }
+  .chip.diff { color: var(--green); border-color: rgba(134,239,172,0.3); background: rgba(134,239,172,0.06); }
+  .chip.tag { color: var(--violet); border-color: rgba(196,181,253,0.3); background: rgba(196,181,253,0.06); }
+
+  /* hero right - stats */
+  .hero-right {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    gap: 20px;
+  }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    padding: 22px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .stat-label {
+    font-size: 12px; color: var(--text-mute);
+    text-transform: uppercase; letter-spacing: 0.16em;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .stat-value {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 36px; font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-top: 8px;
+  }
+  .stat-value .unit { font-size: 14px; color: var(--text-mute); margin-left: 6px; font-weight: 500; }
+  .stat-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  /* ring chart */
+  .ring-wrap { display: flex; align-items: center; gap: 18px; margin-top: 14px; }
+  .ring {
+    width: 86px; height: 86px;
+    position: relative;
+    flex-shrink: 0;
+  }
+  .ring svg { transform: rotate(-90deg); }
+  .ring circle {
+    fill: none;
+    stroke-width: 10;
+    stroke-linecap: round;
+  }
+  .ring .track { stroke: var(--surface-2); }
+  .ring .bar {
+    stroke: url(#g1);
+    stroke-dasharray: 251;
+    stroke-dashoffset: 251;
+    transition: stroke-dashoffset 1.4s ease;
+  }
+  .ring-num {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    font-family: 'Space Grotesk', sans-serif;
+  }
+  .ring-num b { font-size: 22px; font-weight: 700; }
+  .ring-num span { font-size: 10px; color: var(--text-mute); text-transform: uppercase; letter-spacing: 0.1em; }
+  .stat-detail { flex: 1; font-size: 13px; color: var(--text-soft); }
+  .stat-detail .row { display: flex; justify-content: space-between; padding: 4px 0; }
+  .stat-detail .row b { color: var(--text); font-weight: 600; }
+
+  /* trend bar */
+  .trend { display: flex; align-items: flex-end; gap: 4px; height: 50px; margin-top: 16px; }
+  .trend .b {
+    flex: 1; background: linear-gradient(180deg, var(--cyan), rgba(94,234,212,0.2));
+    border-radius: 3px 3px 0 0;
+    opacity: 0.85;
+  }
+
+  /* main grid */
+  .main {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 28px;
+    margin-top: 12px;
+    padding-bottom: 80px;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    overflow: hidden;
+  }
+  .card-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 26px;
+    border-bottom: 1px solid var(--border);
+  }
+  .card-head h3 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 17px; font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .lang-tabs {
+    display: inline-flex;
+    background: var(--surface-2);
+    border-radius: 10px;
+    padding: 4px;
+    gap: 2px;
+  }
+  .lang-tabs button {
+    background: transparent; border: 0; color: var(--text-mute);
+    padding: 7px 14px; border-radius: 7px;
+    font-family: inherit; font-size: 13px; cursor: pointer;
+    transition: all .2s ease;
+  }
+  .lang-tabs button.on {
+    color: var(--text); background: rgba(94,234,212,0.12);
+    box-shadow: inset 0 0 0 1px rgba(94,234,212,0.3);
+  }
+
+  .article { padding: 28px 32px 36px; }
+  .article h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 22px; font-weight: 600;
+    margin: 32px 0 14px;
+    padding-left: 14px;
+    border-left: 3px solid;
+    border-image: linear-gradient(180deg, var(--cyan), var(--violet)) 1;
+    letter-spacing: -0.01em;
+  }
+  .article h2:first-child { margin-top: 6px; }
+  .article p {
+    color: var(--text-soft);
+    font-size: 15.5px;
+    line-height: 1.75;
+    margin: 8px 0 6px;
+  }
+  .article code, .article em {
+    font-family: 'JetBrains Mono', monospace;
+    font-style: italic;
+    color: var(--cyan);
+    font-size: 0.94em;
+    padding: 1px 7px;
+    background: rgba(94,234,212,0.08);
+    border-radius: 5px;
+    border: 1px solid rgba(94,234,212,0.18);
+  }
+  .article strong {
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  /* sample pair */
+  .samples {
+    display: grid;
+    grid-template-columns: 1fr 28px 1fr;
+    gap: 0;
+    align-items: stretch;
+    margin: 18px 0 8px;
+  }
+  .sample-col { display: flex; flex-direction: column; gap: 10px; }
+  .sample-col h4 {
+    font-size: 12px; color: var(--text-mute);
+    text-transform: uppercase; letter-spacing: 0.14em;
+    font-weight: 600;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .sample-col h4 .num {
+    width: 22px; height: 22px;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: var(--surface-2); border-radius: 6px;
+    font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text);
+  }
+  .ide {
+    background: var(--bg-1);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 12px 30px -16px rgba(0,0,0,0.6);
+  }
+  .ide-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 12px;
+    background: var(--bg-2);
+    border-bottom: 1px solid var(--border);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; color: var(--text-mute);
+  }
+  .ide-bar .dots { display: flex; gap: 6px; }
+  .ide-bar .dots i {
+    width: 9px; height: 9px; border-radius: 50%;
+    display: inline-block;
+  }
+  .ide-bar .dots i:nth-child(1) { background: #ff6b6b; }
+  .ide-bar .dots i:nth-child(2) { background: #ffd43b; }
+  .ide-bar .dots i:nth-child(3) { background: #51cf66; }
+  .ide-actions { display: flex; gap: 8px; }
+  .ide-actions a {
+    color: var(--text-mute); cursor: pointer;
+    padding: 2px 8px; border-radius: 5px;
+    text-decoration: none; font-size: 11px;
+  }
+  .ide-actions a:hover { color: var(--text); background: var(--surface-2); }
+  .ide-body {
+    padding: 14px 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text);
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px;
+    min-height: 56px;
+  }
+  .ide-body .ln { color: var(--text-mute); margin-right: 10px; user-select: none; }
+  .ide-body .v { flex: 1; }
+  .arrow {
+    align-self: center;
+    width: 28px; height: 28px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--violet);
+    font-size: 18px;
+  }
+
+  /* sidebar */
+  .side { display: flex; flex-direction: column; gap: 20px; }
+  .side-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    padding: 22px 24px;
+  }
+  .side-card h4 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 15px; font-weight: 600;
+    margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .side-card h4 .accent-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--cyan), var(--violet));
+    box-shadow: 0 0 10px rgba(94,234,212,0.6);
+  }
+  .cta {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px;
+    padding: 18px;
+    background: linear-gradient(135deg, rgba(94,234,212,0.1), rgba(196,181,253,0.1));
+    border: 1px solid rgba(94,234,212,0.25);
+    border-radius: 16px;
+    margin-bottom: 8px;
+  }
+  .cta .text { font-size: 14px; }
+  .cta .text b { display: block; font-size: 15px; font-weight: 600; }
+  .cta .text small { color: var(--text-mute); font-size: 12px; }
+  .cta button {
+    background: var(--text); color: var(--bg-0);
+    border: 0; border-radius: 10px;
+    padding: 9px 16px; font-weight: 600;
+    font-family: inherit; font-size: 13px; cursor: pointer;
+  }
+  .menu { display: flex; flex-direction: column; }
+  .menu a {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 4px;
+    color: var(--text-soft);
+    font-size: 14px;
+    text-decoration: none;
+    border-bottom: 1px dashed var(--border);
+  }
+  .menu a:last-child { border-bottom: 0; }
+  .menu a:hover { color: var(--text); }
+  .menu a .l { display: flex; align-items: center; gap: 10px; }
+  .menu a .l svg { width: 15px; height: 15px; opacity: .7; }
+  .menu a .badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--text-mute);
+    background: var(--surface-2);
+    padding: 2px 8px;
+    border-radius: 999px;
+  }
+
+  .contest {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    margin-bottom: 8px;
+    cursor: pointer;
+  }
+  .contest:hover { border-color: var(--border-strong); }
+  .contest .l { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+  .contest .l .ico {
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--pink), var(--violet));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+  }
+  .contest .r { font-size: 12px; color: var(--text-mute); font-family: 'JetBrains Mono', monospace; }
+
+  /* tags cloud */
+  .tag-cloud { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag-cloud span {
+    font-size: 12px;
+    padding: 4px 10px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    color: var(--text-soft);
+  }
+
+  /* author */
+  .author {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+  }
+  .avatar {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--cyan), var(--violet));
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; color: #0a0a0a;
+    font-size: 16px;
+    box-shadow: 0 4px 16px -4px rgba(94,234,212,0.5);
+  }
+  .author .meta { line-height: 1.3; }
+  .author .meta b { font-size: 14px; }
+  .author .meta small { display: block; color: var(--text-mute); font-size: 12px; }
+
+  /* footer */
+  .foot {
+    margin-top: 30px;
+    border-top: 1px solid var(--border);
+    padding: 32px 0 60px;
+    color: var(--text-mute);
+    font-size: 13px;
+    display: flex; justify-content: space-between;
+  }
+  .foot a { color: var(--text-soft); text-decoration: none; margin-left: 28px; }
+  .foot a:hover { color: var(--text); }
+
+  /* theme toggle button */
+  .theme-toggle {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--text-soft);
+    cursor: pointer;
+    transition: all .2s ease;
+  }
+  .theme-toggle:hover { color: var(--text); border-color: var(--border-strong); }
+  .theme-toggle svg { width: 18px; height: 18px; }
+  .theme-toggle .icon-sun { display: none; }
+  .theme-toggle .icon-moon { display: block; }
+  html[data-theme="light"] .theme-toggle .icon-sun { display: block; }
+  html[data-theme="light"] .theme-toggle .icon-moon { display: none; }
+
+  /* ============================================================
+     LIGHT THEME — Vercel / Geist minimalist black & white
+     ============================================================ */
+  html[data-theme="light"] {
+    --bg-0: #ffffff;
+    --bg-1: #fafafa;
+    --bg-2: #f5f5f5;
+    --surface: #ffffff;
+    --surface-2: #f7f7f7;
+    --border: #eaeaea;
+    --border-strong: #d1d1d1;
+    --text: #000000;
+    --text-soft: #444444;
+    --text-mute: #8f8f8f;
+    /* neutralize accents to monochrome for the Geist look */
+    --cyan: #171717;
+    --blue: #444444;
+    --violet: #171717;
+    --pink: #666666;
+    --amber: #171717;
+    --green: #171717;
+    --red: #171717;
+  }
+  /* remove the colored glows & soften the grid */
+  html[data-theme="light"] body::before { background: none; }
+  html[data-theme="light"] body::after {
+    background-image:
+      linear-gradient(rgba(0,0,0,0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,0,0,0.035) 1px, transparent 1px);
+  }
+  html[data-theme="light"] .nav { background: rgba(255,255,255,0.8); }
+  /* brand mark → solid black square */
+  html[data-theme="light"] .brand-mark {
+    background: #000; box-shadow: none;
+  }
+  html[data-theme="light"] .brand-mark::after { background: #fff; }
+  html[data-theme="light"] .nav-link.active::after { background: #000; }
+  /* primary button → black on white (Geist) */
+  html[data-theme="light"] .btn-primary {
+    background: #000; color: #fff; box-shadow: none;
+  }
+  /* hero */
+  html[data-theme="light"] .hero-left { background: var(--surface); }
+  html[data-theme="light"] .hero-left::before { background: none; }
+  html[data-theme="light"] .eyebrow {
+    color: var(--text-soft);
+    border-color: var(--border);
+    background: var(--surface-2);
+  }
+  html[data-theme="light"] .eyebrow .dot { background: #000; box-shadow: none; }
+  html[data-theme="light"] .hero-title .id {
+    background: none; -webkit-background-clip: initial; background-clip: initial;
+    color: #000;
+  }
+  html[data-theme="light"] .chip.diff,
+  html[data-theme="light"] .chip.tag {
+    color: var(--text-soft);
+    border-color: var(--border);
+    background: var(--surface-2);
+  }
+  /* ring / stat accents → solid black */
+  html[data-theme="light"] .ring .bar { stroke: #000; }
+  html[data-theme="light"] .trend .b {
+    background: linear-gradient(180deg, #171717, rgba(23,23,23,0.15)) !important;
+  }
+  /* article headings & inline code */
+  html[data-theme="light"] .article h2 {
+    border-image: none;
+    border-left: 3px solid #000;
+  }
+  html[data-theme="light"] .article code,
+  html[data-theme="light"] .article em {
+    color: #171717;
+    background: var(--surface-2);
+    border-color: var(--border);
+  }
+  /* sidebar accents */
+  html[data-theme="light"] .side-card h4 .accent-dot {
+    background: #000; box-shadow: none;
+  }
+  html[data-theme="light"] .cta {
+    background: var(--surface-2);
+    border-color: var(--border);
+  }
+  html[data-theme="light"] .cta button { background: #000; color: #fff; }
+  html[data-theme="light"] .contest .l .ico { background: #171717; }
+  html[data-theme="light"] .avatar {
+    background: #000; color: #fff; box-shadow: none;
+  }
+  html[data-theme="light"] .lang-tabs button.on {
+    background: #fff;
+    color: #000;
+    box-shadow: inset 0 0 0 1px var(--border-strong);
+  }
+  html[data-theme="light"] .arrow { color: var(--text-mute); }
+  html[data-theme="light"] .ide { box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+</style>
+<style data-id="immersive-translate-input-injected-css"></style></head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="nav">
+  <div class="shell nav-inner">
+    <div class="brand">
+      <span class="brand-mark"></span>
+      Hydra
+    </div>
+    <div class="nav-links">
+      <a class="nav-link">首页</a>
+      <a class="nav-link active">题库</a>
+      <a class="nav-link">训练</a>
+      <a class="nav-link">比赛</a>
+      <a class="nav-link">讨论</a>
+      <a class="nav-link">评测记录</a>
+      <a class="nav-link">排名</a>
+    </div>
+    <div class="nav-spacer"></div>
+    <div class="nav-right">
+      <span class="lang-pill">🌐 中文 ▾</span>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="切换明暗主题" title="切换明暗主题">
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path></svg>
+      </button>
+      <span class="btn-ghost">登录</span>
+      <span class="btn-primary">注册</span>
+    </div>
+  </div>
+</nav>
+
+<div class="shell">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-left">
+      <span class="eyebrow"><span class="dot"></span>Problem · Traditional · Beginner</span>
+      <h1 class="hero-title">
+        <span class="id">#H1000</span>A + B
+      </h1>
+      <p class="hero-subtitle">经典入门题。给定两个正整数 a 与 b，输出它们的和。用来熟悉在线评测系统的输入输出流程。</p>
+
+      <div class="hero-meta">
+        <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"></path></svg> ID <strong>56</strong></span>
+        <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg> <strong>1000</strong> ms</span>
+        <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="6" width="18" height="12" rx="2"></rect><path d="M7 10v4M11 10v4M15 10v4"></path></svg> <strong>1024</strong> MiB</span>
+        <span class="chip diff"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8 5.8 21.3l2.4-7.4L2 9.4h7.6z"></path></svg> 难度 <strong>1 / 10</strong></span>
+        <span class="chip tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12l-8 8a4 4 0 0 1-5.66-5.66l8-8a3 3 0 0 1 4.24 4.24l-8 8a2 2 0 0 1-2.83-2.83l7-7"></path></svg> 入门 · 语法 · IO</span>
+      </div>
+    </div>
+
+    <div class="hero-right">
+      <div class="stat-row">
+        <div class="stat-card">
+          <div class="stat-label">通过率</div>
+          <div class="ring-wrap">
+            <div class="ring">
+              <svg width="86" height="86" viewBox="0 0 100 100">
+                <defs>
+                  <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#5eead4"></stop>
+                    <stop offset="100%" stop-color="#c4b5fd"></stop>
+                  </linearGradient>
+                </defs>
+                <circle class="track" cx="50" cy="50" r="40"></circle>
+                <circle class="bar" cx="50" cy="50" r="40" style="stroke-dashoffset: 81"></circle>
+              </svg>
+              <div class="ring-num"><b>45%</b><span>AC</span></div>
+            </div>
+            <div class="stat-detail">
+              <div class="row"><span>提交</span><b>13,592</b></div>
+              <div class="row"><span>通过</span><b>6,145</b></div>
+            </div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">近 7 日提交</div>
+          <div class="stat-value">312<span class="unit">次</span></div>
+          <div class="trend">
+            <div class="b" style="height:30%"></div>
+            <div class="b" style="height:55%"></div>
+            <div class="b" style="height:42%"></div>
+            <div class="b" style="height:70%"></div>
+            <div class="b" style="height:60%"></div>
+            <div class="b" style="height:85%"></div>
+            <div class="b" style="height:78%"></div>
+          </div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">平均用时</div>
+        <div class="stat-value">0.18<span class="unit">秒</span></div>
+        <div class="trend">
+          <div class="b" style="height:22%;background:linear-gradient(180deg,#7dd3fc,rgba(125,211,252,0.2))"></div>
+          <div class="b" style="height:30%;background:linear-gradient(180deg,#7dd3fc,rgba(125,211,252,0.2))"></div>
+          <div class="b" style="height:28%;background:linear-gradient(180deg,#7dd3fc,rgba(125,211,252,0.2))"></div>
+          <div class="b" style="height:42%;background:linear-gradient(180deg,#7dd3fc,rgba(125,211,252,0.2))"></div>
+          <div class="b" style="height:36%;background:linear-gradient(180deg,#7dd3fc,rgba(125,211,252,0.2))"></div>
+          <div class="b" style="height:55%;background:linear-gradient(180deg,#7dd3fc,rgba(125,211,252,0.2))"></div>
+          <div class="b" style="height:48%;background:linear-gradient(180deg,#7dd3fc,rgba(125,211,252,0.2))"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MAIN -->
+  <section class="main">
+
+    <!-- LEFT: problem -->
+    <div>
+      <div class="card">
+        <div class="card-head">
+          <h3>题目描述</h3>
+          <div class="lang-tabs">
+            <button class="on">简体中文</button>
+            <button>English</button>
+            <button>正體中文</button>
+          </div>
+        </div>
+
+        <div class="article">
+          <h2>题目描述</h2>
+          <p>给定两个正整数 <em>a</em> 与 <em>b</em>，请计算并输出 <em>a + b</em> 的结果。</p>
+          <p>本题用于帮助你熟悉 <strong>Hydra</strong> 在线评测系统的输入输出与提交流程，请仔细阅读下方格式说明。</p>
+
+          <h2>输入格式</h2>
+          <p>一行，包含两个由空格分隔的正整数 <em>a</em> 与 <em>b</em>。</p>
+
+          <h2>输出格式</h2>
+          <p>一行，输出一个正整数，表示 <em>a + b</em> 的值。</p>
+
+          <h2>样例输入 / 输出</h2>
+          <div class="samples">
+            <div class="sample-col">
+              <h4><span class="num">1</span>输入数据</h4>
+              <div class="ide">
+                <div class="ide-bar">
+                  <span class="dots"><i></i><i></i><i></i></span>
+                  <span>stdin.txt</span>
+                  <span class="ide-actions"><a>Copy</a><a>填充到自测</a></span>
+                </div>
+                <div class="ide-body">
+                  <span class="ln">1</span><span class="v">1 2</span>
+                </div>
+              </div>
+            </div>
+            <div class="arrow">→</div>
+            <div class="sample-col">
+              <h4><span class="num">1</span>输出数据</h4>
+              <div class="ide">
+                <div class="ide-bar">
+                  <span class="dots"><i></i><i></i><i></i></span>
+                  <span>stdout.txt</span>
+                  <span class="ide-actions"><a>Copy</a></span>
+                </div>
+                <div class="ide-body">
+                  <span class="ln">1</span><span class="v">3</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="samples">
+            <div class="sample-col">
+              <h4><span class="num">2</span>输入数据</h4>
+              <div class="ide">
+                <div class="ide-bar">
+                  <span class="dots"><i></i><i></i><i></i></span>
+                  <span>stdin.txt</span>
+                  <span class="ide-actions"><a>Copy</a><a>填充到自测</a></span>
+                </div>
+                <div class="ide-body">
+                  <span class="ln">1</span><span class="v">3 4</span>
+                </div>
+              </div>
+            </div>
+            <div class="arrow">→</div>
+            <div class="sample-col">
+              <h4><span class="num">2</span>输出数据</h4>
+              <div class="ide">
+                <div class="ide-bar">
+                  <span class="dots"><i></i><i></i><i></i></span>
+                  <span>stdout.txt</span>
+                  <span class="ide-actions"><a>Copy</a></span>
+                </div>
+                <div class="ide-body">
+                  <span class="ln">1</span><span class="v">7</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <h2>数据规模与约定</h2>
+          <p>对于 <strong>100%</strong> 的数据，<em>a</em>, <em>b</em> ≤ 10<sup>6</sup>。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: sidebar -->
+    <aside class="side">
+      <div class="side-card">
+        <div class="cta">
+          <div class="text">
+            <b>准备好开题了?</b>
+            <small>登录后即可提交代码</small>
+          </div>
+          <button>提交</button>
+        </div>
+        <div class="menu">
+          <a><span class="l"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>讨论</span><span class="badge">7</span></a>
+          <a><span class="l"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>题解</span><span class="badge">220</span></a>
+          <a><span class="l"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6"></path></svg>附件</span><span class="badge">文件</span></a>
+          <a><span class="l"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"></path><path d="M7 14l4-4 4 4 5-5"></path></svg>统计</span><span class="badge">↗</span></a>
+        </div>
+      </div>
+
+      <div class="side-card">
+        <h4><span class="accent-dot"></span>出题人</h4>
+        <div class="author">
+          <div class="avatar">M</div>
+          <div class="meta">
+            <b>Macesuted</b>
+            <small>已贡献 142 道题目</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="side-card">
+        <h4><span class="accent-dot"></span>出现于比赛</h4>
+        <div class="contest">
+          <div class="l"><div class="ico">🏆</div>LZOJ · Round 01 · Div. 2</div>
+          <div class="r">2024.03</div>
+        </div>
+        <div class="contest">
+          <div class="l"><div class="ico">🏆</div>LZOJ · Round 01 · Div. 1</div>
+          <div class="r">2024.03</div>
+        </div>
+      </div>
+
+      <div class="side-card">
+        <h4><span class="accent-dot"></span>相关标签</h4>
+        <div class="tag-cloud">
+          <span>语法基础</span><span>输入输出</span><span>入门</span><span>数学</span><span>加法</span>
+        </div>
+      </div>
+    </aside>
+  </section>
+
+  <footer class="foot">
+    <div>© 2026 Hydra Online Judge · Crafted with care</div>
+    <div>
+      <a>状态</a>
+      <a>开发</a>
+      <a>支持</a>
+      <a>关于</a>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+  (function () {
+    var root = document.documentElement;
+    var saved = null;
+    try { saved = localStorage.getItem('theme'); } catch (e) {}
+    var initial = saved || (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+    root.setAttribute('data-theme', initial);
+
+    var btn = document.getElementById('themeToggle');
+    if (btn) {
+      btn.addEventListener('click', function () {
+        var next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+        root.setAttribute('data-theme', next);
+        try { localStorage.setItem('theme', next); } catch (e) {}
+      });
+    }
+  })();
+</script>
+
+</body></html>
