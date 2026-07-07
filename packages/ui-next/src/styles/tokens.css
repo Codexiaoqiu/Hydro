@@ -68,6 +68,76 @@
   /* shell */
   --shell-max: 1320px;
   --shell-padding: 28px;
+
+  /* ============================================================
+     Accent tints — translucent fills/borders over the accent colors.
+     Components MUST use these variables instead of hardcoded rgba()
+     so the light theme can remap them to neutral monochrome.
+     ============================================================ */
+  --tint-cyan-04: rgba(94, 234, 212, 0.04);
+  --tint-cyan-06: rgba(94, 234, 212, 0.06);
+  --tint-cyan-08: rgba(94, 234, 212, 0.08);
+  --tint-cyan-10: rgba(94, 234, 212, 0.10);
+  --tint-cyan-12: rgba(94, 234, 212, 0.12);
+  --tint-cyan-18: rgba(94, 234, 212, 0.18);
+  --tint-cyan-20: rgba(94, 234, 212, 0.20);
+  --tint-cyan-25: rgba(94, 234, 212, 0.25);
+  --tint-cyan-30: rgba(94, 234, 212, 0.30);
+  --tint-cyan-40: rgba(94, 234, 212, 0.40);
+  --tint-cyan-50: rgba(94, 234, 212, 0.50);
+  --tint-cyan-60: rgba(94, 234, 212, 0.60);
+
+  --tint-violet-04: rgba(196, 181, 253, 0.04);
+  --tint-violet-06: rgba(196, 181, 253, 0.06);
+  --tint-violet-12: rgba(196, 181, 253, 0.12);
+  --tint-violet-18: rgba(196, 181, 253, 0.18);
+  --tint-violet-25: rgba(196, 181, 253, 0.25);
+  --tint-violet-30: rgba(196, 181, 253, 0.30);
+
+  --tint-blue-14: rgba(125, 211, 252, 0.14);
+  --tint-blue-20: rgba(125, 211, 252, 0.20);
+  --tint-blue-30: rgba(125, 211, 252, 0.30);
+  --tint-blue-40: rgba(125, 211, 252, 0.40);
+
+  --tint-violet-14: rgba(196, 181, 253, 0.14);
+  --tint-violet-16: rgba(196, 181, 253, 0.16);
+
+  --tint-green-04: rgba(134, 239, 172, 0.04);
+  --tint-green-06: rgba(134, 239, 172, 0.06);
+  --tint-green-12: rgba(134, 239, 172, 0.12);
+  --tint-green-30: rgba(134, 239, 172, 0.30);
+
+  /* Body ornament grid lines (dark: white 2.5%, light: black 3.5%). */
+  --tint-grid-dark:  rgba(255, 255, 255, 0.025);
+  --tint-grid-light: rgba(0, 0, 0, 0.035);
+
+  /* Sticky-nav backdrop — translucent in both modes, swapped in light. */
+  --nav-backdrop: rgba(7, 8, 13, 0.65);
+
+  /* ============================================================
+     Accent gradients — semantic names so light mode can replace
+     each with a neutral gradient or solid color.
+     ============================================================ */
+  --gradient-primary:    linear-gradient(135deg, var(--cyan), var(--blue));
+  --gradient-cta:        linear-gradient(135deg, var(--tint-cyan-10), var(--tint-violet-10));
+  --gradient-underline:  linear-gradient(90deg, var(--cyan), var(--violet));
+  --gradient-brand:      conic-gradient(from 220deg at 50% 50%, var(--cyan), var(--violet), var(--pink), var(--blue), var(--cyan));
+  --gradient-avatar:     linear-gradient(135deg, var(--cyan), var(--violet));
+  --gradient-contest:    linear-gradient(135deg, var(--pink), var(--violet));
+  --gradient-trend-cyan: linear-gradient(180deg, var(--cyan), var(--tint-cyan-20));
+  --gradient-trend-blue: linear-gradient(180deg, var(--blue), var(--tint-blue-20));
+  --gradient-article-border: linear-gradient(180deg, var(--cyan), var(--violet));
+
+  /* ============================================================
+     Accent shadows — cyan/violet glows that disappear in light mode.
+     ============================================================ */
+  --shadow-brand-glow:  0 0 24px var(--tint-blue-40);
+  --shadow-primary:     0 6px 24px -8px var(--tint-cyan-60);
+  --shadow-avatar-glow: 0 4px 16px -4px var(--tint-cyan-50);
+  --shadow-ide:         0 12px 30px -16px rgba(0, 0, 0, 0.6);
+
+  /* Text on a bright cyan background (the dark teal used in primary buttons). */
+  --text-on-cyan: #062b29;
 }
 
 [data-theme="light"] {
@@ -89,4 +159,65 @@
   --amber: #171717;
   --green: #171717;
   --red: #171717;
+
+  /* Accent tints → neutral black tints (same alpha, just gray). */
+  --tint-cyan-04: rgba(0, 0, 0, 0.03);
+  --tint-cyan-06: rgba(0, 0, 0, 0.04);
+  --tint-cyan-08: rgba(0, 0, 0, 0.05);
+  --tint-cyan-10: rgba(0, 0, 0, 0.04);
+  --tint-cyan-12: rgba(0, 0, 0, 0.06);
+  --tint-cyan-18: rgba(0, 0, 0, 0.08);
+  --tint-cyan-20: rgba(0, 0, 0, 0.08);
+  --tint-cyan-25: rgba(0, 0, 0, 0.10);
+  --tint-cyan-30: rgba(0, 0, 0, 0.12);
+  --tint-cyan-40: rgba(0, 0, 0, 0.16);
+  --tint-cyan-50: rgba(0, 0, 0, 0.20);
+  --tint-cyan-60: rgba(0, 0, 0, 0.25);
+
+  --tint-violet-04: rgba(0, 0, 0, 0.03);
+  --tint-violet-06: rgba(0, 0, 0, 0.04);
+  --tint-violet-12: rgba(0, 0, 0, 0.06);
+  --tint-violet-18: rgba(0, 0, 0, 0.08);
+  --tint-violet-25: rgba(0, 0, 0, 0.10);
+  --tint-violet-30: rgba(0, 0, 0, 0.12);
+
+  --tint-blue-14: rgba(0, 0, 0, 0.06);
+  --tint-blue-20: rgba(0, 0, 0, 0.08);
+  --tint-blue-30: rgba(0, 0, 0, 0.12);
+  --tint-blue-40: rgba(0, 0, 0, 0.16);
+
+  --tint-violet-14: rgba(0, 0, 0, 0.06);
+  --tint-violet-16: rgba(0, 0, 0, 0.07);
+
+  --tint-green-04: rgba(0, 0, 0, 0.03);
+  --tint-green-06: rgba(0, 0, 0, 0.04);
+  --tint-green-12: rgba(0, 0, 0, 0.06);
+  --tint-green-30: rgba(0, 0, 0, 0.12);
+
+  /* Body ornament grid lines — flipped in light mode. */
+  --tint-grid-dark:  var(--tint-grid-light);
+  --tint-grid-light: rgba(0, 0, 0, 0.035);
+
+  /* Sticky-nav backdrop → white translucent in light mode. */
+  --nav-backdrop: rgba(255, 255, 255, 0.8);
+
+  /* Accent gradients → solid black or neutral surface. */
+  --gradient-primary:    linear-gradient(135deg, #000, #171717);
+  --gradient-cta:        var(--surface-2);
+  --gradient-underline:  #000;
+  --gradient-brand:      #000;
+  --gradient-avatar:     #000;
+  --gradient-contest:    #171717;
+  --gradient-trend-cyan: linear-gradient(180deg, #171717, rgba(23, 23, 23, 0.15));
+  --gradient-trend-blue: linear-gradient(180deg, #444444, rgba(68, 68, 68, 0.15));
+  --gradient-article-border: #000;
+
+  /* Accent shadows → none (or very soft). */
+  --shadow-brand-glow:  none;
+  --shadow-primary:     none;
+  --shadow-avatar-glow: none;
+  --shadow-ide:         0 1px 3px rgba(0, 0, 0, 0.06);
+
+  /* Text on a primary button → white (the button itself is black in light mode). */
+  --text-on-cyan: #ffffff;
 }

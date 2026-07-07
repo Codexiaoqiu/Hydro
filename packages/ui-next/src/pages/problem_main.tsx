@@ -1,26 +1,184 @@
-import { Card } from '../components/primitives/Card';
-import { Chip } from '../components/primitives/Chip';
-import { LangPill } from '../components/nav/LangPill';
-import { NavLink } from '../components/nav/NavLink';
-import { TopNav } from '../components/nav/TopNav';
-import { ThemeToggle } from '../components/ThemeToggle';
+import { useMemo, useState } from 'react';
+import { STATUS, STATUS_SHORT_TEXTS } from '@hydrooj/common';
 import { Button } from '../components/primitives/Button';
-import { Ring } from '../components/charts/Ring';
-import { TagCloud } from '../components/primitives/TagCloud';
-import { Author } from '../components/sidebar/Author';
-import { ContestList } from '../components/sidebar/ContestList';
+import { Card } from '../components/primitives/Card';
 import { CtaCard } from '../components/sidebar/CtaCard';
-import { usePageData } from '../context/page-data';
+import { Eyebrow } from '../components/primitives/Eyebrow';
+import { LangPill } from '../components/nav/LangPill';
 import { Link } from '../components/link';
+import { NavLink } from '../components/nav/NavLink';
+import { TagCloud } from '../components/primitives/TagCloud';
+import { ThemeToggle } from '../components/ThemeToggle';
+import { TopNav } from '../components/nav/TopNav';
+import { usePageData } from '../context/page-data';
+import { useBuildUrl } from '../hooks/use-build-url';
+import styles from './problem_main.module.css';
 
-const SAMPLE = [
-  { id: 'H1000', title: 'A + B Problem', tags: ['入门', 'IO'], difficulty: 1, acRate: 45 },
-  { id: 'H1001', title: 'Sort the Array', tags: ['排序', '基础'], difficulty: 2, acRate: 60 },
-  { id: 'H1002', title: 'Binary Search', tags: ['二分', '基础'], difficulty: 3, acRate: 38 },
-];
+interface Pdoc {
+  docId: number;
+  pid?: string;
+  domainId: string;
+  title: string;
+  tag?: string[];
+  hidden?: boolean;
+  nSubmit: number;
+  nAccept: number;
+  difficulty?: number;
+}
+
+interface Psdoc {
+  rid?: string | null;
+  status?: number;
+  star?: string | string[];
+}
+
+interface ProblemArgs {
+  page?: number;
+  pcount?: number;
+  ppcount?: number;
+  pcountRelation?: string;
+  pdocs?: Pdoc[];
+  psdict?: Record<string, Psdoc>;
+  qs?: string;
+  sort?: 'default' | 'recent';
+}
+
+interface ProblemCategory {
+  [k: string]: string[] | undefined;
+}
+
+const difficultyLabel = (d: number | undefined): string => {
+  if (typeof d !== 'number' || !Number.isFinite(d)) return '—';
+  if (d <= 0) return '入门';
+  if (d === 1) return '★';
+  if (d === 2) return '★★';
+  if (d === 3) return '★★★';
+  if (d === 4) return '★★★★';
+  return `★${Math.min(d, 10)}`;
+};
+
+const formatPid = (pdoc: Pdoc): string => {
+  const id = pdoc.pid || String(pdoc.docId);
+  return id.includes('-') ? id.split('-').join('#') : id;
+};
+
+const statusClass = (status: number | undefined): string => {
+  if (status === undefined) return styles.statusIgnore;
+  if (status === STATUS.STATUS_ACCEPTED) return styles.statusPass;
+  if (status === STATUS.STATUS_CANCELED || status === STATUS.STATUS_IGNORED) return styles.statusIgnore;
+  return styles.statusFail;
+};
+
+const statusLabel = (status: number | undefined): string => {
+  if (status === undefined) return '—';
+  return STATUS_SHORT_TEXTS[status as STATUS] || '…';
+};
+
+function SearchIcon() {
+  return (
+    <svg className={styles.searchIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <circle cx="11" cy="11" r="7" />
+      <path d="m20 20-3.5-3.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function Pager({ page, ppcount, qs, sort, buildUrl }: {
+  page: number;
+  ppcount: number;
+  qs: string;
+  sort: string;
+  buildUrl: ReturnType<typeof useBuildUrl>;
+}) {
+  if (!ppcount || ppcount <= 1) return null;
+
+  const buildHref = (p: number) => {
+    const params: Record<string, string> = { page: String(p) };
+    if (qs) params.q = qs;
+    if (sort && sort !== 'default') params.sort = sort;
+    return buildUrl('problem_main', {}, params);
+  };
+
+  const items: Array<number | 'gap'> = [];
+  const window = 1;
+  if (ppcount <= 7) {
+    for (let i = 1; i <= ppcount; i++) items.push(i);
+  } else {
+    items.push(1);
+    if (page - window > 2) items.push('gap');
+    for (let i = Math.max(2, page - window); i <= Math.min(ppcount - 1, page + window); i++) items.push(i);
+    if (page + window < ppcount - 1) items.push('gap');
+    items.push(ppcount);
+  }
+
+  return (
+    <nav className={styles.pager} aria-label="pagination">
+      {items.map((it, idx) => {
+        if (it === 'gap') {
+          return <span key={`g-${idx}`} className={styles.pagerGap}>…</span>;
+        }
+        const active = it === page;
+        return (
+          <Link
+            key={it}
+            href={buildHref(it)}
+            className={`${styles.pagerItem} ${active ? styles.pagerActive : ''}`}
+          >
+            {it}
+          </Link>
+        );
+      })}
+    </nav>
+  );
+}
 
 export default function ProblemMain() {
-  const { UserContext } = usePageData() as any;
+  const pageData = usePageData() as any;
+  const { UserContext, UiContext } = pageData.args;
+  const args: ProblemArgs = pageData.args;
+  const buildUrl = useBuildUrl();
+
+  const pdocs = args.pdocs || [];
+  const psdict = args.psdict || {};
+  const page = Math.max(1, args.page || 1);
+  const ppcount = Math.max(0, args.ppcount || 0);
+  const pcount = Math.max(0, args.pcount || 0);
+  const qs = args.qs || '';
+  const sort = args.sort || 'default';
+
+  const [query, setQuery] = useState(qs);
+
+  const categorySetting = (UiContext?.problemCategories || {}) as ProblemCategory;
+
+  const flatTags = useMemo(() => {
+    const tags = new Set<string>();
+    for (const p of pdocs) (p.tag || []).forEach((t) => tags.add(t));
+    return Array.from(tags).slice(0, 16);
+  }, [pdocs]);
+
+  const submitSearch = (e?: React.FormEvent) => {
+    e?.preventDefault();
+    const params: Record<string, string> = {};
+    if (query) params.q = query;
+    if (sort && sort !== 'default') params.sort = sort;
+    const href = buildUrl('problem_main', {}, params);
+    window.location.href = href;
+  };
+
+  const sortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const params: Record<string, string> = {};
+    if (qs) params.q = qs;
+    if (e.target.value && e.target.value !== 'default') params.sort = e.target.value;
+    window.location.href = buildUrl('problem_main', {}, params);
+  };
+
+  const extraTitle = UiContext?.extraTitleContent as string | undefined;
+  const statText = pcount > 0
+    ? (args.pcountRelation === 'eq' ? `${pcount} 道题目` : `${pcount}+ 道题目`)
+    : '暂无题目';
+
+  const tagQuery = (tag: string) => `category:${tag.includes(' ') ? `"${tag}"` : tag}`;
+
   return (
     <>
       <TopNav
@@ -30,8 +188,12 @@ export default function ProblemMain() {
           <>
             <LangPill label={UserContext?.viewLangName || '中文'} />
             <ThemeToggle />
-            <Button variant="ghost">登录</Button>
-            <Button variant="primary">注册</Button>
+            <Button variant="ghost" onClick={() => { window.location.href = '/login'; }}>
+              登录
+            </Button>
+            <Button variant="primary" onClick={() => { window.location.href = '/register'; }}>
+              注册
+            </Button>
           </>
         }
       >
@@ -41,48 +203,186 @@ export default function ProblemMain() {
         <NavLink to="discussion_main">讨论</NavLink>
       </TopNav>
 
-      <div style={{ maxWidth: 'var(--shell-max)', margin: '0 auto', padding: 'var(--shell-padding)', display: 'grid', gridTemplateColumns: '1fr 320px', gap: 'var(--space-6)' }}>
-        <div>
-          <Card variant="default" header={
-            <h3 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-xl)', fontWeight: 600 }}>题目列表</h3>
-          }>
-            <div>
-              {SAMPLE.map((p) => (
-                <div key={p.id} style={{ display: 'grid', gridTemplateColumns: '60px 1fr 120px 80px', alignItems: 'center', gap: 'var(--space-3)', padding: 'var(--space-3) var(--space-6)', borderBottom: '1px solid var(--border)' }}>
-                  <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-mute)' }}>{p.id}</span>
-                  <Link to="problem_detail" style={{ color: 'var(--text)' }}>{p.title}</Link>
-                  <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-                    {p.tags.map((t) => <Chip key={t} variant="tag">{t}</Chip>)}
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-                    <Ring percent={p.acRate} size={32} strokeWidth={4} />
-                    <Chip variant="diff">★ {p.difficulty}</Chip>
-                  </div>
+      <div className={styles.shell}>
+        <main>
+          <Card
+            variant="default"
+            header={
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+                <div className={styles.crumbs}>
+                  <Eyebrow dot={false}>题库 / Problems</Eyebrow>
+                  {extraTitle && <span className={styles.crumb}>· {extraTitle}</span>}
                 </div>
-              ))}
+                <h3 style={{
+                  fontFamily: 'var(--font-display)',
+                  fontSize: 'var(--text-xl)',
+                  fontWeight: 600,
+                  letterSpacing: '-0.01em',
+                  margin: 0,
+                }}
+                >
+                  题目列表
+                </h3>
+              </div>
+            }
+          >
+            <div className={styles.toolbar}>
+              <form className={styles.toolbarRow} onSubmit={submitSearch}>
+                <label className={styles.search}>
+                  <SearchIcon />
+                  <input
+                    type="text"
+                    name="q"
+                    placeholder="搜索题目 ID / 标题 / 标签…"
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    aria-label="搜索题目"
+                  />
+                </label>
+                <select
+                  className={styles.select}
+                  name="sort"
+                  value={sort}
+                  onChange={sortChange}
+                  aria-label="排序方式"
+                >
+                  <option value="default">默认排序</option>
+                  <option value="recent">最新优先</option>
+                </select>
+              </form>
+              <div className={styles.stat}>{statText}</div>
             </div>
-          </Card>
-        </div>
 
-        <aside style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
-          <Card variant="side">
-            <CtaCard title="准备好开刷了？" subtitle="登录后即可提交代码" actionLabel="登录" />
+            {pdocs.length === 0 ? (
+              <div className={styles.empty}>
+                当前筛选下没有题目。试试清空搜索,或者从侧边栏的分类开始浏览。
+              </div>
+            ) : (
+              <>
+                <div className={styles.list}>
+                  {pdocs.map((p) => {
+                    const ps = psdict[String(p.docId)];
+                    const acRate = p.nSubmit > 0 ? Math.round((p.nAccept / p.nSubmit) * 100) : 0;
+                    const status = ps?.status;
+                    const hasStatus = status !== undefined && ps?.rid;
+                    return (
+                      <div key={p.docId} className={styles.row}>
+                        <div className={styles.id}>{formatPid(p)}</div>
+
+                        <div className={styles.title}>
+                          <Link
+                            to="problem_detail"
+                            params={{ pid: p.pid || String(p.docId) }}
+                            className={styles.titleLink}
+                            title={p.title}
+                          >
+                            {p.title}
+                            {p.hidden && <span className={styles.hidden}> · Hidden</span>}
+                          </Link>
+                          {p.tag && p.tag.length > 0 && (
+                            <div className={styles.tags}>
+                              {p.tag.slice(0, 5).map((t) => (
+                                <Link
+                                  key={t}
+                                  href={buildUrl('problem_main', {}, { q: tagQuery(t) })}
+                                  className={styles.tagLink}
+                                >
+                                  {t}
+                                </Link>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+
+                        <div className={styles.ac}>
+                          <strong>{p.nAccept}</strong>
+                          <span>/ {p.nSubmit}</span>
+                        </div>
+
+                        <div className={styles.ac} title={`通过率 ${acRate}%`}>
+                          <strong>{acRate}%</strong>
+                          <span style={{ fontSize: 'var(--text-xs)' }}>通过率</span>
+                        </div>
+
+                        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                          {hasStatus ? (
+                            <span className={`${styles.status} ${statusClass(status)}`}>
+                              {statusLabel(status)}
+                            </span>
+                          ) : (
+                            <span className={`${styles.diff} ${!p.difficulty ? styles.diffNone : ''}`}>
+                              {difficultyLabel(p.difficulty)}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+                <Pager page={page} ppcount={ppcount} qs={qs} sort={sort} buildUrl={buildUrl} />
+              </>
+            )}
           </Card>
+        </main>
+
+        <aside className={styles.sidebar}>
           <Card variant="side">
-            <h4 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-base)', fontWeight: 600, marginBottom: 'var(--space-3)' }}>热门标签</h4>
-            <TagCloud tags={['语法基础', '输入输出', '入门', '数学', '排序', '二分', '图论', '动态规划']} />
+            <CtaCard
+              title="准备好开刷了?"
+              subtitle="登录后即可提交代码、查看状态"
+              actionLabel="登录"
+              onAction={() => { window.location.href = '/login'; }}
+            />
           </Card>
+
+          {Object.keys(categorySetting).length > 0 && (
+            <Card variant="side">
+              <h4 className={styles.sideTitle}>分类</h4>
+              <div className={styles.catList}>
+                {Object.entries(categorySetting).map(([cat, subs]) => (
+                  <div key={cat}>
+                    <Link
+                      href={buildUrl('problem_main', {}, { q: tagQuery(cat) })}
+                      className={styles.catItem}
+                    >
+                      <span>{cat}</span>
+                    </Link>
+                    {Array.isArray(subs) && subs.length > 0 && subs.map((sub) => (
+                      <Link
+                        key={sub}
+                        href={buildUrl('problem_main', {}, { q: tagQuery(sub) })}
+                        className={`${styles.catItem} ${styles.subCat}`}
+                      >
+                        {sub}
+                      </Link>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </Card>
+          )}
+
           <Card variant="side">
-            <h4 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-base)', fontWeight: 600, marginBottom: 'var(--space-3)' }}>活跃出题人</h4>
-            <Author name="Macesuted" contribution="已贡献 142 道题目" />
+            <h4 className={styles.sideTitle}>手气不错</h4>
+            <Link
+              href={qs ? buildUrl('problem_random', {}, { q: qs }) : buildUrl('problem_random')}
+              className={styles.lucky}
+              target="_blank"
+              rel="noopener"
+            >
+              <span aria-hidden>🎲</span> 随机一题
+            </Link>
+            <p className={styles.luckyHint}>
+              根据当前筛选条件随机抽一道题目;清空搜索可以扩展到全题库。
+            </p>
           </Card>
-          <Card variant="side">
-            <h4 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-base)', fontWeight: 600, marginBottom: 'var(--space-3)' }}>进行中的比赛</h4>
-            <ContestList items={[
-              { title: 'Weekly Round 12', date: '今日 20:00' },
-              { title: 'Newbie Contest 03', date: '明日 14:00' },
-            ]} />
-          </Card>
+
+          {flatTags.length > 0 && (
+            <Card variant="side">
+              <h4 className={styles.sideTitle}>本页热门标签</h4>
+              <TagCloud tags={flatTags} />
+            </Card>
+          )}
         </aside>
       </div>
     </>

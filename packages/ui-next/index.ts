@@ -9,7 +9,7 @@ import {
     Context, Handler, Logger,
     NotFoundError, param, size, Types,
 } from 'hydrooj';
-import { THEME_INIT_SCRIPT } from './theme/theme-init';
+import { THEME_INIT_SCRIPT } from './src/theme/theme-init';
 
 const logger = new Logger('ui-next');
 
@@ -202,7 +202,7 @@ export async function apply(ctx: Context) {
                     route_map: ctx.server.routeMap,
                     endpoint: ctx.setting.get('server.url') || undefined,
                 }, serializer(false, context.handler));
-                const htmlToRender = html.replace(INJECT_MARKER, buildInject(serialized)).replace('</head>', `${THEME_INIT_SCRIPT}</head>`);
+                const htmlToRender = html.replace(INJECT_MARKER, buildInject(serialized)).replace('</head>', `<script>${THEME_INIT_SCRIPT}</script></head>`);
                 return await vite.transformIndexHtml(context.handler.context.req.url!, htmlToRender);
             },
         });
@@ -222,7 +222,7 @@ export async function apply(ctx: Context) {
             async render(_name, args, context) {
                 const indexHtml = path.join(__dirname, 'public', 'index.html');
                 if (!fs.existsSync(indexHtml)) return PENDING_HTML;
-                const html = fs.readFileSync(indexHtml, 'utf-8').replace('</head>', `${THEME_INIT_SCRIPT}</head>`);
+                const html = fs.readFileSync(indexHtml, 'utf-8').replace('</head>', `<script>${THEME_INIT_SCRIPT}</script></head>`);
                 const serialized = JSON.stringify({
                     HYDRO_INJECTED: true,
                     name: context.handler.context._matchedRouteName,

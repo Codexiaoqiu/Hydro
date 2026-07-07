@@ -1,4 +1,4 @@
-.cta { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); padding: var(--space-4); background: linear-gradient(135deg, rgba(94,234,212,0.1), rgba(196,181,253,0.1)); border: 1px solid rgba(94,234,212,0.25); border-radius: var(--radius-lg); margin-bottom: var(--space-2); transition: all var(--motion-slow); }
+.cta { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); padding: var(--space-4); background: var(--gradient-cta); border: 1px solid var(--tint-cyan-25); border-radius: var(--radius-lg); margin-bottom: var(--space-2); transition: all var(--motion-slow); }
 .text { font-size: var(--text-sm); }
 .text b { display: block; font-size: var(--text-base); font-weight: 600; }
 .text small { color: var(--text-mute); font-size: var(--text-xs); }

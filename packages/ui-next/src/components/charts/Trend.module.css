@@ -1,4 +1,4 @@
 .trend { display: flex; align-items: flex-end; gap: 4px; height: 50px; }
-.bar { flex: 1; background: linear-gradient(180deg, var(--cyan), rgba(94,234,212,0.2)); border-radius: 3px 3px 0 0; opacity: 0.85; transition: opacity var(--motion-base); }
+.bar { flex: 1; background: var(--gradient-trend-cyan); border-radius: 3px 3px 0 0; opacity: 0.85; transition: opacity var(--motion-base); }
 .bar:hover { opacity: 1; }
-.blue { background: linear-gradient(180deg, var(--blue), rgba(125,211,252,0.2)); }
+.blue { background: var(--gradient-trend-blue); }

@@ -1,5 +1,5 @@
 .btn { display: inline-flex; align-items: center; justify-content: center; padding: 7px 16px; border-radius: var(--radius-md); font-size: var(--text-sm); font-weight: 600; transition: background-color var(--motion-base), color var(--motion-base), box-shadow var(--motion-base); }
-.primary { background: linear-gradient(135deg, var(--cyan), var(--blue)); color: #062b29; box-shadow: var(--shadow-2); }
+.primary { background: var(--gradient-primary); color: var(--text-on-cyan); box-shadow: var(--shadow-primary); }
 .primary:hover { filter: brightness(1.05); }
 .ghost { background: transparent; color: var(--text-soft); }
 .ghost:hover { background: var(--surface-2); color: var(--text); }

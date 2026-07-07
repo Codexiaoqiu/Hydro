@@ -43,7 +43,7 @@ function createRouteMapStore(initial: Record<string, string>): RouteMapStore {
 
 export const routeMapStore: RouteMapStore = import.meta.hot?.data?.routeMapStore
   ?? createRouteMapStore(injectionData.route_map || {});
-if (import.meta.hot) import.meta.hot.data.routeMapStore = routeMapStore;
+if (import.meta.hot?.data) import.meta.hot.data.routeMapStore = routeMapStore;
 
 export const endpoints: string[] = (() => {
   if (hydroDomains.length) {

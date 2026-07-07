@@ -12,10 +12,12 @@ export function useBuildUrl() {
   const { domainId, domain } = useUiContext();
 
   const getPrefix = useCallback((id?: string) => {
-    id ||= domainId;
-    const domainHost = Array.isArray(domain.host) ? domain.host : [domain.host];
+    id ||= domainId || 'system';
+    const host = domain?.host;
+    const domainHost = Array.isArray(host) ? host : host ? [host] : [];
     const currentHost = window.location.host;
-    return id === (domainHost && domainHost.includes(currentHost) ? domainId : 'system') ? '' : `/d/${id}`;
+    const rootDomainId = domainHost.includes(currentHost) ? domainId : 'system';
+    return id === rootDomainId ? '' : `/d/${id}`;
   }, [domainId, domain]);
 
   return useCallback((name: string, params: UrlParams = {}, searchParams: Record<string, string> = {}): string => {
