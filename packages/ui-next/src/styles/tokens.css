@@ -1,0 +1,92 @@
+:root {
+  /* colors — dark default */
+  --bg-0: #07080d;
+  --bg-1: #0c0f1a;
+  --bg-2: #121728;
+  --surface: rgba(255,255,255,0.03);
+  --surface-2: rgba(255,255,255,0.06);
+  --border: rgba(255,255,255,0.08);
+  --border-strong: rgba(255,255,255,0.16);
+  --text: #e8ecf3;
+  --text-soft: #a7b0c2;
+  --text-mute: #6b748a;
+  --cyan: #5eead4;
+  --blue: #7dd3fc;
+  --violet: #c4b5fd;
+  --pink: #f0abfc;
+  --amber: #fcd34d;
+  --green: #86efac;
+  --red: #fca5a5;
+
+  /* typography */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
+  --font-display: 'Space Grotesk', 'Inter', sans-serif;
+
+  --text-xs: 11px;
+  --text-sm: 13px;
+  --text-base: 14px;
+  --text-md: 15.5px;
+  --text-lg: 16px;
+  --text-xl: 17px;
+  --text-2xl: 22px;
+  --text-3xl: 36px;
+  --text-4xl: 64px;
+
+  --leading-tight: 1.05;
+  --leading-snug: 1.3;
+  --leading-normal: 1.55;
+  --leading-relaxed: 1.75;
+
+  /* spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 22px;
+  --space-6: 28px;
+  --space-7: 36px;
+  --space-8: 56px;
+
+  /* radius */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 22px;
+  --radius-pill: 999px;
+
+  /* shadow */
+  --shadow-1: 0 1px 3px rgba(0,0,0,0.06);
+  --shadow-2: 0 6px 24px -8px rgba(94,234,212,0.6);
+  --shadow-3: 0 12px 30px -16px rgba(0,0,0,0.6);
+
+  /* motion */
+  --motion-fast: 150ms ease;
+  --motion-base: 200ms ease;
+  --motion-slow: 350ms ease;
+
+  /* shell */
+  --shell-max: 1320px;
+  --shell-padding: 28px;
+}
+
+[data-theme="light"] {
+  --bg-0: #ffffff;
+  --bg-1: #fafafa;
+  --bg-2: #f5f5f5;
+  --surface: #ffffff;
+  --surface-2: #f7f7f7;
+  --border: #eaeaea;
+  --border-strong: #d1d1d1;
+  --text: #000000;
+  --text-soft: #444444;
+  --text-mute: #8f8f8f;
+  /* neutralize accents to monochrome for the Geist look */
+  --cyan: #171717;
+  --blue: #444444;
+  --violet: #171717;
+  --pink: #666666;
+  --amber: #171717;
+  --green: #171717;
+  --red: #171717;
+}

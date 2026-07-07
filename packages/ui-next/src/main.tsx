@@ -1,3 +1,7 @@
+import './styles/tokens.css';
+import './styles/reset.css';
+import './styles/globals.css';
+
 import './pages';
 
 import { StrictMode } from 'react';
@@ -8,6 +12,7 @@ import { PageDataProvider } from './context/page-data';
 import { RouterProvider } from './context/router';
 import { initialPage, pluginsUrl } from './globals';
 import { installPlugin } from './registry';
+import { ThemeProvider } from './theme/ThemeProvider';
 
 declare global {
   interface Window {
@@ -47,10 +52,12 @@ await loadPlugins();
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <PageDataProvider initial={initialPage}>
-      <RouterProvider>
-        <App />
-      </RouterProvider>
-    </PageDataProvider>
+    <ThemeProvider>
+      <PageDataProvider initial={initialPage}>
+        <RouterProvider>
+          <App />
+        </RouterProvider>
+      </PageDataProvider>
+    </ThemeProvider>
   </StrictMode>,
 );

@@ -1,0 +1,3 @@
+.tabs { display: inline-flex; background: var(--surface-2); border-radius: var(--radius-md); padding: 4px; gap: 2px; }
+.tab { background: transparent; border: 0; color: var(--text-mute); padding: 7px var(--space-3); border-radius: 7px; font-size: var(--text-sm); transition: all var(--motion-base); }
+.tab.on { color: var(--text); background: rgba(94,234,212,0.12); box-shadow: inset 0 0 0 1px rgba(94,234,212,0.3); }

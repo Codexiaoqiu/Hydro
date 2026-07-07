@@ -1,0 +1,7 @@
+.wrap { display: inline-flex; align-items: center; justify-content: center; position: relative; flex-shrink: 0; }
+.svg { transform: rotate(-90deg); }
+.track { fill: none; stroke: var(--surface-2); }
+.bar { fill: none; stroke: url(#hydro-ring-gradient); stroke-linecap: round; transition: stroke-dashoffset 1.4s ease; }
+.center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: var(--font-display); }
+.big { font-size: 22px; font-weight: 700; }
+.small { font-size: 10px; color: var(--text-mute); text-transform: uppercase; letter-spacing: 0.1em; }

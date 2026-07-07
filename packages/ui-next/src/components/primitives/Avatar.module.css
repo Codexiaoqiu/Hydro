@@ -1,0 +1,1 @@
+.avatar { display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; background: linear-gradient(135deg, var(--cyan), var(--violet)); font-weight: 700; color: #0a0a0a; box-shadow: 0 4px 16px -4px rgba(94,234,212,0.5); }
