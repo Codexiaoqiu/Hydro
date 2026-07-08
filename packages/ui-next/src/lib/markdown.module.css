@@ -1,0 +1,35 @@
+/* Localised copy of Article.module.css typography rules so module CSS remains
+   self-contained (no global selector leakage). Add new rules here as needed;
+   keep the selector scope to `.markdown`. */
+.markdown {
+  color: var(--text);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+}
+.markdown :global(h1),
+.markdown :global(h2),
+.markdown :global(h3),
+.markdown :global(h4) {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+  margin: var(--space-5) 0 var(--space-3);
+  color: var(--text);
+}
+.markdown :global(p) { margin: var(--space-3) 0; }
+.markdown :global(a) { color: var(--cyan); text-decoration: none; }
+.markdown :global(a:hover) { text-decoration: underline; }
+.markdown :global(ul),
+.markdown :global(ol) { margin: var(--space-3) 0 var(--space-3) var(--space-6); }
+.markdown :global(code) {
+  background: var(--bg-soft);
+  padding: 0 var(--space-1);
+  border-radius: var(--radius-1, 4px);
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+}
+.markdown :global(pre) {
+  background: var(--bg-soft);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-2, 8px);
+  overflow-x: auto;
+}
