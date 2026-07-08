@@ -92,4 +92,4 @@ function createRegistryStore() {
 }
 
 export const store: ReturnType<typeof createRegistryStore> = import.meta.hot?.data?.slotStore ?? createRegistryStore();
-if (import.meta.hot) import.meta.hot.data.slotStore = store;
+if (import.meta.hot?.data) import.meta.hot.data.slotStore = store;
