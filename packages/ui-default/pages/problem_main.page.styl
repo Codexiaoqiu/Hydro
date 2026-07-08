@@ -219,12 +219,24 @@
   top: 10px
   font-size: rem(17px)
 
+// Sort dropdown embedded in the search bar. The .select.compact classes
+// apply the project's standard form-control chrome (border, custom expand
+// arrow, focus state) — we override background and right border so it
+// reads as part of the same control as the input and the cyan submit
+// button sits flush against its right edge.
 .search-sort
   position: absolute
-  border: none
   top: 1px
-  height: 34px
   right: 37px
-  color: #000000
-  cursor: pointer
   width: 120px
+  height: 34px
+  border-right: none
+  background-color: transparent
+  cursor: pointer
+
+  // Native <option> styling is browser-limited; only color and
+  // background-color reliably take effect. Match the open menu to the
+  // page chrome so the dropdown doesn't flash OS-default white.
+  option
+    background-color: $content-bg-color
+    color: $text-1-color

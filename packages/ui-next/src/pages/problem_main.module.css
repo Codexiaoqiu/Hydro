@@ -150,7 +150,6 @@
 
 .ac {
   display: flex;
-  flex-direction: column;
   gap: 2px;
   font-family: var(--font-mono);
   font-size: var(--text-sm);

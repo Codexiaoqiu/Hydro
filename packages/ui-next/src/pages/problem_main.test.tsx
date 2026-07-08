@@ -298,8 +298,27 @@ describe('ProblemMain', () => {
             ppcount: 0,
             qs: 'graph',
         });
-        const select = screen.getByLabelText('排序方式') as HTMLSelectElement;
-        fireEvent.change(select, { target: { value: 'recent' } });
+        // Open the custom Select trigger, then choose the "最新优先" option.
+        fireEvent.click(screen.getByRole('button', { name: '排序方式' }));
+        fireEvent.click(screen.getByRole('option', { name: '最新优先' }));
         expect(window.location.href).toBe('/p?q=graph&sort=recent');
+    });
+
+    it('computes difficulty from nSubmit/nAccept when p.difficulty is missing', () => {
+        // Real injected pdocs carry no `difficulty` field (see q.md); the page
+        // must run the same algorithm client-side. (200, 200) clamps to 1,
+        // which the difficultyLabel helper renders as "★".
+        renderProblem({
+            pdocs: [
+                { docId: 1, domainId: 'system', title: 'A + B', tag: [], nSubmit: 200, nAccept: 200 },
+            ],
+            psdict: {},
+            page: 1,
+            pcount: 1,
+            ppcount: 1,
+        });
+        const pill = screen.getByText('★');
+        expect(pill).toBeInTheDocument();
+        expect(pill.className).toMatch(/diff(?!None)/);
     });
 });

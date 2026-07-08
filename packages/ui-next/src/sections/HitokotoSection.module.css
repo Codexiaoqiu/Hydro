@@ -4,7 +4,8 @@
   font-size: var(--text-base);
   font-style: italic;
   color: var(--text);
-  border-left: 3px solid var(--violet);
+  border-left: 5px solid var(--violet);
+  border-radius: var(--radius-xl);
 }
 .attr {
   margin-top: var(--space-2);

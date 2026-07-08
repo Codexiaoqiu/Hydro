@@ -10,7 +10,7 @@
             <div class="search">
               <input name="q" type="text" value="{{ qs }}" placeholder="{{ _('Search') }}">
               {% include "partials/problem_stat.html" %}
-              <select name="sort" class="search-sort">
+              <select name="sort" class="search-sort select">
                 {%- for sortType in ["default", "recent"] -%}
                   <option value="{{ sortType }}" {{ "selected" if sort == sortType else "" }}>{{ _('sort::' + sortType) }}</option>
                 {%- endfor -%}

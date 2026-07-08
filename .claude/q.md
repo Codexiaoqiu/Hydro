@@ -1,202 +1,276 @@
-installHook.js:1 [Hydro] Failed to build URL for route "homepage": TypeError: Cannot read properties of undefined (reading 'host')
-    at useTheme-M6ow9bUA.js:1:15534
-    at useTheme-M6ow9bUA.js:1:15786
-    at useTheme-M6ow9bUA.js:1:16198
-    at Object.useMemo (index-BJlUHeo0.js:9:59816)
-    at e.useMemo (useTheme-M6ow9bUA.js:1:7718)
-    at K (useTheme-M6ow9bUA.js:1:16191)
-    at Oo (index-BJlUHeo0.js:9:47528)
-    at yc (index-BJlUHeo0.js:9:69949)
-    at Ic (index-BJlUHeo0.js:9:80204)
-    at Mu (index-BJlUHeo0.js:9:115503)
-overrideMethod @ installHook.js:1
-(anonymous) @ useTheme-M6ow9bUA.js:1
-(anonymous) @ useTheme-M6ow9bUA.js:1
-useMemo @ index-BJlUHeo0.js:9
-e.useMemo @ useTheme-M6ow9bUA.js:1
-K @ useTheme-M6ow9bUA.js:1
-Oo @ index-BJlUHeo0.js:9
-yc @ index-BJlUHeo0.js:9
-Ic @ index-BJlUHeo0.js:9
-Mu @ index-BJlUHeo0.js:9
-ju @ index-BJlUHeo0.js:9
-Au @ index-BJlUHeo0.js:9
-gu @ index-BJlUHeo0.js:9
-cd @ index-BJlUHeo0.js:9
-ae @ index-BJlUHeo0.js:2
-postMessage
-oe @ index-BJlUHeo0.js:2
-e.unstable_scheduleCallback @ index-BJlUHeo0.js:2
-sd @ index-BJlUHeo0.js:9
-od @ index-BJlUHeo0.js:9
-(anonymous) @ index-BJlUHeo0.js:9
-installHook.js:1 [Hydro] Failed to build URL for route "problem_main": TypeError: Cannot read properties of undefined (reading 'host')
-    at useTheme-M6ow9bUA.js:1:15534
-    at useTheme-M6ow9bUA.js:1:15786
-    at useTheme-M6ow9bUA.js:1:16198
-    at Object.useMemo (index-BJlUHeo0.js:9:59816)
-    at e.useMemo (useTheme-M6ow9bUA.js:1:7718)
-    at K (useTheme-M6ow9bUA.js:1:16191)
-    at Oo (index-BJlUHeo0.js:9:47528)
-    at yc (index-BJlUHeo0.js:9:69949)
-    at Ic (index-BJlUHeo0.js:9:80204)
-    at Mu (index-BJlUHeo0.js:9:115503)
-overrideMethod @ installHook.js:1
-(anonymous) @ useTheme-M6ow9bUA.js:1
-(anonymous) @ useTheme-M6ow9bUA.js:1
-useMemo @ index-BJlUHeo0.js:9
-e.useMemo @ useTheme-M6ow9bUA.js:1
-K @ useTheme-M6ow9bUA.js:1
-Oo @ index-BJlUHeo0.js:9
-yc @ index-BJlUHeo0.js:9
-Ic @ index-BJlUHeo0.js:9
-Mu @ index-BJlUHeo0.js:9
-ju @ index-BJlUHeo0.js:9
-Au @ index-BJlUHeo0.js:9
-gu @ index-BJlUHeo0.js:9
-cd @ index-BJlUHeo0.js:9
-ae @ index-BJlUHeo0.js:2
-postMessage
-oe @ index-BJlUHeo0.js:2
-e.unstable_scheduleCallback @ index-BJlUHeo0.js:2
-sd @ index-BJlUHeo0.js:9
-od @ index-BJlUHeo0.js:9
-(anonymous) @ index-BJlUHeo0.js:9
-installHook.js:1 [Hydro] Failed to build URL for route "contest_main": TypeError: Cannot read properties of undefined (reading 'host')
-    at useTheme-M6ow9bUA.js:1:15534
-    at useTheme-M6ow9bUA.js:1:15786
-    at useTheme-M6ow9bUA.js:1:16198
-    at Object.useMemo (index-BJlUHeo0.js:9:59816)
-    at e.useMemo (useTheme-M6ow9bUA.js:1:7718)
-    at K (useTheme-M6ow9bUA.js:1:16191)
-    at Oo (index-BJlUHeo0.js:9:47528)
-    at yc (index-BJlUHeo0.js:9:69949)
-    at Ic (index-BJlUHeo0.js:9:80204)
-    at Mu (index-BJlUHeo0.js:9:115503)
-overrideMethod @ installHook.js:1
-(anonymous) @ useTheme-M6ow9bUA.js:1
-(anonymous) @ useTheme-M6ow9bUA.js:1
-useMemo @ index-BJlUHeo0.js:9
-e.useMemo @ useTheme-M6ow9bUA.js:1
-K @ useTheme-M6ow9bUA.js:1
-Oo @ index-BJlUHeo0.js:9
-yc @ index-BJlUHeo0.js:9
-Ic @ index-BJlUHeo0.js:9
-Mu @ index-BJlUHeo0.js:9
-ju @ index-BJlUHeo0.js:9
-Au @ index-BJlUHeo0.js:9
-gu @ index-BJlUHeo0.js:9
-cd @ index-BJlUHeo0.js:9
-ae @ index-BJlUHeo0.js:2
-postMessage
-oe @ index-BJlUHeo0.js:2
-e.unstable_scheduleCallback @ index-BJlUHeo0.js:2
-sd @ index-BJlUHeo0.js:9
-od @ index-BJlUHeo0.js:9
-(anonymous) @ index-BJlUHeo0.js:9
-installHook.js:1 [Hydro] Failed to build URL for route "discussion_main": TypeError: Cannot read properties of undefined (reading 'host')
-    at useTheme-M6ow9bUA.js:1:15534
-    at useTheme-M6ow9bUA.js:1:15786
-    at useTheme-M6ow9bUA.js:1:16198
-    at Object.useMemo (index-BJlUHeo0.js:9:59816)
-    at e.useMemo (useTheme-M6ow9bUA.js:1:7718)
-    at K (useTheme-M6ow9bUA.js:1:16191)
-    at Oo (index-BJlUHeo0.js:9:47528)
-    at yc (index-BJlUHeo0.js:9:69949)
-    at Ic (index-BJlUHeo0.js:9:80204)
-    at Mu (index-BJlUHeo0.js:9:115503)
-overrideMethod @ installHook.js:1
-(anonymous) @ useTheme-M6ow9bUA.js:1
-(anonymous) @ useTheme-M6ow9bUA.js:1
-useMemo @ index-BJlUHeo0.js:9
-e.useMemo @ useTheme-M6ow9bUA.js:1
-K @ useTheme-M6ow9bUA.js:1
-Oo @ index-BJlUHeo0.js:9
-yc @ index-BJlUHeo0.js:9
-Ic @ index-BJlUHeo0.js:9
-Mu @ index-BJlUHeo0.js:9
-ju @ index-BJlUHeo0.js:9
-Au @ index-BJlUHeo0.js:9
-gu @ index-BJlUHeo0.js:9
-cd @ index-BJlUHeo0.js:9
-ae @ index-BJlUHeo0.js:2
-postMessage
-oe @ index-BJlUHeo0.js:2
-e.unstable_scheduleCallback @ index-BJlUHeo0.js:2
-sd @ index-BJlUHeo0.js:9
-od @ index-BJlUHeo0.js:9
-(anonymous) @ index-BJlUHeo0.js:9
-installHook.js:1 [Hydro] Failed to build URL for route "problem_main": TypeError: Cannot read properties of undefined (reading 'host')
-    at useTheme-M6ow9bUA.js:1:15534
-    at useTheme-M6ow9bUA.js:1:15786
-    at useTheme-M6ow9bUA.js:1:16198
-    at Object.useMemo (index-BJlUHeo0.js:9:59816)
-    at e.useMemo (useTheme-M6ow9bUA.js:1:7718)
-    at K (useTheme-M6ow9bUA.js:1:16191)
-    at Oo (index-BJlUHeo0.js:9:47528)
-    at yc (index-BJlUHeo0.js:9:69949)
-    at Ic (index-BJlUHeo0.js:9:80204)
-    at Mu (index-BJlUHeo0.js:9:115503)
-overrideMethod @ installHook.js:1
-(anonymous) @ useTheme-M6ow9bUA.js:1
-(anonymous) @ useTheme-M6ow9bUA.js:1
-useMemo @ index-BJlUHeo0.js:9
-e.useMemo @ useTheme-M6ow9bUA.js:1
-K @ useTheme-M6ow9bUA.js:1
-Oo @ index-BJlUHeo0.js:9
-yc @ index-BJlUHeo0.js:9
-Ic @ index-BJlUHeo0.js:9
-Mu @ index-BJlUHeo0.js:9
-ju @ index-BJlUHeo0.js:9
-Au @ index-BJlUHeo0.js:9
-gu @ index-BJlUHeo0.js:9
-cd @ index-BJlUHeo0.js:9
-ae @ index-BJlUHeo0.js:2
-postMessage
-oe @ index-BJlUHeo0.js:2
-e.unstable_scheduleCallback @ index-BJlUHeo0.js:2
-sd @ index-BJlUHeo0.js:9
-od @ index-BJlUHeo0.js:9
-(anonymous) @ index-BJlUHeo0.js:9
-installHook.js:1 [Hydro] Failed to build URL for route "contest_main": TypeError: Cannot read properties of undefined (reading 'host')
-    at useTheme-M6ow9bUA.js:1:15534
-    at useTheme-M6ow9bUA.js:1:15786
-    at useTheme-M6ow9bUA.js:1:16198
-    at Object.useMemo (index-BJlUHeo0.js:9:59816)
-    at e.useMemo (useTheme-M6ow9bUA.js:1:7718)
-    at K (useTheme-M6ow9bUA.js:1:16191)
-    at Oo (index-BJlUHeo0.js:9:47528)
-    at yc (index-BJlUHeo0.js:9:69949)
-    at Ic (index-BJlUHeo0.js:9:80204)
-    at Mu (index-BJlUHeo0.js:9:115503)
-overrideMethod @ installHook.js:1
-(anonymous) @ useTheme-M6ow9bUA.js:1
-(anonymous) @ useTheme-M6ow9bUA.js:1
-useMemo @ index-BJlUHeo0.js:9
-e.useMemo @ useTheme-M6ow9bUA.js:1
-K @ useTheme-M6ow9bUA.js:1
-Oo @ index-BJlUHeo0.js:9
-yc @ index-BJlUHeo0.js:9
-Ic @ index-BJlUHeo0.js:9
-Mu @ index-BJlUHeo0.js:9
-ju @ index-BJlUHeo0.js:9
-Au @ index-BJlUHeo0.js:9
-gu @ index-BJlUHeo0.js:9
-cd @ index-BJlUHeo0.js:9
-ae @ index-BJlUHeo0.js:2
-postMessage
-oe @ index-BJlUHeo0.js:2
-e.unstable_scheduleCallback @ index-BJlUHeo0.js:2
-sd @ index-BJlUHeo0.js:9
-od @ index-BJlUHeo0.js:9
-(anonymous) @ index-BJlUHeo0.js:9
-installHook.js:1 [Hydro] Failed to build URL for route "discussion_main": TypeError: Cannot read properties of undefined (reading 'host')
-    at useTheme-M6ow9bUA.js:1:15534
-    at useTheme-M6ow9bUA.js:1:15786
-    at useTheme-M6ow9bUA.js:1:16198
-    at Object.useMemo (index-BJlUHeo0.js:9:59816)
-    at e.useMemo (useTheme-M6ow9bUA.js:1:7718)
-    at K (useTheme-M6ow9bUA.js:1:16191)
-    at Oo (index-BJlUHeo0.js:9:47528)
-    at yc (index-BJlUHeo0.js:9:69949)
-    at Ic (index-BJlUHeo0.js:9:80204)
+{
+    "HYDRO_INJECTED": true,
+    "name": "problem_main",
+    "template": "problem_main.html",
+    "args": {
+        "UserContext": {
+            "_id": 0,
+            "mail": "Guest@hydro.local",
+            "uname": "Guest",
+            "hashType": "hydro",
+            "priv": 8,
+            "regat": "2025-11-13T02:14:15.665Z",
+            "loginat": "2025-11-14T06:49:23.067Z",
+            "perm": "BigInt::37483536664552833153",
+            "role": "guest",
+            "scope": "BigInt::-1",
+            "tfa": false,
+            "authn": false,
+            "group": [],
+            "domains": [],
+            "timeZone": "Asia/Shanghai",
+            "avatar": "gravatar:Guest@hydro.local",
+            "gender": 2,
+            "backgroundImage": "/components/profile/backgrounds/1.jpg",
+            "pinnedDomains": [],
+            "showTimeAgo": true,
+            "fontFamily": "Open Sans",
+            "codeFontFamily": "Source Code Pro",
+            "theme": "light",
+            "preferredEditorType": "sv",
+            "formatCode": true,
+            "rpInfo": {},
+            "rp": 0,
+            "level": 0,
+            "join": true,
+            "avatarUrl": "//cn.gravatar.com/avatar/97119d3d15d5201ab506330ed4bab0f7?d=mm&s=128"
+        },
+        "UiContext": {
+            "cdn_prefix": "/",
+            "cdn_dynamic": false,
+            "url_prefix": "/",
+            "ws_prefix": "/",
+            "hydroacFeatures": [],
+            "blspHost": "wss://ws.hydrooj.com",
+            "constantVersion": "69a600a1",
+            "domainId": "system",
+            "domainVersion": 1783478922064,
+            "SWConfig": {
+                "preload": "",
+                "hosts": [
+                    "http://localhost:8000",
+                    "https://localhost:8000",
+                    "/",
+                    "/"
+                ],
+                "assets": [],
+                "domains": []
+            }
+        },
+        "page": 1,
+        "pcount": 3,
+        "ppcount": 1,
+        "pcountRelation": "eq",
+        "pdocs": [
+            {
+                "_id": "694e543ae86bb0a4a7ce0569",
+                "owner": 2,
+                "domainId": "system",
+                "docType": 10,
+                "docId": 3,
+                "title": "百万富翁（richest）",
+                "tag": [
+                    "NOI",
+                    "2024",
+                    "price::50",
+                    "source::ccf"
+                ],
+                "hidden": false,
+                "nSubmit": 3,
+                "nAccept": 1,
+                "pid": "NOI2024B",
+                "stats": {
+                    "AC": 2,
+                    "WA": 0,
+                    "TLE": 0,
+                    "MLE": 0,
+                    "RE": 0,
+                    "SE": 1,
+                    "IGN": 0,
+                    "CE": 0,
+                    "s0": 1,
+                    "s100": 2
+                }
+            },
+            {
+                "_id": "694e010ee86bb0a4a7ce0431",
+                "owner": 2,
+                "domainId": "system",
+                "docType": 10,
+                "docId": 1,
+                "title": "回文子串",
+                "tag": [
+                    "xq"
+                ],
+                "hidden": false,
+                "nSubmit": 1,
+                "nAccept": 1,
+                "stats": {
+                    "AC": 1,
+                    "WA": 0,
+                    "TLE": 0,
+                    "MLE": 0,
+                    "RE": 0,
+                    "SE": 0,
+                    "IGN": 0,
+                    "CE": 0,
+                    "s100": 1
+                }
+            },
+            {
+                "_id": "694e5870e86bb0a4a7ce05d1",
+                "owner": 2,
+                "domainId": "system",
+                "docType": 10,
+                "docId": 5,
+                "title": "百万富翁（richest）",
+                "tag": [
+                    "NOI",
+                    "2024",
+                    "price::50",
+                    "source::ccf"
+                ],
+                "hidden": false,
+                "nSubmit": 1,
+                "nAccept": 1,
+                "stats": {
+                    "AC": 1,
+                    "WA": 0,
+                    "TLE": 0,
+                    "MLE": 0,
+                    "RE": 0,
+                    "SE": 0,
+                    "IGN": 0,
+                    "CE": 0,
+                    "s100": 1
+                }
+            }
+        ],
+        "psdict": {},
+        "qs": "",
+        "sort": "default"
+    },
+    "url": "/p",
+    "route_map": {
+        "problem_category_compat": "/p/category/:category",
+        "contest_create": "/contest/create",
+        "contest_main": "/contest",
+        "contest_detail": "/contest/:tid",
+        "contest_problemlist": "/contest/:tid/problems",
+        "contest_edit": "/contest/:tid/edit",
+        "contest_print": "/contest/:tid/print",
+        "contest_print_alt": "/contest/:tid/api/printing/team",
+        "contest_manage": "/contest/:tid/management",
+        "contest_clarification": "/contest/:tid/clarification",
+        "contest_code": "/contest/:tid/code",
+        "contest_file_download": "/contest/:tid/file/:type/:filename",
+        "contest_user": "/contest/:tid/user",
+        "contest_balloon": "/contest/:tid/balloon",
+        "discussion_main": "/discuss",
+        "discussion_detail": "/discuss/:did",
+        "discussion_edit": "/discuss/:did/edit",
+        "discussion_raw": "/discuss/:did/raw",
+        "discussion_reply_raw": "/discuss/:did/:drid/raw",
+        "discussion_tail_reply_raw": "/discuss/:did/:drid/:drrid/raw",
+        "discussion_node": "/discuss/:type/:name",
+        "discussion_create": "/discuss/:type/:name/create",
+        "ranking": "/ranking",
+        "domain_dashboard": "/domain/dashboard",
+        "domain_edit": "/domain/edit",
+        "domain_user": "/domain/user",
+        "domain_permission": "/domain/permission",
+        "domain_role": "/domain/role",
+        "domain_group": "/domain/group",
+        "domain_join_applications": "/domain/join_applications",
+        "domain_join": "/domain/join",
+        "domain_search": "/domain/search",
+        "homework_main": "/homework",
+        "homework_create": "/homework/create",
+        "homework_detail": "/homework/:tid",
+        "homework_code": "/homework/:tid/code",
+        "homework_edit": "/homework/:tid/edit",
+        "homework_files": "/homework/:tid/file",
+        "homework_file_download": "/homework/:tid/file/:type/:filename",
+        "problem_import_hydro": "/problem/import/hydro",
+        "judge_files_download": "/judge/files",
+        "judge_files_upload": "/judge/upload",
+        "manage": "/manage",
+        "manage_dashboard": "/manage/dashboard",
+        "manage_script": "/manage/script",
+        "manage_setting": "/manage/setting",
+        "manage_config": "/manage/config",
+        "manage_user_import": "/manage/userimport",
+        "manage_user_priv": "/manage/userpriv",
+        "switch_language": "/language/:lang",
+        "home_files": "/file",
+        "fs_download": "/file/:uid/:filename",
+        "storage": "/storage",
+        "switch_account": "/account/:uid",
+        "problem_main": "/p",
+        "problem_random": "/problem/random",
+        "problem_detail": "/p/:pid",
+        "problem_submit": "/p/:pid/submit",
+        "problem_hack": "/p/:pid/hack/:rid",
+        "problem_edit": "/p/:pid/edit",
+        "problem_config": "/p/:pid/config",
+        "problem_files": "/p/:pid/files",
+        "problem_file_download": "/p/:pid/file/:filename",
+        "problem_solution": "/p/:pid/solution",
+        "problem_solution_detail": "/p/:pid/solution/:sid",
+        "problem_solution_raw": "/p/:pid/solution/:psid/raw",
+        "problem_solution_reply_raw": "/p/:pid/solution/:psid/:psrid/raw",
+        "problem_statistics": "/p/:pid/stat",
+        "problem_create": "/problem/create",
+        "record_main": "/record",
+        "record_detail": "/record/:rid",
+        "status": "/status",
+        "status_update": "/status/update",
+        "training_main": "/training",
+        "training_create": "/training/create",
+        "training_detail": "/training/:tid",
+        "training_edit": "/training/:tid/edit",
+        "training_files": "/training/:tid/file",
+        "training_file_download": "/training/:tid/file/:filename",
+        "contest_scoreboard": "/contest/:tid/scoreboard",
+        "contest_scoreboard_view": "/contest/:tid/scoreboard/:view",
+        "homework_scoreboard": "/homework/:tid/scoreboard",
+        "homework_scoreboard_view": "/homework/:tid/scoreboard/:view",
+        "homepage": "/",
+        "home_security": "/home/security",
+        "user_changemail_with_code": "/home/changeMail/:code",
+        "home_settings": "/home/settings/:category",
+        "home_avatar": "/home/avatar",
+        "home_domain": "/home/domain",
+        "home_domain_create": "/home/domain/create",
+        "home_messages": "/home/messages",
+        "user_login": "/login",
+        "user_oauth": "/oauth/:type/login",
+        "user_sudo": "/user/sudo",
+        "user_tfa": "/user/tfa",
+        "user_webauthn": "/user/webauthn",
+        "user_oauth_callback": "/oauth/:type/callback",
+        "user_register": "/register",
+        "user_register_with_code": "/register/:code",
+        "user_logout": "/logout",
+        "user_lostpass": "/lostpass",
+        "user_lostpass_with_code": "/lostpass/:code",
+        "user_delete": "/user/delete",
+        "user_detail": "/user/:uid",
+        "api": "/api/:op",
+        "officialaddon_management": "/manage/official-addon",
+        "lsp_sethost": "/lsp-set",
+        "sim_result": "/manage/sim_result/:tid",
+        "sim_result_callback": "/manage/sim_result_callback/:tid/:hydroac",
+        "luogu_openapi_management": "/manage/luogu-api",
+        "problem_quickimport": "/problem/quickimport",
+        "wiki_help": "/wiki/help",
+        "wiki_about": "/wiki/about",
+        "set_theme": "/set_theme/:theme",
+        "set_legacy": "/legacy",
+        "markdown": "/markdown",
+        "media": "/media",
+        "config_schema": "/manage/config/schema.json",
+        "constant": "/resource/:version/:name"
+    },
+    "endpoint": "/"
+}

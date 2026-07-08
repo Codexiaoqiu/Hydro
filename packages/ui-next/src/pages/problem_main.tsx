@@ -7,11 +7,13 @@ import { Eyebrow } from '../components/primitives/Eyebrow';
 import { LangPill } from '../components/nav/LangPill';
 import { Link } from '../components/link';
 import { NavLink } from '../components/nav/NavLink';
+import { Select } from '../components/primitives/Select';
 import { TagCloud } from '../components/primitives/TagCloud';
 import { ThemeToggle } from '../components/ThemeToggle';
 import { TopNav } from '../components/nav/TopNav';
 import { usePageData } from '../context/page-data';
 import { useBuildUrl } from '../hooks/use-build-url';
+import { difficultyAlgorithm } from '../lib/difficulty';
 import styles from './problem_main.module.css';
 
 interface Pdoc {
@@ -165,10 +167,10 @@ export default function ProblemMain() {
     window.location.href = href;
   };
 
-  const sortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const sortChange = (value: string) => {
     const params: Record<string, string> = {};
     if (qs) params.q = qs;
-    if (e.target.value && e.target.value !== 'default') params.sort = e.target.value;
+    if (value && value !== 'default') params.sort = value;
     window.location.href = buildUrl('problem_main', {}, params);
   };
 
@@ -239,16 +241,15 @@ export default function ProblemMain() {
                     aria-label="搜索题目"
                   />
                 </label>
-                <select
-                  className={styles.select}
-                  name="sort"
+                <Select
                   value={sort}
                   onChange={sortChange}
-                  aria-label="排序方式"
-                >
-                  <option value="default">默认排序</option>
-                  <option value="recent">最新优先</option>
-                </select>
+                  ariaLabel="排序方式"
+                  options={[
+                    { value: 'default', label: '默认排序' },
+                    { value: 'recent', label: '最新优先' },
+                  ]}
+                />
               </form>
               <div className={styles.stat}>{statText}</div>
             </div>
@@ -265,6 +266,11 @@ export default function ProblemMain() {
                     const acRate = p.nSubmit > 0 ? Math.round((p.nAccept / p.nSubmit) * 100) : 0;
                     const status = ps?.status;
                     const hasStatus = status !== undefined && ps?.rid;
+                    // The server does not pre-compute `difficulty` (see q.md:
+                    // pdocs lack that field), so we run the same algorithm
+                    // client-side when it's missing. The algorithm returns
+                    // null when nSubmit is 0; treat that as "no signal".
+                    const difficulty = p.difficulty ?? difficultyAlgorithm(p.nSubmit, p.nAccept) ?? undefined;
                     return (
                       <div key={p.docId} className={styles.row}>
                         <div className={styles.id}>{formatPid(p)}</div>
@@ -310,8 +316,8 @@ export default function ProblemMain() {
                               {statusLabel(status)}
                             </span>
                           ) : (
-                            <span className={`${styles.diff} ${!p.difficulty ? styles.diffNone : ''}`}>
-                              {difficultyLabel(p.difficulty)}
+                            <span className={`${styles.diff} ${!difficulty ? styles.diffNone : ''}`}>
+                              {difficultyLabel(difficulty)}
                             </span>
                           )}
                         </div>
