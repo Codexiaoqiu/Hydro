@@ -3,12 +3,16 @@ import './styles/reset.css';
 import './styles/globals.css';
 
 import './pages';
+// Side-effect imports: register layout/auth slot defaults with the registry on startup.
+import './components/auth/auth-layout';
 
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import * as api from './api';
 import App from './app';
+import { SignInDialog } from './components/auth/SignInDialog';
 import { PageDataProvider } from './context/page-data';
+import { SignInDialogProvider } from './hooks/use-sign-in-dialog';
 import { RouterProvider } from './context/router';
 import { initialPage, pluginsUrl } from './globals';
 import { installPlugin } from './registry';
@@ -53,11 +57,14 @@ await loadPlugins();
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ThemeProvider>
-      <PageDataProvider initial={initialPage}>
-        <RouterProvider>
-          <App />
-        </RouterProvider>
-      </PageDataProvider>
+      <SignInDialogProvider>
+        <PageDataProvider initial={initialPage}>
+          <RouterProvider>
+            <App />
+            <SignInDialog />
+          </RouterProvider>
+        </PageDataProvider>
+      </SignInDialogProvider>
     </ThemeProvider>
   </StrictMode>,
 );

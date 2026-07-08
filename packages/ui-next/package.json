@@ -34,7 +34,9 @@
     "marked": "^14.0.0",
     "path-to-regexp": "^8.4.2",
     "react": "^19.2.7",
-    "react-dom": "^19.2.7"
+    "react-dom": "^19.2.7",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1"
   },
   "devDependencies": {
     "@playwright/test": "^1.61.1",

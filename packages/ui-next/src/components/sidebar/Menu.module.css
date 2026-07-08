@@ -1,7 +1,9 @@
 .menu { display: flex; flex-direction: column; }
-.row { display: flex; align-items: center; justify-content: space-between; padding: 12px 4px; color: var(--text-soft); font-size: var(--text-sm); border-bottom: 1px dashed var(--border); transition: color var(--motion-base); }
-.row:last-child { border-bottom: 0; }
+.row { display: flex; align-items: center; justify-content: space-between; padding: 12px 4px; color: var(--text-soft); font-size: var(--text-sm); border-bottom: 1px dashed var(--border); transition: color var(--motion-base); background: transparent; border-top: 0; border-left: 0; border-right: 0; width: 100%; cursor: pointer; text-align: left; font-family: inherit; text-decoration: none; }
+.menu > *:last-child .row { border-bottom: 0; }
 .row:hover { color: var(--text); }
+.form { display: contents; }
+.sep { height: 1px; background: var(--border); margin: var(--space-2) 0; border: 0; }
 .l { display: flex; align-items: center; gap: var(--space-2); }
 .l svg { width: 15px; height: 15px; opacity: 0.7; }
 .badge { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--text-mute); background: var(--surface-2); padding: 2px var(--space-2); border-radius: var(--radius-pill); }

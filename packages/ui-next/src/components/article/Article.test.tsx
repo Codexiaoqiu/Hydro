@@ -1,0 +1,58 @@
+/* @vitest-environment happy-dom */
+import { render } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
+import { Article } from './Article';
+
+describe('Article', () => {
+  it('renders markdown from content prop', () => {
+    const { container } = render(<Article content={'# Hello\n\nWorld'} />);
+    expect(container.querySelector('h1')?.textContent).toBe('Hello');
+    expect(container.querySelector('p')?.textContent).toBe('World');
+  });
+
+  it('renders markdown from string children', () => {
+    const { container } = render(<Article>{'## Heading\n\ntext'}</Article>);
+    expect(container.querySelector('h2')?.textContent).toBe('Heading');
+    expect(container.querySelector('p')?.textContent).toBe('text');
+  });
+
+  it('passes through ReactNode children as-is', () => {
+    const { container } = render(
+      <Article><span data-testid="custom">custom</span></Article>,
+    );
+    expect(container.querySelector('[data-testid="custom"]')?.textContent).toBe('custom');
+  });
+
+  it('renders GFM tables via remark-gfm', () => {
+    const { container } = render(
+      <Article content={'| a | b |\n|---|---|\n| 1 | 2 |'} />,
+    );
+    expect(container.querySelector('table')).toBeTruthy();
+  });
+
+  it('escapes raw HTML (XSS-safe)', () => {
+    const { container } = render(<Article content={'<script>alert(1)</script>'} />);
+    expect(container.querySelector('script')).toBeNull();
+  });
+
+  it('prefers content prop over children when both are strings', () => {
+    const { container } = render(
+      <Article content={'# From content'}>{'# From children'}</Article>,
+    );
+    expect(container.querySelector('h1')?.textContent).toBe('From content');
+  });
+
+  it('renders fenced code blocks', () => {
+    const { container } = render(
+      <Article content={'```js\nconsole.log(1)\n```'} />,
+    );
+    expect(container.querySelector('pre code')?.textContent).toContain('console.log(1)');
+  });
+
+  it('renders links', () => {
+    const { container } = render(<Article content={'[link](https://example.com)'} />);
+    const a = container.querySelector('a');
+    expect(a?.getAttribute('href')).toBe('https://example.com');
+    expect(a?.textContent).toBe('link');
+  });
+});

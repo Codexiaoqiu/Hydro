@@ -5,6 +5,7 @@ import { fireEvent, render, screen, within } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { STATUS } from '@hydrooj/common';
 import { PageDataProvider, type PageData } from '../context/page-data';
+import * as routerMod from '../context/router';
 import { RouterProvider } from '../context/router';
 import { routeMapStore } from '../globals';
 import { ThemeProvider } from '../theme/ThemeProvider';
@@ -45,6 +46,7 @@ function renderProblem(args: PageData['args']) {
 
 describe('ProblemMain', () => {
     let originalRouteMap: Record<string, string>;
+    let navigateSpy: ReturnType<typeof vi.fn>;
     let restoreConsoleError: () => void;
     let restoreConsoleWarn: () => void;
 
@@ -56,13 +58,13 @@ describe('ProblemMain', () => {
             problem_random: '/problem/random',
         });
 
-        // window.location.href assignment fires a navigation in real browsers but
-        // throws on the URL-only stub. Stub it so submitSearch / sortChange run
-        // without raising.
-        Object.defineProperty(window, 'location', {
-            configurable: true,
-            value: { ...window.location, href: 'http://localhost/p', assign: vi.fn() },
-        });
+        // submitSearch / sortChange call useNavigate() to drive SPA navigation.
+        // Spy on the hook so tests can assert the URL that was navigated to
+        // without spinning up the real RouterProvider fetch pipeline.
+        navigateSpy = vi.fn();
+        vi.spyOn(routerMod, 'useNavigate').mockImplementation(
+            () => navigateSpy as unknown as (url: string) => Promise<void>,
+        );
 
         const err = vi.spyOn(console, 'error').mockImplementation(() => {});
         const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
@@ -274,7 +276,7 @@ describe('ProblemMain', () => {
         expect(lucky.getAttribute('href')).toBe('/problem/random?q=category%3A%E5%9B%BE%E8%AE%BA');
     });
 
-    it('submits the search form and writes the q param to location.href', () => {
+    it('submits the search form and navigates with the q param', () => {
         renderProblem({
             pdocs: [],
             psdict: {},
@@ -286,7 +288,7 @@ describe('ProblemMain', () => {
         const input = screen.getByLabelText('搜索题目') as HTMLInputElement;
         fireEvent.change(input, { target: { value: 'graph' } });
         fireEvent.submit(input.closest('form')!);
-        expect(window.location.href).toBe('/p?q=graph');
+        expect(navigateSpy).toHaveBeenCalledWith('/p?q=graph');
     });
 
     it('switches sort and keeps the existing q parameter', () => {
@@ -301,7 +303,7 @@ describe('ProblemMain', () => {
         // Open the custom Select trigger, then choose the "最新优先" option.
         fireEvent.click(screen.getByRole('button', { name: '排序方式' }));
         fireEvent.click(screen.getByRole('option', { name: '最新优先' }));
-        expect(window.location.href).toBe('/p?q=graph&sort=recent');
+        expect(navigateSpy).toHaveBeenCalledWith('/p?q=graph&sort=recent');
     });
 
     it('computes difficulty from nSubmit/nAccept when p.difficulty is missing', () => {

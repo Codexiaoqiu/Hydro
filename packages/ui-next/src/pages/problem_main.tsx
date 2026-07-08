@@ -12,6 +12,7 @@ import { TagCloud } from '../components/primitives/TagCloud';
 import { ThemeToggle } from '../components/ThemeToggle';
 import { TopNav } from '../components/nav/TopNav';
 import { usePageData } from '../context/page-data';
+import { useNavigate } from '../context/router';
 import { useBuildUrl } from '../hooks/use-build-url';
 import { difficultyAlgorithm } from '../lib/difficulty';
 import styles from './problem_main.module.css';
@@ -139,6 +140,7 @@ export default function ProblemMain() {
   const { UserContext, UiContext } = pageData.args;
   const args: ProblemArgs = pageData.args;
   const buildUrl = useBuildUrl();
+  const navigate = useNavigate();
 
   const pdocs = args.pdocs || [];
   const psdict = args.psdict || {};
@@ -164,14 +166,14 @@ export default function ProblemMain() {
     if (query) params.q = query;
     if (sort && sort !== 'default') params.sort = sort;
     const href = buildUrl('problem_main', {}, params);
-    window.location.href = href;
+    navigate(href);
   };
 
   const sortChange = (value: string) => {
     const params: Record<string, string> = {};
     if (qs) params.q = qs;
     if (value && value !== 'default') params.sort = value;
-    window.location.href = buildUrl('problem_main', {}, params);
+    navigate(buildUrl('problem_main', {}, params));
   };
 
   const extraTitle = UiContext?.extraTitleContent as string | undefined;
@@ -190,10 +192,10 @@ export default function ProblemMain() {
           <>
             <LangPill label={UserContext?.viewLangName || '中文'} />
             <ThemeToggle />
-            <Button variant="ghost" onClick={() => { window.location.href = '/login'; }}>
+            <Button variant="ghost" onClick={() => { navigate('/login'); }}>
               登录
             </Button>
-            <Button variant="primary" onClick={() => { window.location.href = '/register'; }}>
+            <Button variant="primary" onClick={() => { navigate('/register'); }}>
               注册
             </Button>
           </>
@@ -337,7 +339,7 @@ export default function ProblemMain() {
               title="准备好开刷了?"
               subtitle="登录后即可提交代码、查看状态"
               actionLabel="登录"
-              onAction={() => { window.location.href = '/login'; }}
+              onAction={() => { navigate('/login'); }}
             />
           </Card>
 
