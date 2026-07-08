@@ -1,0 +1,14 @@
+.quote {
+  margin: 0;
+  padding: var(--space-4) var(--space-5);
+  font-size: var(--text-base);
+  font-style: italic;
+  color: var(--text);
+  border-left: 3px solid var(--violet);
+}
+.attr {
+  margin-top: var(--space-2);
+  font-size: var(--text-sm);
+  font-style: normal;
+  color: var(--text-mute);
+}
