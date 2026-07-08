@@ -1,0 +1,6 @@
+.img {
+  border-radius: var(--radius-pill, 9999px);
+  display: block;
+  object-fit: cover;
+  background: var(--bg-soft, transparent);
+}
