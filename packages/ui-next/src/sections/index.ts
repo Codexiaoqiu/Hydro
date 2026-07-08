@@ -1,0 +1,28 @@
+import { defineSlot } from '../registry/slot';
+import { BulletinSection } from './BulletinSection';
+import { ContestSection } from './ContestSection';
+import { DiscussionNodesSection } from './DiscussionNodesSection';
+import { DiscussionSection } from './DiscussionSection';
+import { ErrorSection } from './ErrorSection';
+import { HitokotoSection } from './HitokotoSection';
+import { HomeworkSection } from './HomeworkSection';
+import { ProblemSearchSection } from './ProblemSearchSection';
+import { RankingSection } from './RankingSection';
+import { RecentProblemsSection } from './RecentProblemsSection';
+import { StarredProblemsSection } from './StarredProblemsSection';
+import { SuggestionSection } from './SuggestionSection';
+import { TrainingSection } from './TrainingSection';
+
+defineSlot('homepage:section:bulletin', BulletinSection);
+defineSlot('homepage:section:contest', ContestSection);
+defineSlot('homepage:section:discussion', DiscussionSection);
+defineSlot('homepage:section:discussion_nodes', DiscussionNodesSection);
+defineSlot('homepage:section:error', ErrorSection);
+defineSlot('homepage:section:hitokoto', HitokotoSection);
+defineSlot('homepage:section:homework', HomeworkSection);
+defineSlot('homepage:section:problem_search', ProblemSearchSection);
+defineSlot('homepage:section:ranking', RankingSection);
+defineSlot('homepage:section:recent_problems', RecentProblemsSection);
+defineSlot('homepage:section:starred_problems', StarredProblemsSection);
+defineSlot('homepage:section:suggestion', SuggestionSection);
+defineSlot('homepage:section:training', TrainingSection);
