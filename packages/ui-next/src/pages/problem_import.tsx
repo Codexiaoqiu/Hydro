@@ -6,6 +6,7 @@ import { TopNav } from '../components/nav/TopNav';
 import { NavLink } from '../components/nav/NavLink';
 import { Alert, Button, Checkbox, Input, RateLimitAlert } from '../components/primitives';
 import { HydroClientError, request } from '../hooks/use-api';
+import { useTranslate } from '../lib/i18n';
 
 interface Args {
   type?: string;
@@ -27,18 +28,19 @@ function getImporterType(args: Args) {
   return args.type ?? (typeof window !== 'undefined' ? window.location.pathname.split('/').pop() ?? '' : '');
 }
 
-function ProblemImportShell({ title, children }: { title: string; children: ReactNode }) {
+function ProblemImportShell({ title, subtitle, children }: { title: string; subtitle: string; children: ReactNode }) {
+  const t = useTranslate();
   return (
     <>
       <TopNav brand="Hydro" currentRoute="problem_import">
-        <NavLink to="homepage">Home</NavLink>
-        <NavLink to="problem_main">Problems</NavLink>
+        <NavLink to="homepage">{t('Common.Home')}</NavLink>
+        <NavLink to="problem_main">{t('Common.Problems')}</NavLink>
       </TopNav>
       <AuthShell
         title={title}
-        subtitle="Upload a problem package (zip) exported from another judge."
+        subtitle={subtitle}
         hideTopNav
-        footLinks={<Link to="problem_main">← Back to problem list</Link>}
+        footLinks={<Link to="problem_main">{t('ProblemImport.ShellBackToList')}</Link>}
       >
         {children}
       </AuthShell>
@@ -54,6 +56,7 @@ function ProblemImportForm({ args, importerType }: { args: Args; importerType: s
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<HydroClientError | null>(null);
   const [done, setDone] = useState(false);
+  const t = useTranslate();
 
   const showKeepUser = !!args.UserContext?.hasPriv?.(8) && !importerType;
   const actionUrl = `/problem/import/${encodeURIComponent(importerType)}`;
@@ -61,7 +64,7 @@ function ProblemImportForm({ args, importerType }: { args: Args; importerType: s
   const submit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!file) {
-      setError(new HydroClientError({ code: 400, message: 'Please choose a zip file to import.' }));
+      setError(new HydroClientError({ code: 400, message: t('ProblemImport.ErrorNoFile') }));
       return;
     }
     setSubmitting(true);
@@ -78,23 +81,26 @@ function ProblemImportForm({ args, importerType }: { args: Args; importerType: s
       if (err instanceof HydroClientError) {
         setError(err);
       } else {
-        setError(new HydroClientError({ code: 0, message: err instanceof Error ? err.message : 'Unexpected upload failure.' }));
+        setError(new HydroClientError({ code: 0, message: err instanceof Error ? err.message : t('ProblemImport.UnexpectedError') }));
       }
     } finally {
       setSubmitting(false);
     }
   };
 
+  const shellTitle = importerType ? `${t('ProblemImport.ShellTitleWith')}${importerType}` : t('ProblemImport.ShellTitle');
+  const shellSubtitle = t('ProblemImport.ShellSubtitle');
+
   return (
-    <ProblemImportShell title={importerType ? `Import via ${importerType}` : 'Import problems'}>
+    <ProblemImportShell title={shellTitle} subtitle={shellSubtitle}>
       {error && error.code !== 429 && <Alert variant="error" message={error.message} />}
       <RateLimitAlert error={error} />
       {done ? (
-        <Alert variant="success" title="Import complete" message="Your problems have been added. Visit the problem list to see them." />
+        <Alert variant="success" title={t('ProblemImport.ImportCompleteTitle')} message={t('ProblemImport.ImportCompleteMessage')} />
       ) : (
         <form onSubmit={submit} method="POST" encType="multipart/form-data" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
           <label style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-            <span style={{ fontSize: 'var(--text-sm)', fontWeight: 600 }}>Package (.zip)</span>
+            <span style={{ fontSize: 'var(--text-sm)', fontWeight: 600 }}>{t('ProblemImport.PackageLabel')}</span>
             <input
               type="file"
               accept=".zip,application/zip"
@@ -103,17 +109,17 @@ function ProblemImportForm({ args, importerType }: { args: Args; importerType: s
             />
           </label>
           <Input
-            label="Preferred prefix"
+            label={t('ProblemImport.PreferredPrefixLabel')}
             name="preferredPrefix"
             value={preferredPrefix}
             onChange={(e) => setPreferredPrefix(e.currentTarget.value)}
-            hint="Leave empty for default."
-            placeholder="Leave empty for default"
+            hint={t('ProblemImport.PreferredPrefixHint')}
+            placeholder={t('ProblemImport.PreferredPrefixPlaceholder')}
           />
-          <Checkbox name="hidden" label="Import as hidden" checked={hidden} onChange={(e) => setHidden(e.currentTarget.checked)} />
-          {showKeepUser && <Checkbox name="keepUser" label="Keep original uploader" checked={keepUser} onChange={(e) => setKeepUser(e.currentTarget.checked)} />}
+          <Checkbox name="hidden" label={t('ProblemImport.HiddenLabel')} checked={hidden} onChange={(e) => setHidden(e.currentTarget.checked)} />
+          {showKeepUser && <Checkbox name="keepUser" label={t('ProblemImport.KeepUserLabel')} checked={keepUser} onChange={(e) => setKeepUser(e.currentTarget.checked)} />}
           <Button type="submit" variant="primary" disabled={submitting || !file}>
-            {submitting ? 'Importing…' : 'Import'}
+            {submitting ? t('ProblemImport.Importing') : t('ProblemImport.Import')}
           </Button>
         </form>
       )}
@@ -123,11 +129,12 @@ function ProblemImportForm({ args, importerType }: { args: Args; importerType: s
 
 export default function ProblemImportPage() {
   const pageData = usePageData() as unknown as ImportPageData;
+  const t = useTranslate();
 
   if (!isPageDataReady(pageData)) {
     return (
-      <ProblemImportShell title="Import problems">
-        <p style={{ margin: 0 }}>Loading...</p>
+      <ProblemImportShell title={t('ProblemImport.ShellTitle')} subtitle={t('ProblemImport.ShellSubtitle')}>
+        <p style={{ margin: 0 }}>{t('ProblemImport.Loading')}</p>
       </ProblemImportShell>
     );
   }

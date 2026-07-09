@@ -26,7 +26,24 @@ const PENDING_HTML = `<html>
 </html>`;
 
 const INJECT_MARKER = '<!-- __HYDRO_INJECTION__DO_NOT_REMOVE_THIS__ -->';
-const buildInject = (data: string) => `<script id="__HYDRO_INJECTION__" type="application/json">${data}</script>`;
+// Escape `<` to its unicode escape so JSON emitted inside a <script> tag cannot
+// terminate the surrounding element via an injected `</script>`. This matches
+// the Next.js / Remix convention. `>` does not need escaping — only `</` is
+// load-bearing.
+const escapeForScript = (data: string) => data.replace(/</g, '\\u003c');
+const buildInject = (data: string) => `<script id="__HYDRO_INJECTION__" type="application/json">${escapeForScript(data)}</script>`;
+
+// Parse an Accept-Language header into the highest-priority tag, ignoring q=
+// values for simplicity (we only need a single best-match hint to feed into
+// resolveLocale). Returns null when the header is absent or empty.
+function parseAcceptLanguage(header: string | undefined | null): string | null {
+    if (!header) return null;
+    // Each entry: "tag[;q=...]". Pick the first tag and normalise separators.
+    const first = header.split(',')[0];
+    if (!first) return null;
+    const tag = first.split(';')[0].trim();
+    return tag || null;
+}
 
 function getAddonEntries(): Record<string, string> {
     const entries: Record<string, string> = {};
@@ -163,6 +180,14 @@ export async function apply(ctx: Context) {
         const vite = await createServer({
             root: __dirname,
             clearScreen: false,
+            resolve: {
+                alias: {
+                    '@': path.resolve(__dirname, 'src'),
+                },
+            },
+            optimizeDeps: {
+                include: ['react', 'react-dom', 'react-dom/client', 'react-markdown', 'remark-gfm'],
+            },
             server: {
                 middlewareMode: true,
                 hmr: {
@@ -174,7 +199,7 @@ export async function apply(ctx: Context) {
                 },
             },
             appType: 'custom',
-            plugins: [hydroPlugins()],
+            plugins: [hydroPlugins(), react()],
         });
         const middleware = c2k(vite.middlewares);
         const capture = ['/@vite/', '/src/', '/node_modules/', '/@react-refresh', '/@fs', '/@id/'];
@@ -201,6 +226,10 @@ export async function apply(ctx: Context) {
                     url: context.handler.context.req.url!,
                     route_map: ctx.server.routeMap,
                     endpoint: ctx.setting.get('server.url') || undefined,
+                    locale: (context.UserContext as unknown as { viewLang?: string })?.viewLang
+                        || context.handler.UiContext?.locale
+                        || parseAcceptLanguage(context.handler.context.request?.headers?.['accept-language'])
+                        || undefined,
                 }, serializer(false, context.handler));
                 const htmlToRender = html.replace(INJECT_MARKER, buildInject(serialized)).replace('</head>', `<script>${THEME_INIT_SCRIPT}</script></head>`);
                 return await vite.transformIndexHtml(context.handler.context.req.url!, htmlToRender);
@@ -235,6 +264,10 @@ export async function apply(ctx: Context) {
                     url: context.handler.context.req.url!,
                     route_map: ctx.server.routeMap,
                     endpoint: ctx.setting.get('server.url') || undefined,
+                    locale: (context.UserContext as unknown as { viewLang?: string })?.viewLang
+                        || context.handler.UiContext?.locale
+                        || parseAcceptLanguage(context.handler.context.request?.headers?.['accept-language'])
+                        || undefined,
                     plugins_url: `/plugins/${hashes['plugins.js'] || '00000000'}/plugins.js`,
                 }, serializer(false, context.handler));
                 return html.replace(INJECT_MARKER, buildInject(serialized));

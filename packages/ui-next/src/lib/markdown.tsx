@@ -1,17 +1,20 @@
-import { useMemo } from 'react';
-import { marked } from 'marked';
+import type { JSX } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import styles from './markdown.module.css';
 
 interface MarkdownProps {
-  /** Raw markdown source. Admin-authored for BulletinSection. */
+  /** Raw markdown source. Rendered through react-markdown (XSS-safe by
+   *  default — raw HTML in the source is escaped rather than injected). */
   source: string;
 }
 
-/** Render markdown as HTML. No sanitization — `source` must be trusted (admin-only). */
+/** Render markdown as React elements. Sanitization is handled by react-markdown
+ *  escaping any inline HTML; we never pass `dangerouslySetInnerHTML`. */
 export function Markdown({ source }: MarkdownProps): JSX.Element {
-  const html = useMemo(
-    () => marked.parse(source, { async: false, breaks: true }) as string,
-    [source],
+  return (
+    <div className={styles.markdown}>
+      <ReactMarkdown remarkPlugins={[remarkGfm]}>{source}</ReactMarkdown>
+    </div>
   );
-  return <div className={styles.markdown} dangerouslySetInnerHTML={{ __html: html }} />;
 }

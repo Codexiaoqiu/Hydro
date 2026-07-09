@@ -2,6 +2,7 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { Alert, Button, Checkbox, Input, RateLimitAlert } from '../primitives';
 import { HydroClientError, request } from '../../hooks/use-api';
 import { usePostLoginRedirect } from '../../hooks/use-post-login-redirect';
+import { useTranslate } from '../../lib/i18n';
 import styles from './LoginForm.module.css';
 
 export interface LoginMethod {
@@ -51,11 +52,13 @@ export function LoginForm({
   loginMethods = [],
   redirect,
   extraFields,
-  submitLabel = 'Login',
+  submitLabel,
   hideFootnote,
   onSuccess,
   wide,
 }: LoginFormProps) {
+  const t = useTranslate();
+  const effectiveSubmitLabel = submitLabel ?? t('Auth.SubmitLogin');
   const [uname, setUname] = useState('');
   const [password, setPassword] = useState('');
   const [rememberme, setRememberme] = useState(false);
@@ -96,7 +99,7 @@ export function LoginForm({
       const formData = new URLSearchParams();
       formData.set('uname', uname);
       formData.set('password', password);
-      formData.set('login_submit', submitLabel);
+      formData.set('login_submit', effectiveSubmitLabel);
       if (rememberme) formData.set('rememberme', 'on');
       if (tfa) formData.set('tfa', tfa);
       if (authnChallenge) formData.set('authnChallenge', authnChallenge);
@@ -140,7 +143,7 @@ export function LoginForm({
       {builtInLogin && (
         <>
           <Input
-            label="Username"
+            label={t('Auth.Username')}
             name="uname"
             type="text"
             autoFocus
@@ -151,7 +154,7 @@ export function LoginForm({
             error={error?.code === 404 ? error.message : undefined}
           />
           <Input
-            label="Password"
+            label={t('Auth.Password')}
             name="password"
             type="password"
             autoComplete="current-password"
@@ -161,13 +164,13 @@ export function LoginForm({
           />
           <Checkbox
             name="rememberme"
-            label="Remember me"
+            label={t('Auth.RememberMe')}
             checked={rememberme}
             onChange={(e) => setRememberme(e.currentTarget.checked)}
           />
           {showTfaField && (
             <Input
-              label="2FA Code"
+              label={t('Auth.TfaCode')}
               name="tfa"
               type="text"
               inputMode="numeric"
@@ -175,24 +178,24 @@ export function LoginForm({
               required
               value={tfa}
               onChange={(e) => setTfa(e.currentTarget.value)}
-              hint={tfaInfo?.authn ? 'Or use your passkey.' : undefined}
+              hint={tfaInfo?.authn ? t('Auth.TfaHint') : undefined}
             />
           )}
           {extraFields}
           <input type="hidden" name="authnChallenge" value={authnChallenge} />
           <input type="hidden" name="redirect" value={redirect ?? ''} />
           <Button type="submit" variant="primary" disabled={submitting}>
-            {submitting ? 'Signing in…' : submitLabel}
+            {submitting ? t('Auth.SigningIn') : effectiveSubmitLabel}
           </Button>
           {!hideFootnote && (
             <p className={styles.footnote}>
-              <a href="/lostpass">Forgot password or username?</a>
+              <a href="/lostpass">{t('Auth.Forgot')}</a>
             </p>
           )}
         </>
       )}
 
-      {showOauth && builtInLogin && <div className={styles.divider}><span>or</span></div>}
+      {showOauth && builtInLogin && <div className={styles.divider}><span>{t('Common.Or')}</span></div>}
       {showOauth && (
         <div className={styles.oauthList}>
           {loginMethods.map((m) => (
@@ -210,8 +213,8 @@ export function LoginForm({
       {!builtInLogin && !showOauth && (
         <Alert
           variant="info"
-          title="No login methods configured"
-          message="The administrator has not enabled any login providers."
+          title={t('Auth.NoLoginMethodsTitle')}
+          message={t('Auth.NoLoginMethodsMessage')}
         />
       )}
     </form>

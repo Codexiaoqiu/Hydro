@@ -1,6 +1,7 @@
 import { usePageData } from '../context/page-data';
 import { AuthShell } from '../components/auth/AuthShell';
 import { LoginForm, type LoginMethod } from '../components/auth/LoginForm';
+import { useTranslate } from '../lib/i18n';
 
 interface Args {
   builtInLogin?: boolean;
@@ -12,16 +13,17 @@ interface Args {
 export default function UserSudoPage() {
   const { args } = usePageData() as unknown as { args: Args };
   const { builtInLogin = true, loginMethods = [], redirect } = args ?? {};
+  const t = useTranslate();
   return (
     <AuthShell
-      title="Confirm your password"
-      subtitle="For your security, please re-enter your password to continue."
+      title={t('Auth.SudoTitle')}
+      subtitle={t('Auth.SudoSubtitle')}
     >
       <LoginForm
         builtInLogin={builtInLogin}
         loginMethods={loginMethods}
         redirect={redirect}
-        submitLabel="Confirm"
+        submitLabel={t('Auth.Confirm')}
         hideFootnote
         onSuccess={() => {
           if (typeof window !== 'undefined') {

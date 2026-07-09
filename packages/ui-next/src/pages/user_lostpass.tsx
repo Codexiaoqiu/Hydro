@@ -4,6 +4,7 @@ import { Link } from '../components/link';
 import { AuthShell } from '../components/auth/AuthShell';
 import { Alert, Button, Input, RateLimitAlert } from '../components/primitives';
 import { HydroClientError, request } from '../hooks/use-api';
+import { useTranslate } from '../lib/i18n';
 
 interface Args {
   smtpConfigured?: boolean;
@@ -16,6 +17,7 @@ export default function UserLostPassPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<HydroClientError | null>(null);
   const [sent, setSent] = useState(false);
+  const t = useTranslate();
 
   const submit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -35,30 +37,30 @@ export default function UserLostPassPage() {
 
   return (
     <AuthShell
-      title="Lost password"
+      title={t('Auth.LostPassword')}
       subtitle={
         smtpConfigured
-          ? 'Enter the email tied to your account and we will send you a reset link.'
-          : 'Relax and try to remember your password.'
+          ? t('Auth.ResetHint')
+          : t('Auth.LostPassFallback')
       }
-      footLinks={<Link to="user_login">Back to sign in</Link>}
+      footLinks={<Link to="user_login">{t('Auth.BackToSignIn')}</Link>}
     >
       {!smtpConfigured ? (
         <Alert
           variant="warn"
-          title="Mail not configured"
-          message="The administrator has not set up a mail provider, so password recovery is unavailable. Contact an administrator for help."
+          title={t('Auth.MailNotConfiguredTitle')}
+          message={t('Auth.MailNotConfiguredMessage')}
         />
       ) : (
         <>
           {error && error.code !== 429 && <Alert variant="error" message={error.message} />}
           <RateLimitAlert error={error} />
           {sent ? (
-            <Alert variant="success" title="Reset link sent" message="Check your inbox for instructions." />
+            <Alert variant="success" title={t('Auth.ResetSentTitle')} message={t('Auth.ResetSentMessage')} />
           ) : (
             <form onSubmit={submit} method="POST" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
               <Input
-                label="Email"
+                label={t('Auth.Email')}
                 name="mail"
                 type="text"
                 autoFocus
@@ -68,7 +70,7 @@ export default function UserLostPassPage() {
                 onChange={(e) => setMail(e.currentTarget.value)}
               />
               <Button type="submit" variant="primary" disabled={submitting}>
-                {submitting ? 'Sending…' : 'Send password reset email'}
+                {submitting ? t('Auth.Sending') : t('Auth.SendReset')}
               </Button>
             </form>
           )}

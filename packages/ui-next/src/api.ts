@@ -45,3 +45,7 @@ export { defineSlot } from './registry';
 export { default as React } from 'react';
 export { default as ReactDOM } from 'react-dom/client';
 export { default as jsxRuntime } from 'react/jsx-runtime';
+
+// i18n
+export { translate, useTranslate, detectLocale, resolveLocale, catalogs } from './lib/i18n';
+export type { Locale, Catalog } from './lib/i18n';

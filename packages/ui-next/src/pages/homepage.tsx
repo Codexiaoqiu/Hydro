@@ -25,6 +25,7 @@ export default function Homepage() {
   const { args } = usePageData() as unknown as { args: HomepageArgs };
   const { UserContext, contents, udict = {}, domain = { _id: '' } } = args ?? {};
   const cols = Array.isArray(contents) ? contents : [];
+  console.log(cols)
   return (
     <>
       <TopNav

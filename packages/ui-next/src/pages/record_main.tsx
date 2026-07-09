@@ -6,6 +6,7 @@ import { TopNav } from '../components/nav/TopNav';
 import { NavLink } from '../components/nav/NavLink';
 import { Link } from '../components/link';
 import { Alert, Button } from '../components/primitives';
+import { useTranslate } from '../lib/i18n';
 
 interface Rdoc {
   _id: string;
@@ -36,13 +37,11 @@ interface Args {
   languages?: Array<{ value: string; label: string }>;
 }
 
-const STATUS_TEXT = ['Accepted', 'Wrong Answer', 'Time Limit Exceeded', 'Memory Limit Exceeded',
-  'Runtime Error', 'System Error', 'Compile Error', 'Presentation Error'];
-
 export default function RecordMainPage() {
   const { args } = usePageData() as unknown as { args: Args };
   const { rdocs = [], udict = {}, pdoc, UiContext, filter, languages = [] } = args;
   const navigate = useNavigate();
+  const t = useTranslate();
   const [live, setLive] = useState<Record<string, Partial<Rdoc>>>({});
   const [query, setQuery] = useState({
     uidOrName: filter?.uidOrName ?? '',
@@ -90,15 +89,26 @@ export default function RecordMainPage() {
     }
   };
 
+  const STATUS_KEYS = [
+    'Record.Status.Accepted',
+    'Record.Status.WrongAnswer',
+    'Record.Status.TimeLimitExceeded',
+    'Record.Status.MemoryLimitExceeded',
+    'Record.Status.RuntimeError',
+    'Record.Status.SystemError',
+    'Record.Status.CompileError',
+    'Record.Status.PresentationError',
+  ];
+
   return (
     <>
       <TopNav brand="Hydro" currentRoute="record_main">
-        <NavLink to="homepage">Home</NavLink>
-        <NavLink to="problem_main">Problems</NavLink>
+        <NavLink to="homepage">{t('RecordMain.Home')}</NavLink>
+        <NavLink to="problem_main">{t('RecordMain.Problems')}</NavLink>
       </TopNav>
       <main style={{ maxWidth: 1320, margin: '0 auto', padding: 'var(--space-6)' }}>
         <header style={{ marginBottom: 'var(--space-4)' }}>
-          <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-2xl)', margin: 0 }}>Submissions</h1>
+          <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-2xl)', margin: 0 }}>{t('RecordMain.Title')}</h1>
           {pdoc?.title && <p style={{ color: 'var(--text-mute)', margin: 'var(--space-1) 0 0' }}>{pdoc.title}</p>}
         </header>
 
@@ -109,44 +119,44 @@ export default function RecordMainPage() {
           style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr) auto', gap: 'var(--space-3)', alignItems: 'end', marginBottom: 'var(--space-4)' }}
         >
           <label style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-            <span style={{ fontSize: 'var(--text-xs)' }}>User</span>
-            <input value={query.uidOrName} onChange={(e) => setQuery({ ...query, uidOrName: e.currentTarget.value })} style={inputStyle} placeholder="uid or name" />
+            <span style={{ fontSize: 'var(--text-xs)' }}>{t('Common.User')}</span>
+            <input value={query.uidOrName} onChange={(e) => setQuery({ ...query, uidOrName: e.currentTarget.value })} style={inputStyle} placeholder={t('RecordMain.UserPlaceholder')} />
           </label>
           <label style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-            <span style={{ fontSize: 'var(--text-xs)' }}>Problem</span>
-            <input value={query.pid} onChange={(e) => setQuery({ ...query, pid: e.currentTarget.value })} style={inputStyle} placeholder="P1000" />
+            <span style={{ fontSize: 'var(--text-xs)' }}>{t('RecordDetail.Problem')}</span>
+            <input value={query.pid} onChange={(e) => setQuery({ ...query, pid: e.currentTarget.value })} style={inputStyle} placeholder={t('RecordMain.ProblemPlaceholder')} />
           </label>
           <label style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-            <span style={{ fontSize: 'var(--text-xs)' }}>Language</span>
+            <span style={{ fontSize: 'var(--text-xs)' }}>{t('Common.Lang')}</span>
             <select value={query.language} onChange={(e) => setQuery({ ...query, language: e.currentTarget.value })} style={inputStyle}>
-              <option value="">Any</option>
+              <option value="">{t('Common.Any')}</option>
               {languages.map((l) => <option key={l.value} value={l.value}>{l.label}</option>)}
             </select>
           </label>
           <label style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-            <span style={{ fontSize: 'var(--text-xs)' }}>Status</span>
+            <span style={{ fontSize: 'var(--text-xs)' }}>{t('Common.Status')}</span>
             <select value={query.status} onChange={(e) => setQuery({ ...query, status: e.currentTarget.value })} style={inputStyle}>
-              <option value="">Any</option>
-              {STATUS_TEXT.map((s, i) => <option key={i} value={String(i)}>{s}</option>)}
+              <option value="">{t('Common.Any')}</option>
+              {STATUS_KEYS.map((s, i) => <option key={i} value={String(i)}>{t(s)}</option>)}
             </select>
           </label>
           <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
-            <label><input type="checkbox" checked={query.all} onChange={(e) => setQuery({ ...query, all: e.currentTarget.checked })} /> All</label>
-            <label><input type="checkbox" checked={query.allDomain} onChange={(e) => setQuery({ ...query, allDomain: e.currentTarget.checked })} /> All domains</label>
+            <label><input type="checkbox" checked={query.all} onChange={(e) => setQuery({ ...query, all: e.currentTarget.checked })} /> {t('Common.All')}</label>
+            <label><input type="checkbox" checked={query.allDomain} onChange={(e) => setQuery({ ...query, allDomain: e.currentTarget.checked })} /> {t('RecordMain.AllDomains')}</label>
           </div>
-          <Button type="submit" variant="primary">Filter</Button>
+          <Button type="submit" variant="primary">{t('RecordMain.Filter')}</Button>
         </form>
 
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--text-sm)' }}>
           <thead>
             <tr style={{ textAlign: 'left', color: 'var(--text-mute)' }}>
-              <th style={th}>ID</th>
-              <th style={th}>User</th>
-              <th style={th}>Problem</th>
-              <th style={th}>Lang</th>
-              <th style={th}>Status</th>
-              <th style={th}>Score</th>
-              <th style={th}>Time</th>
+              <th style={th}>{t('RecordMain.HeaderId')}</th>
+              <th style={th}>{t('RecordMain.HeaderUser')}</th>
+              <th style={th}>{t('RecordMain.HeaderProblem')}</th>
+              <th style={th}>{t('RecordMain.HeaderLang')}</th>
+              <th style={th}>{t('RecordMain.HeaderStatus')}</th>
+              <th style={th}>{t('RecordMain.HeaderScore')}</th>
+              <th style={th}>{t('RecordMain.HeaderTime')}</th>
             </tr>
           </thead>
           <tbody>
@@ -156,13 +166,13 @@ export default function RecordMainPage() {
                 <td style={td}>{udict[r.uid]?.uname ?? `#${r.uid}`}</td>
                 <td style={td}>{r.pid ? <Link to="problem_detail" params={{ pid: String(r.pid) }}>{String(r.pid)}</Link> : '—'}</td>
                 <td style={td}>{r.lang ?? '—'}</td>
-                <td style={td}>{STATUS_TEXT[r.status ?? -1] ?? 'Pending'}</td>
+                <td style={td}>{r.status !== undefined && STATUS_KEYS[r.status] ? t(STATUS_KEYS[r.status]) : t('Record.Status.Pending')}</td>
                 <td style={td}>{r.score ?? '—'}</td>
                 <td style={td}>{r.judgeAt ? new Date(r.judgeAt).toLocaleTimeString() : '—'}</td>
               </tr>
             ))}
             {!merged.length && (
-              <tr><td style={td} colSpan={7}><em style={{ color: 'var(--text-mute)' }}>No submissions match the filter.</em></td></tr>
+              <tr><td style={td} colSpan={7}><em style={{ color: 'var(--text-mute)' }}>{t('RecordMain.NoSubmissions')}</em></td></tr>
             )}
           </tbody>
         </table>

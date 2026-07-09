@@ -15,6 +15,10 @@ if (injectionEl) {
 export const isInjected: boolean = !!injectionData.HYDRO_INJECTED;
 export const hydroDomains: string[] = injectionData.hydro_domains ?? [];
 export const pluginsUrl: string | undefined = injectionData.plugins_url;
+// Expose the server-injected locale to the i18n hook (window.__hydro_locale).
+if (typeof window !== 'undefined' && typeof injectionData.locale === 'string') {
+  (window as unknown as { __hydro_locale?: string }).__hydro_locale = injectionData.locale;
+}
 
 interface RouteMapStore {
   _routeMap: Record<string, string>;

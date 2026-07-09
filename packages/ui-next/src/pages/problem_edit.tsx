@@ -4,6 +4,7 @@ import { ProblemForm } from '../components/problem/ProblemForm';
 import { TopNav } from '../components/nav/TopNav';
 import { NavLink } from '../components/nav/NavLink';
 import { Link } from '../components/link';
+import { useTranslate } from '../lib/i18n';
 
 interface Args {
   pdoc?: {
@@ -24,6 +25,7 @@ interface Args {
 
 export default function ProblemEditPage() {
   const { args } = usePageData() as unknown as { args: Args };
+  const t = useTranslate();
   const pdoc = args?.pdoc;
   // canDelete when either the user owns the problem or has PERM_EDIT_PROBLEM.
   const canDelete = !!(pdoc && args?.UserContext && (
@@ -34,15 +36,17 @@ export default function ProblemEditPage() {
   return (
     <>
       <TopNav brand="Hydro" currentRoute="problem_edit">
-        <NavLink to="homepage">Home</NavLink>
-        <NavLink to="problem_main">Problems</NavLink>
+        <NavLink to="homepage">{t('Common.Home')}</NavLink>
+        <NavLink to="problem_main">{t('Common.Problems')}</NavLink>
       </TopNav>
       <AuthShell
-        title={pdoc?.title || 'Edit problem'}
-        subtitle={pdoc?.pid ? `Editing ${pdoc.pid}` : 'Editing problem'}
+        title={pdoc?.title || t('Problem.EditProblem')}
+        subtitle={pdoc?.pid ? `${t('ProblemEdit.Editing')}${pdoc.pid}` : t('ProblemEdit.EditingGeneric')}
         hideTopNav
         footLinks={
-          pdoc?.pid ? <Link to="problem_detail" params={{ pid: pdoc.pid }}>← Back to problem</Link> : <Link to="problem_main">← Back</Link>
+          pdoc?.pid
+            ? <Link to="problem_detail" params={{ pid: pdoc.pid }}>{t('ProblemEdit.BackToProblem')}</Link>
+            : <Link to="problem_main">{t('ProblemEdit.Back')}</Link>
         }
       >
         <ProblemForm

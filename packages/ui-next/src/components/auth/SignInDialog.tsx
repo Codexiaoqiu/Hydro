@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, type ReactNode } from 'react';
 import { usePageData } from '../../context/page-data';
 import { SignInDialogContext, useSignInDialogState } from '../../hooks/use-sign-in-dialog';
 import { LoginForm, type LoginMethod } from './LoginForm';
+import { useTranslate } from '../../lib/i18n';
 import styles from './SignInDialog.module.css';
 
 export interface SignInDialogProps {
@@ -28,6 +29,7 @@ const MOBILE_BREAKPOINT = 880;
  */
 export function SignInDialog({ children, passkeyHint, onOpenChange }: SignInDialogProps) {
   const { open, hide } = useSignInDialogState();
+  const t = useTranslate();
   const overlayRef = useRef<HTMLDivElement | null>(null);
 
   // Mobile short-circuit: redirect to /login instead of showing the modal.
@@ -89,8 +91,8 @@ export function SignInDialog({ children, passkeyHint, onOpenChange }: SignInDial
 
   return (
     <div ref={overlayRef} className={styles.overlay} onClick={onOverlayClick} role="presentation">
-      <div className={styles.modal} role="dialog" aria-modal="true" aria-label="Sign in">
-        <button type="button" className={styles.close} onClick={hide} aria-label="Close">
+      <div className={styles.modal} role="dialog" aria-modal="true" aria-label={t('Auth.SignIn')}>
+        <button type="button" className={styles.close} onClick={hide} aria-label={t('Common.Close')}>
           ×
         </button>
         {passkeyHint && <div className={styles.notice}>{passkeyHint}</div>}

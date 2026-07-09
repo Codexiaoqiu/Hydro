@@ -1,3 +1,4 @@
+import type { JSX } from 'react';
 import { Suspense, useSyncExternalStore } from 'react';
 import { SlotErrorBoundary } from './error-boundary';
 import { store } from './store';

@@ -3,6 +3,7 @@ import { useNavigate } from '../../context/router';
 import { useBuildUrl } from '../../hooks/use-build-url';
 import { HydroClientError, request } from '../../hooks/use-api';
 import { Alert, Button, Checkbox, Input, LangTabs, RateLimitAlert } from '../primitives';
+import { useTranslate } from '../../lib/i18n';
 import styles from './ProblemForm.module.css';
 
 const PID_PATTERN = /^(?:[a-z0-9]{1,10}-)?[a-z][a-z0-9]*$/i;
@@ -55,6 +56,7 @@ export function ProblemForm({
 }: ProblemFormProps) {
   const navigate = useNavigate();
   const buildUrl = useBuildUrl();
+  const t = useTranslate();
   const userLang = statementLangs[0] ?? 'zh_CN';
 
   const [pid, setPid] = useState(pdoc?.pid ?? '');
@@ -103,17 +105,17 @@ export function ProblemForm({
     setSubmitting(true);
     setError(null);
     if (!title.trim()) {
-      setError(new HydroClientError({ code: 400, message: 'Title is required.' }));
+      setError(new HydroClientError({ code: 400, message: t('ProblemForm.ErrorTitleRequired') }));
       setSubmitting(false);
       return;
     }
     if (pid && !PID_PATTERN.test(pid)) {
-      setError(new HydroClientError({ code: 400, message: 'PID format invalid. Use letters, digits, and optional prefix like "P1000-".' }));
+      setError(new HydroClientError({ code: 400, message: t('ProblemForm.ErrorPidInvalid') }));
       setSubmitting(false);
       return;
     }
     if (difficulty !== '' && (typeof difficulty !== 'number' || difficulty < 1 || difficulty > 10)) {
-      setError(new HydroClientError({ code: 400, message: 'Difficulty must be an integer between 1 and 10.' }));
+      setError(new HydroClientError({ code: 400, message: t('ProblemForm.ErrorDifficultyRange') }));
       setSubmitting(false);
       return;
     }
@@ -139,7 +141,7 @@ export function ProblemForm({
   };
 
   const onDelete = async () => {
-    if (!confirm(`Delete problem "${title || pid}"? This cannot be undone.`)) return;
+    if (!confirm(t('ProblemForm.DeleteConfirm', { name: title || pid }))) return;
     setDeleting(true);
     setError(null);
     try {
@@ -184,16 +186,16 @@ export function ProblemForm({
 
         <div className={styles.row}>
           <Input
-            label="Problem ID"
+            label={t('ProblemForm.ProblemID')}
             name="pid"
             value={pid}
             onChange={(e) => setPid(e.currentTarget.value)}
-            placeholder="P1000"
+            placeholder={t('ProblemForm.ProblemIDPlaceholder')}
             disabled={isReference}
-            hint="Optional. Format: optional prefix + lowercase alphanumeric, e.g. 'cf-1234a' or 'P1000'."
+            hint={t('ProblemForm.ProblemIDHint')}
           />
           <Input
-            label="Difficulty"
+            label={t('ProblemForm.Difficulty')}
             name="difficulty"
             type="number"
             inputMode="numeric"
@@ -201,12 +203,12 @@ export function ProblemForm({
             min={1}
             max={10}
             onChange={(e) => setDifficulty(e.currentTarget.value === '' ? '' : Number(e.currentTarget.value))}
-            placeholder="1–10"
+            placeholder={t('ProblemForm.DifficultyPlaceholder')}
           />
         </div>
 
         <Input
-          label="Title"
+          label={t('ProblemForm.Title')}
           name="title"
           required
           autoFocus={pageName === 'problem_create'}
@@ -215,15 +217,15 @@ export function ProblemForm({
         />
 
         <Input
-          label="Tags"
+          label={t('ProblemForm.Tags')}
           name="tag"
           value={tagText}
           onChange={(e) => setTagText(e.currentTarget.value)}
-          hint="Comma-separated. Click categories on the right to append."
-          placeholder="math,greedy,dp"
+          hint={t('ProblemForm.TagsHint')}
+          placeholder={t('ProblemForm.TagsPlaceholder')}
         />
 
-        <Checkbox name="hidden" label="Hidden (only visible to users with permission)" checked={hidden} onChange={(e) => setHidden(e.currentTarget.checked)} />
+        <Checkbox name="hidden" label={t('ProblemForm.Hidden')} checked={hidden} onChange={(e) => setHidden(e.currentTarget.checked)} />
 
         <div className={styles.markdown}>
           <LangTabs
@@ -234,19 +236,19 @@ export function ProblemForm({
           <textarea
             value={activeContent}
             onChange={(e) => onContentChange(e.currentTarget.value)}
-            placeholder={`Write the problem statement in ${activeLang}…`}
+            placeholder={t('ProblemForm.StatementPlaceholder', { lang: activeLang })}
             spellCheck={false}
           />
         </div>
 
         <div className={styles.actions}>
           <Button type="submit" variant="primary" disabled={submitting || deleting}>
-            {submitting ? 'Saving…' : pageName === 'problem_create' ? 'Create' : 'Update'}
+            {submitting ? t('ProblemForm.Saving') : pageName === 'problem_create' ? t('ProblemForm.Create') : t('ProblemForm.Update')}
           </Button>
           <div className={styles.actionsRight}>
             {pageName === 'problem_edit' && canDelete && (
               <Button type="button" variant="ghost" disabled={submitting || deleting} onClick={onDelete}>
-                {deleting ? 'Deleting…' : 'Delete'}
+                {deleting ? t('ProblemForm.Deleting') : t('ProblemForm.Delete')}
               </Button>
             )}
           </div>
@@ -256,16 +258,20 @@ export function ProblemForm({
       <aside className={styles.sidebar}>
         {pageName === 'problem_create' ? (
           <div className={styles.mdHint}>
-            <strong>Markdown tips</strong>
+            <strong>{t('ProblemForm.MarkdownTips')}</strong>
             <ul style={{ margin: '8px 0 0', paddingLeft: '20px' }}>
-              <li>Use <code>file://filename.png</code> to reference uploaded images.</li>
-              <li>Code blocks with <code>```cpp</code> highlight in statement.</li>
-              <li>Multiple languages: switch the tab above.</li>
+              <li>{t('ProblemForm.MarkdownImage').split('file://filename.png').map((part, i, arr) => (
+                <span key={i}>{part}{i < arr.length - 1 ? <code>file://filename.png</code> : null}</span>
+              ))}</li>
+              <li>{t('ProblemForm.MarkdownCode').split('```cpp').map((part, i, arr) => (
+                <span key={i}>{part}{i < arr.length - 1 ? <code>```cpp</code> : null}</span>
+              ))}</li>
+              <li>{t('ProblemForm.MarkdownLang')}</li>
             </ul>
           </div>
         ) : (
           <div>
-            <h3 style={{ margin: '0 0 8px', fontSize: 'var(--text-md)' }}>Additional files</h3>
+            <h3 style={{ margin: '0 0 8px', fontSize: 'var(--text-md)' }}>{t('ProblemForm.AdditionalFiles')}</h3>
             <div className={styles.uploadList}>
               {(additionalFile ?? pdoc?.additional_file ?? []).map((f) => (
                 <div key={f.name} className={styles.uploadItem}>
@@ -274,7 +280,7 @@ export function ProblemForm({
                 </div>
               ))}
               {(!(additionalFile ?? pdoc?.additional_file ?? []).length) && (
-                <span style={{ color: 'var(--text-mute)', fontSize: 'var(--text-sm)' }}>None uploaded.</span>
+                <span style={{ color: 'var(--text-mute)', fontSize: 'var(--text-sm)' }}>{t('ProblemForm.NoneUploaded')}</span>
               )}
             </div>
           </div>
@@ -282,7 +288,7 @@ export function ProblemForm({
 
         {flatCategories.length > 0 && (
           <div>
-            <h3 style={{ margin: '0 0 8px', fontSize: 'var(--text-md)' }}>Categories</h3>
+            <h3 style={{ margin: '0 0 8px', fontSize: 'var(--text-md)' }}>{t('ProblemForm.Categories')}</h3>
             <div className={styles.categoryTree}>
               {flatCategories.map((name) => (
                 <button key={name} type="button" className={styles.categoryChip} onClick={() => appendTag(name)}>

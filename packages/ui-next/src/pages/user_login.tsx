@@ -2,6 +2,7 @@ import { usePageData } from '../context/page-data';
 import { Link } from '../components/link';
 import { AuthShell } from '../components/auth/AuthShell';
 import { LoginForm, type LoginMethod } from '../components/auth/LoginForm';
+import { useTranslate } from '../lib/i18n';
 
 interface UserLoginArgs {
   builtInLogin?: boolean;
@@ -14,21 +15,22 @@ export default function UserLoginPage() {
   const { args } = usePageData() as unknown as { args: UserLoginArgs };
   const { builtInLogin = true, loginMethods = [], redirect, UserContext } = args ?? {};
   const isLoggedIn = !!UserContext?._id;
+  const t = useTranslate();
 
   return (
     <AuthShell
-      title={isLoggedIn ? `Welcome, ${UserContext?.uname ?? ''}` : 'Sign in'}
-      subtitle={isLoggedIn ? 'You are already signed in.' : 'Use your Hydro account to continue.'}
+      title={isLoggedIn ? t('Auth.WelcomeBack', { uname: UserContext?.uname ?? '' }) : t('Auth.SignIn')}
+      subtitle={isLoggedIn ? t('Auth.AlreadySignedIn') : t('Auth.UseAccount')}
       footLinks={
         <>
-          <Link to="homepage">← Back to homepage</Link>
-          {!isLoggedIn && <Link to="user_register">Create an account</Link>}
+          <Link to="homepage">{t('Common.Back')}</Link>
+          {!isLoggedIn && <Link to="user_register">{t('Auth.CreateAccount')}</Link>}
         </>
       }
     >
       {isLoggedIn ? (
         <p style={{ color: 'var(--text-soft)' }}>
-          Visit the <Link to="homepage">homepage</Link> or <Link to="user_logout">sign out</Link>.
+          {t('Auth.VisitHomepage')} <Link to="homepage">{t('Common.Home')}</Link> {t('Common.Or')} <Link to="user_logout">{t('Common.Logout')}</Link>.
         </p>
       ) : (
         <LoginForm

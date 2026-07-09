@@ -5,6 +5,7 @@ import { NavLink } from '../components/nav/NavLink';
 import { Link } from '../components/link';
 import { Alert, Button } from '../components/primitives';
 import { Menu } from '../components/sidebar/Menu';
+import { useTranslate } from '../lib/i18n';
 
 interface Rdoc {
   _id: string;
@@ -33,12 +34,20 @@ interface Args {
   };
 }
 
-const STATUS_TEXT = ['Accepted', 'Wrong Answer', 'Time Limit Exceeded', 'Memory Limit Exceeded',
-  'Runtime Error', 'System Error', 'Compile Error', 'Presentation Error'];
+const STATUS_KEYS = [
+  'Record.Status.Accepted',
+  'Record.Status.WrongAnswer',
+  'Record.Status.TimeLimitExceeded',
+  'Record.Status.MemoryLimitExceeded',
+  'Record.Status.RuntimeError',
+  'Record.Status.SystemError',
+  'Record.Status.CompileError',
+  'Record.Status.PresentationError',
+];
 
-function statusLabel(s?: number): string {
-  if (s === undefined) return 'Pending';
-  return STATUS_TEXT[s] ?? `Status ${s}`;
+function statusLabel(s: number | undefined, t: (k: string) => string): string {
+  if (s === undefined) return t('Record.Status.Pending');
+  return STATUS_KEYS[s] ? t(STATUS_KEYS[s]) : `Status ${s}`;
 }
 
 function highlightFor(lang?: string): string {
@@ -50,6 +59,7 @@ function highlightFor(lang?: string): string {
 export default function RecordDetailPage() {
   const { args } = usePageData() as unknown as { args: Args };
   const { rdoc, pdoc, tdoc, udoc, judge_udoc, allRevs = [], rev, UserContext } = args;
+  const t = useTranslate();
   const [liveStatus, setLiveStatus] = useState<number | undefined>(rdoc.status);
   const [liveScore, setLiveScore] = useState<number | undefined>(rdoc.score);
   // Mirror liveStatus into a ref so the EventSource lifecycle effect does not
@@ -60,7 +70,7 @@ export default function RecordDetailPage() {
 
   useEffect(() => {
     if (rev) return;
-    if (typeof liveStatusRef.current === 'number' && STATUS_TEXT[liveStatusRef.current]) return;
+    if (typeof liveStatusRef.current === 'number' && STATUS_KEYS[liveStatusRef.current]) return;
     if (typeof EventSource === 'undefined') return;
     const es = new EventSource(`/record-detail-conn?domainId=${encodeURIComponent(String(rdoc.domainId ?? ''))}&rid=${encodeURIComponent(String(rdoc._id))}`);
     es.addEventListener('update', (ev) => {
@@ -70,7 +80,7 @@ export default function RecordDetailPage() {
           setLiveStatus(data.status);
           liveStatusRef.current = data.status;
           // Terminal status — no more updates expected, close the stream.
-          if (STATUS_TEXT[data.status]) es.close();
+          if (STATUS_KEYS[data.status]) es.close();
         }
         if (typeof data.score === 'number') setLiveScore(data.score);
       } catch { /* ignore */ }
@@ -87,61 +97,61 @@ export default function RecordDetailPage() {
 
   const info = useMemo(() => {
     const rows: Array<[string, React.ReactNode]> = [];
-    rows.push(['Submit By', <Link key="sb" to="user_detail" params={{ uid: String(rdoc.uid) }}>{udoc?.uname ?? rdoc.uid}</Link>]);
-    if (rdoc.hackTarget) rows.push(['Hacked', <Link key="h" to="record_detail" params={{ rid: String(rdoc.hackTarget) }}>View source</Link>]);
-    rows.push(['Problem', <Link key="p" to="problem_detail" params={{ pid: pdoc.pid ?? String(pdoc.docId) }}>{pdoc.title}</Link>]);
+    rows.push([t('RecordDetail.SubmitBy'), <Link key="sb" to="user_detail" params={{ uid: String(rdoc.uid) }}>{udoc?.uname ?? rdoc.uid}</Link>]);
+    if (rdoc.hackTarget) rows.push([t('RecordDetail.Hacked'), <Link key="h" to="record_detail" params={{ rid: String(rdoc.hackTarget) }}>{t('RecordDetail.ViewSource')}</Link>]);
+    rows.push([t('RecordDetail.Problem'), <Link key="p" to="problem_detail" params={{ pid: pdoc.pid ?? String(pdoc.docId) }}>{pdoc.title}</Link>]);
     if (tdoc?.rule && tdoc.rule !== 'normal') {
-      rows.push([tdoc.rule === 'homework' ? 'Homework' : 'Contest',
+      rows.push([tdoc.rule === 'homework' ? t('RecordDetail.Homework') : t('RecordDetail.Contest'),
         <Link key="t" to={tdoc.rule === 'homework' ? 'homework_detail' : 'contest_detail'} params={{ tid: String(tdoc.docId) }}>{String(tdoc.docId)}</Link>]);
     }
-    if (rdoc.lang) rows.push(['Language', codeLang]);
-    if (code) rows.push(['Code Length', `${code.length} B`]);
-    if (rdoc.judgeAt) rows.push(['Judged At', new Date(rdoc.judgeAt).toLocaleString()]);
-    if (judge_udoc?.uname) rows.push(['Judged By', judge_udoc.uname]);
+    if (rdoc.lang) rows.push([t('RecordDetail.Language'), codeLang]);
+    if (code) rows.push([t('RecordDetail.CodeLength'), `${code.length}${t('RecordDetail.CodeLengthUnit')}`]);
+    if (rdoc.judgeAt) rows.push([t('RecordDetail.JudgedAt'), new Date(rdoc.judgeAt).toLocaleString()]);
+    if (judge_udoc?.uname) rows.push([t('RecordDetail.JudgedBy'), judge_udoc.uname]);
     return rows;
-  }, [rdoc, pdoc, tdoc, udoc, judge_udoc, code, codeLang]);
+  }, [rdoc, pdoc, tdoc, udoc, judge_udoc, code, codeLang, t]);
 
   return (
     <>
       <TopNav brand="Hydro" currentRoute="record_detail">
-        <NavLink to="homepage">Home</NavLink>
-        <NavLink to="record_main">Submissions</NavLink>
+        <NavLink to="homepage">{t('RecordDetail.Home')}</NavLink>
+        <NavLink to="record_main">{t('RecordDetail.Submissions')}</NavLink>
       </TopNav>
       <main style={{ maxWidth: 1320, margin: '0 auto', padding: 'var(--space-6)' }}>
         <header style={{ marginBottom: 'var(--space-4)' }}>
           <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-2xl)', margin: 0 }}>
-            Submission #{String(rdoc._id)}
+            {t('RecordDetail.TitlePrefix')}{String(rdoc._id)}
           </h1>
           <div style={{ color: 'var(--text-mute)', fontSize: 'var(--text-sm)', marginTop: 'var(--space-1)' }}>
-            <strong style={{ color: 'var(--text)' }}>{statusLabel(liveStatus)}</strong>
-            {liveScore !== undefined && <> · score {liveScore}</>}
+            <strong style={{ color: 'var(--text)' }}>{statusLabel(liveStatus, t)}</strong>
+            {liveScore !== undefined && <> · {t('Common.Score')} {liveScore}</>}
           </div>
         </header>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 320px', gap: 'var(--space-6)' }}>
           <section>
             {typeof liveStatus === 'number' && (
-              <Alert variant="info" title="Live" message={`Status: ${statusLabel(liveStatus)}`} />
+              <Alert variant="info" title={t('RecordDetail.Live')} message={`${t('RecordDetail.StatusPrefix')}${statusLabel(liveStatus, t)}`} />
             )}
             <div style={{ marginTop: 'var(--space-3)', display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
               <a href={`/record/${encodeURIComponent(String(rdoc._id))}?download=true`}>
-                <Button variant="ghost">Download code</Button>
+                <Button variant="ghost">{t('RecordDetail.DownloadCode')}</Button>
               </a>
               {rdoc.files?.hack && (
                 <a href={`/record/${encodeURIComponent(String(rdoc._id))}?download=hack`}>
-                  <Button variant="ghost">Download hack input</Button>
+                  <Button variant="ghost">{t('RecordDetail.DownloadHack')}</Button>
                 </a>
               )}
             </div>
             <pre style={{ marginTop: 'var(--space-4)', padding: 'var(--space-4)', borderRadius: 'var(--radius-md)', background: 'var(--bg-1)', border: '1px solid var(--border)', overflow: 'auto' }}>
-              <code className={`language-${codeLang}`}>{code || '(empty)'}</code>
+              <code className={`language-${codeLang}`}>{code || t('RecordDetail.Empty')}</code>
             </pre>
 
             {allRevs.length > 0 && (
               <section style={{ marginTop: 'var(--space-5)' }}>
-                <h2 style={{ fontSize: 'var(--text-md)' }}>History</h2>
+                <h2 style={{ fontSize: 'var(--text-md)' }}>{t('RecordDetail.History')}</h2>
                 <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-                  <li><Link to="record_detail" params={{ rid: String(rdoc._id) }}>Latest version</Link></li>
+                  <li><Link to="record_detail" params={{ rid: String(rdoc._id) }}>{t('RecordDetail.LatestVersion')}</Link></li>
                   {allRevs.map(([revId, time]) => (
                     <li key={revId}>
                       <Link to="record_detail" params={{ rid: String(rdoc._id) }} searchParams={{ rev: revId }}>
@@ -158,20 +168,20 @@ export default function RecordDetailPage() {
             <Menu
               items={[
                 isAdmin && !rdoc.files?.hack && {
-                  key: 'rejudge', title: 'Rejudge', form: true, action: '', postBody: { operation: 'rejudge' },
+                  key: 'rejudge', title: t('RecordDetail.Rejudge'), form: true, action: '', postBody: { operation: 'rejudge' },
                 },
                 isAdmin && !rdoc.files?.hack && {
-                  key: 'cancel-score', title: 'Cancel score', form: true, action: '', postBody: { operation: 'cancel' },
+                  key: 'cancel-score', title: t('RecordDetail.CancelScore'), form: true, action: '', postBody: { operation: 'cancel' },
                 },
                 canHack && {
                   key: 'hack',
-                  title: 'Hack',
+                  title: t('RecordDetail.Hack'),
                   href: `/p/${encodeURIComponent(String(pdoc.docId))}/hack/${encodeURIComponent(String(rdoc._id))}`,
                 },
               ].filter(Boolean) as never}
             />
             <div style={{ padding: 'var(--space-4)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border)', background: 'var(--surface)' }}>
-              <h3 style={{ fontSize: 'var(--text-md)', margin: '0 0 var(--space-3)' }}>Information</h3>
+              <h3 style={{ fontSize: 'var(--text-md)', margin: '0 0 var(--space-3)' }}>{t('RecordDetail.Information')}</h3>
               <dl style={{ margin: 0, display: 'grid', gridTemplateColumns: 'max-content 1fr', gap: 'var(--space-2) var(--space-4)', fontSize: 'var(--text-sm)' }}>
                 {info.map(([k, v]) => (<span key={k} style={{ display: 'contents' }}><dt style={{ color: 'var(--text-mute)' }}>{k}</dt><dd style={{ margin: 0 }}>{v}</dd></span>))}
               </dl>

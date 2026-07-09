@@ -6,6 +6,7 @@ import { NavLink } from '../components/nav/NavLink';
 import { Link } from '../components/link';
 import { Alert, Button, RateLimitAlert } from '../components/primitives';
 import { HydroClientError, request } from '../hooks/use-api';
+import { useTranslate } from '../lib/i18n';
 
 interface LangOption { value: string; label: string; }
 interface Args {
@@ -18,6 +19,7 @@ interface Args {
 export default function ProblemSubmitPage() {
   const { args } = usePageData() as unknown as { args: Args };
   const navigate = useNavigate();
+  const t = useTranslate();
   const { pdoc, langRange = [], codeLang = '', tid } = args;
   const [lang, setLang] = useState(codeLang || langRange[0]?.value || '');
   const [code, setCode] = useState('');
@@ -29,7 +31,7 @@ export default function ProblemSubmitPage() {
   const submit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!code.trim() && !file) {
-      setError(new HydroClientError({ code: 400, message: 'Please provide either source code or an upload.' }));
+      setError(new HydroClientError({ code: 400, message: t('ProblemSubmit.ErrorNoCodeOrFile') }));
       return;
     }
     setSubmitting(true);
@@ -70,14 +72,14 @@ export default function ProblemSubmitPage() {
   return (
     <>
       <TopNav brand="Hydro" currentRoute="problem_submit">
-        <NavLink to="homepage">Home</NavLink>
-        <NavLink to="problem_main">Problems</NavLink>
+        <NavLink to="homepage">{t('Common.Home')}</NavLink>
+        <NavLink to="problem_main">{t('Common.Problems')}</NavLink>
       </TopNav>
       <main style={{ maxWidth: 1080, margin: '0 auto', padding: 'var(--space-6)' }}>
         <header style={{ marginBottom: 'var(--space-4)' }}>
-          <Link to="problem_detail" params={{ pid: pdoc?.pid ?? String(pdoc?.docId ?? '') }}>← Back to problem</Link>
+          <Link to="problem_detail" params={{ pid: pdoc?.pid ?? String(pdoc?.docId ?? '') }}>{t('ProblemSubmit.BackToProblem')}</Link>
           <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-2xl)', margin: 'var(--space-2) 0 0' }}>
-            Submit: {pdoc?.title}
+            {t('ProblemSubmit.TitlePrefix')}{pdoc?.title}
           </h1>
         </header>
 
@@ -86,7 +88,7 @@ export default function ProblemSubmitPage() {
 
         <form onSubmit={submit} method="POST" encType="multipart/form-data" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
           <label style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-            <span style={{ fontSize: 'var(--text-sm)', fontWeight: 600 }}>Language</span>
+            <span style={{ fontSize: 'var(--text-sm)', fontWeight: 600 }}>{t('ProblemSubmit.Language')}</span>
             <select
               name="lang"
               value={lang}
@@ -101,12 +103,12 @@ export default function ProblemSubmitPage() {
           </label>
 
           <label style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-            <span style={{ fontSize: 'var(--text-sm)', fontWeight: 600 }}>Source code</span>
+            <span style={{ fontSize: 'var(--text-sm)', fontWeight: 600 }}>{t('ProblemSubmit.SourceCode')}</span>
             <textarea
               name="code"
               value={code}
-              onChange={(e) => setCode(e.currentTarget.value)}
-              placeholder="Paste your solution here…"
+              onChange={(e) => setCode(e.target.value)}
+              placeholder={t('ProblemSubmit.SourcePlaceholder')}
               spellCheck={false}
               autoFocus
               style={{
@@ -119,21 +121,21 @@ export default function ProblemSubmitPage() {
           </label>
 
           <label style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-            <span style={{ fontSize: 'var(--text-sm)', fontWeight: 600 }}>Or upload file</span>
+            <span style={{ fontSize: 'var(--text-sm)', fontWeight: 600 }}>{t('ProblemSubmit.UploadFile')}</span>
             <input type="file" name="file" onChange={(e) => setFile(e.currentTarget.files?.[0] ?? null)} />
             <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-mute)' }}>
-              Use a file when submitting binaries, zip packages, or very large sources.
+              {t('ProblemSubmit.UploadHint')}
             </span>
           </label>
 
           {pretestAllowed && (
             <label style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-              <span style={{ fontSize: 'var(--text-sm)', fontWeight: 600 }}>Pretest input (optional)</span>
+              <span style={{ fontSize: 'var(--text-sm)', fontWeight: 600 }}>{t('ProblemSubmit.PretestInput')}</span>
               <textarea
                 name="input"
                 value={pretestInput}
-                onChange={(e) => setPretestInput(e.currentTarget.value)}
-                placeholder="stdin for a quick local run…"
+                onChange={(e) => setPretestInput(e.target.value)}
+                placeholder={t('ProblemSubmit.PretestPlaceholder')}
                 style={{
                   width: '100%', minHeight: 120, padding: 'var(--space-3)',
                   borderRadius: 'var(--radius-md)', border: '1px solid var(--border)',
@@ -146,7 +148,7 @@ export default function ProblemSubmitPage() {
 
           <input type="hidden" name="tid" value={tid ?? ''} />
           <Button type="submit" variant="primary" disabled={submitting}>
-            {submitting ? 'Submitting…' : 'Submit'}
+            {submitting ? t('ProblemSubmit.Submitting') : t('ProblemSubmit.Submit')}
           </Button>
         </form>
       </main>
