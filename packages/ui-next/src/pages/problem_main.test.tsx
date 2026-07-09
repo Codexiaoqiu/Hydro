@@ -323,4 +323,60 @@ describe('ProblemMain', () => {
         expect(pill).toBeInTheDocument();
         expect(pill.className).toMatch(/diff(?!None)/);
     });
+
+    describe('TagRow collapse', () => {
+        const manyTags = ['t1', 't2', 't3', 't4', 't5', 't6', 't7'];
+        const fewTags = ['t1', 't2', 't3'];
+
+        it('collapses to 5 tags with a Show all (+N) button when more than 5', () => {
+            renderProblem({
+                pdocs: [{ docId: 1, domainId: 'system', title: 'P', tag: manyTags, nSubmit: 0, nAccept: 0 }],
+                psdict: {},
+                page: 1,
+                pcount: 1,
+                ppcount: 1,
+            });
+            const tags = manyTags.slice(0, 5);
+            tags.forEach((name) => {
+                expect(screen.getByRole('link', { name })).toBeInTheDocument();
+            });
+            expect(screen.queryByRole('link', { name: 't6' })).not.toBeInTheDocument();
+            expect(screen.queryByRole('link', { name: 't7' })).not.toBeInTheDocument();
+            const toggle = screen.getByRole('button', { name: /Show all/i });
+            expect(toggle).toBeInTheDocument();
+            expect(toggle).toHaveAttribute('aria-expanded', 'false');
+            expect(toggle.textContent).toMatch(/\+2/);
+        });
+
+        it('expands all tags after click on Show all', () => {
+            renderProblem({
+                pdocs: [{ docId: 1, domainId: 'system', title: 'P', tag: manyTags, nSubmit: 0, nAccept: 0 }],
+                psdict: {},
+                page: 1,
+                pcount: 1,
+                ppcount: 1,
+            });
+            const toggle = screen.getByRole('button', { name: /Show all/i });
+            fireEvent.click(toggle);
+            manyTags.forEach((name) => {
+                expect(screen.getByRole('link', { name })).toBeInTheDocument();
+            });
+            const hide = screen.getByRole('button', { name: /Show less|收起/i });
+            expect(hide).toHaveAttribute('aria-expanded', 'true');
+        });
+
+        it('does not show a toggle when there are <= 5 tags', () => {
+            renderProblem({
+                pdocs: [{ docId: 1, domainId: 'system', title: 'P', tag: fewTags, nSubmit: 0, nAccept: 0 }],
+                psdict: {},
+                page: 1,
+                pcount: 1,
+                ppcount: 1,
+            });
+            fewTags.forEach((name) => {
+                expect(screen.getByRole('link', { name })).toBeInTheDocument();
+            });
+            expect(screen.queryByRole('button', { name: /Show all|Show less|展开|收起/i })).not.toBeInTheDocument();
+        });
+    });
 });

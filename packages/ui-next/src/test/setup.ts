@@ -7,6 +7,11 @@ afterEach(() => {
     cleanup();
 });
 
+// Pin locale for deterministic i18n assertions in tests.
+// detectLocale() falls back to navigator.language; CI hosts (en-US) would
+// otherwise flip every Chinese-literal assertion to English.
+(window as unknown as { __hydro_locale?: string }).__hydro_locale = 'zh_CN';
+
 // jsdom/happy-dom do not implement matchMedia; stub it for ThemeProvider.
 if (typeof window !== 'undefined' && !window.matchMedia) {
     Object.defineProperty(window, 'matchMedia', {

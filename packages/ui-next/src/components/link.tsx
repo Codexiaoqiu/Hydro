@@ -9,6 +9,8 @@ export interface LinkProps extends Omit<React.AnchorHTMLAttributes<HTMLAnchorEle
   to?: string;
   /** Params for route resolution when `to` is given. */
   params?: UrlParams;
+  /** Search params appended after path resolution when `to` is given. */
+  searchParams?: Record<string, string>;
 }
 
 function isModifiedEvent(e: React.MouseEvent): boolean {
@@ -16,7 +18,7 @@ function isModifiedEvent(e: React.MouseEvent): boolean {
 }
 
 export const Link: React.FC<React.PropsWithChildren<LinkProps>> = ({
-  href, to, params,
+  href, to, params, searchParams,
   onClick, target, download = false,
   children,
   ...rest
@@ -24,7 +26,10 @@ export const Link: React.FC<React.PropsWithChildren<LinkProps>> = ({
   const buildUrl = useBuildUrl();
   const navigate = useNavigate();
 
-  const resolvedHref = useMemo(() => (to ? buildUrl(to, params) : (href ?? '#')), [buildUrl, href, to, params]);
+  const resolvedHref = useMemo(
+    () => (to ? buildUrl(to, params, searchParams ?? {}) : (href ?? '#')),
+    [buildUrl, href, to, params, searchParams],
+  );
 
   const handleClick = useCallback(
     (e: React.MouseEvent<HTMLAnchorElement>) => {
