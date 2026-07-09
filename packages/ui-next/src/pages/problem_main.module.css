@@ -133,6 +133,46 @@
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
+  align-items: center;
+}
+
+.tagToggle {
+  font-family: inherit;
+  font-size: var(--text-xs);
+  color: var(--text-mute);
+  background: transparent;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-sm);
+  padding: 2px var(--space-2);
+  cursor: pointer;
+  transition: color var(--motion-base), border-color var(--motion-base), background-color var(--motion-base);
+}
+
+.tagToggle:hover {
+  color: var(--text-soft);
+  border-color: var(--border-strong);
+  background: var(--surface-2);
+}
+
+.tagToggle:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 1px;
+}
+
+.uploadedBy {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--text-xs);
+  color: var(--text-mute);
+}
+
+.uploadedByName {
+  font-family: var(--font-mono);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 12ch;
 }
 
 .tagLink {

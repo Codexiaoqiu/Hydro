@@ -1,10 +1,11 @@
+import type { JSX } from 'react';
 import { Avatar as PrimAvatar } from '../components/primitives/Avatar';
 import styles from './avatar.module.css';
 
 // ---- Tiny RFC 1321 MD5 (snippet condensed from Joseph Myers' public-domain C;
 // edited for brevity). No external dep: the server uses Node's crypto.createHash('md5'),
 // the browser needs a pure-JS implementation; this one is ~70 LOC and unit-tested.
-// The asserted hash f3ada405ce890b6d18a4358a394a3c45 == MD5("foo@bar.com").
+// The asserted hash f3ada405ce890b6f8204094deb12d8a8 == MD5("foo@bar.com").
 function md5(s: string): string {
   function r(n: number, c: number) { return (n << c) | (n >>> (32 - c)); }
   function add32(a: number, b: number) { return (a + b) & 0xffffffff; }
@@ -141,23 +142,40 @@ export function avatarUrl(spec: string | undefined, size = 64): string | null {
 interface AvatarProps {
   spec?: string;
   name?: string;
-  size?: number;
+  /**
+   * Pixels (or any valid CSS length string like `'40px'`, `'1.5rem'`).
+   * Number values are passed through as `<img width height>`; strings go to
+   * inline `style={{ width, height }}`. For gravatar/github/qq avatars, a
+   * numeric size is required to size the remote request; non-numeric inputs
+   * fall back to requesting 64px (the third-party then gets downscaled by
+   * CSS).
+   */
+  size?: number | string;
+  // Optional accessible label — emitted as both `title` (native tooltip) and
+  // `aria-label` so screen readers and sighted users get the same hint.
+  title?: string;
 }
 
+const DEFAULT_AVATAR_SIZE = 32;
+
 /** Avatar with provider-spec URL resolution; falls back to initials via primitives/Avatar. */
-export function Avatar({ spec, name, size = 40 }: AvatarProps): JSX.Element {
-  const url = avatarUrl(spec, size);
+export function Avatar({ spec, name, size = DEFAULT_AVATAR_SIZE, title }: AvatarProps): JSX.Element {
+  const url = avatarUrl(spec, typeof size === 'number' ? size : 64);
   if (url) {
+    const numericSize = typeof size === 'number' ? size : undefined;
     return (
       <img
         className={styles.img}
         src={url}
-        width={size}
-        height={size}
+        width={numericSize}
+        height={numericSize}
+        style={typeof size === 'string' ? { width: size, height: size } : undefined}
         alt={name ?? ''}
+        title={title}
+        aria-label={title}
         loading="lazy"
       />
     );
   }
-  return <PrimAvatar name={name} size={size} />;
+  return <PrimAvatar name={name} size={size} title={title} />;
 }

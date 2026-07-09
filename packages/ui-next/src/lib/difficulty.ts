@@ -51,4 +51,10 @@ export function difficultyAlgorithm(nSubmit: number, nAccept: number): number | 
     return Math.max(ans, 1);
 }
 
+// `formatN` historically lived here; it has been moved to `./format.ts` so
+// any module that needs to render a count can share one implementation.
+// Re-exported below for backwards compatibility with existing call sites
+// (`pages/problem_main.tsx`, this module's own test).
+export { formatN } from './format';
+
 export default difficultyAlgorithm;

@@ -14,7 +14,9 @@ import { TopNav } from '../components/nav/TopNav';
 import { usePageData } from '../context/page-data';
 import { useNavigate } from '../context/router';
 import { useBuildUrl } from '../hooks/use-build-url';
-import { difficultyAlgorithm } from '../lib/difficulty';
+import { Avatar } from '../lib/avatar';
+import { difficultyAlgorithm, formatN } from '../lib/difficulty';
+import { useTranslate } from '../lib/i18n';
 import styles from './problem_main.module.css';
 
 interface Pdoc {
@@ -27,6 +29,10 @@ interface Pdoc {
   nSubmit: number;
   nAccept: number;
   difficulty?: number;
+  // Optional uploader info — when present we render an avatar next to the
+  // row. Kept separate from `owner` (an id) so future backend payloads can
+  // pre-fill the avatar spec without breaking the page.
+  uploadedBy?: { _id?: number; uname?: string; avatar?: string };
 }
 
 interface Psdoc {
@@ -77,12 +83,49 @@ const statusLabel = (status: number | undefined): string => {
   return STATUS_SHORT_TEXTS[status as STATUS] || '…';
 };
 
+const tagQuery = (tag: string): string => `category:${tag.includes(' ') ? `"${tag}"` : tag}`;
+
 function SearchIcon() {
   return (
     <svg className={styles.searchIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
       <circle cx="11" cy="11" r="7" />
       <path d="m20 20-3.5-3.5" strokeLinecap="round" />
     </svg>
+  );
+}
+
+function TagRow({ tags, buildUrl }: { tags: string[]; buildUrl: ReturnType<typeof useBuildUrl> }) {
+  // Limit to 5 tags per row by default — beyond that the row gets crowded
+  // and the chip strip wraps onto a second line. A "Show all" button expands
+  // to reveal every tag, which is more discoverable than horizontal scroll.
+  const COLLAPSED_LIMIT = 5;
+  const [expanded, setExpanded] = useState(false);
+  const t = useTranslate();
+  const visible = expanded ? tags : tags.slice(0, COLLAPSED_LIMIT);
+  const hiddenCount = tags.length - visible.length;
+
+  return (
+    <div className={styles.tags}>
+      {visible.map((tagName) => (
+        <Link
+          key={tagName}
+          href={buildUrl('problem_main', {}, { q: tagQuery(tagName) })}
+          className={styles.tagLink}
+        >
+          {tagName}
+        </Link>
+      ))}
+      {hiddenCount > 0 && (
+        <button
+          type="button"
+          className={styles.tagToggle}
+          aria-expanded={expanded}
+          onClick={() => setExpanded((v) => !v)}
+        >
+          {expanded ? t('Problem.TagToggleHide') : `${t('Problem.TagToggleShow')} (+${hiddenCount})`}
+        </button>
+      )}
+    </div>
   );
 }
 
@@ -93,6 +136,7 @@ function Pager({ page, ppcount, qs, sort, buildUrl }: {
   sort: string;
   buildUrl: ReturnType<typeof useBuildUrl>;
 }) {
+  const t = useTranslate();
   if (!ppcount || ppcount <= 1) return null;
 
   const buildHref = (p: number) => {
@@ -115,7 +159,7 @@ function Pager({ page, ppcount, qs, sort, buildUrl }: {
   }
 
   return (
-    <nav className={styles.pager} aria-label="pagination">
+    <nav className={styles.pager} aria-label={t('ProblemMain.PagerAria')}>
       {items.map((it, idx) => {
         if (it === 'gap') {
           return <span key={`g-${idx}`} className={styles.pagerGap}>…</span>;
@@ -141,6 +185,7 @@ export default function ProblemMain() {
   const args: ProblemArgs = pageData.args;
   const buildUrl = useBuildUrl();
   const navigate = useNavigate();
+  const t = useTranslate();
 
   const pdocs = args.pdocs || [];
   const psdict = args.psdict || {};
@@ -178,10 +223,8 @@ export default function ProblemMain() {
 
   const extraTitle = UiContext?.extraTitleContent as string | undefined;
   const statText = pcount > 0
-    ? (args.pcountRelation === 'eq' ? `${pcount} 道题目` : `${pcount}+ 道题目`)
-    : '暂无题目';
-
-  const tagQuery = (tag: string) => `category:${tag.includes(' ') ? `"${tag}"` : tag}`;
+    ? (args.pcountRelation === 'eq' ? `${pcount}${t('ProblemMain.ProblemCount')}` : `${pcount}${t('ProblemMain.ProblemCountRelation')}`)
+    : t('ProblemMain.NoProblems');
 
   return (
     <>
@@ -193,18 +236,18 @@ export default function ProblemMain() {
             <LangPill label={UserContext?.viewLangName || '中文'} />
             <ThemeToggle />
             <Button variant="ghost" onClick={() => { navigate('/login'); }}>
-              登录
+              {t('ProblemMain.Login')}
             </Button>
             <Button variant="primary" onClick={() => { navigate('/register'); }}>
-              注册
+              {t('ProblemMain.Register')}
             </Button>
           </>
         }
       >
-        <NavLink to="homepage">首页</NavLink>
-        <NavLink to="problem_main">题库</NavLink>
-        <NavLink to="contest_main">比赛</NavLink>
-        <NavLink to="discussion_main">讨论</NavLink>
+        <NavLink to="homepage">{t('ProblemMain.Problems')}</NavLink>
+        <NavLink to="problem_main">{t('Common.Problems')}</NavLink>
+        <NavLink to="contest_main">{t('ProblemMain.Contests')}</NavLink>
+        <NavLink to="discussion_main">{t('ProblemMain.Discussions')}</NavLink>
       </TopNav>
 
       <div className={styles.shell}>
@@ -214,7 +257,7 @@ export default function ProblemMain() {
             header={
               <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
                 <div className={styles.crumbs}>
-                  <Eyebrow dot={false}>题库 / Problems</Eyebrow>
+                  <Eyebrow dot={false}>{t('ProblemMain.Crumbs')}</Eyebrow>
                   {extraTitle && <span className={styles.crumb}>· {extraTitle}</span>}
                 </div>
                 <h3 style={{
@@ -225,7 +268,7 @@ export default function ProblemMain() {
                   margin: 0,
                 }}
                 >
-                  题目列表
+                  {t('ProblemMain.Title')}
                 </h3>
               </div>
             }
@@ -237,19 +280,19 @@ export default function ProblemMain() {
                   <input
                     type="text"
                     name="q"
-                    placeholder="搜索题目 ID / 标题 / 标签…"
+                    placeholder={t('ProblemMain.SearchPlaceholder')}
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
-                    aria-label="搜索题目"
+                    aria-label={t('ProblemMain.SearchAria')}
                   />
                 </label>
                 <Select
                   value={sort}
                   onChange={sortChange}
-                  ariaLabel="排序方式"
+                  ariaLabel={t('ProblemMain.SortAria')}
                   options={[
-                    { value: 'default', label: '默认排序' },
-                    { value: 'recent', label: '最新优先' },
+                    { value: 'default', label: t('ProblemMain.SortDefault') },
+                    { value: 'recent', label: t('ProblemMain.SortRecent') },
                   ]}
                 />
               </form>
@@ -258,7 +301,7 @@ export default function ProblemMain() {
 
             {pdocs.length === 0 ? (
               <div className={styles.empty}>
-                当前筛选下没有题目。试试清空搜索,或者从侧边栏的分类开始浏览。
+                {t('ProblemMain.NoProblemsHint')}
               </div>
             ) : (
               <>
@@ -273,6 +316,8 @@ export default function ProblemMain() {
                     // client-side when it's missing. The algorithm returns
                     // null when nSubmit is 0; treat that as "no signal".
                     const difficulty = p.difficulty ?? difficultyAlgorithm(p.nSubmit, p.nAccept) ?? undefined;
+                    const uploader = p.uploadedBy;
+                    const hasUploader = !!uploader && (!!uploader.uname || !!uploader.avatar || uploader._id !== undefined);
                     return (
                       <div key={p.docId} className={styles.row}>
                         <div className={styles.id}>{formatPid(p)}</div>
@@ -285,31 +330,34 @@ export default function ProblemMain() {
                             title={p.title}
                           >
                             {p.title}
-                            {p.hidden && <span className={styles.hidden}> · Hidden</span>}
+                            {p.hidden && <span className={styles.hidden}>{t('ProblemMain.Hidden')}</span>}
                           </Link>
                           {p.tag && p.tag.length > 0 && (
-                            <div className={styles.tags}>
-                              {p.tag.slice(0, 5).map((t) => (
-                                <Link
-                                  key={t}
-                                  href={buildUrl('problem_main', {}, { q: tagQuery(t) })}
-                                  className={styles.tagLink}
-                                >
-                                  {t}
-                                </Link>
-                              ))}
+                            <TagRow tags={p.tag} buildUrl={buildUrl} />
+                          )}
+                          {hasUploader && (
+                            <div className={styles.uploadedBy}>
+                              <Avatar
+                                spec={uploader!.avatar}
+                                name={uploader!.uname ?? `#${uploader!._id}`}
+                                size={20}
+                                title={uploader!.uname}
+                              />
+                              <span className={styles.uploadedByName}>
+                                {uploader!.uname ?? `#${uploader!._id}`}
+                              </span>
                             </div>
                           )}
                         </div>
 
                         <div className={styles.ac}>
                           <strong>{p.nAccept}</strong>
-                          <span>/ {p.nSubmit}</span>
+                          <span>/ {formatN(p.nSubmit)}</span>
                         </div>
 
-                        <div className={styles.ac} title={`通过率 ${acRate}%`}>
+                        <div className={styles.ac} title={`${t('ProblemMain.AcRateTitle')}${acRate}%`}>
                           <strong>{acRate}%</strong>
-                          <span style={{ fontSize: 'var(--text-xs)' }}>通过率</span>
+                          <span style={{ fontSize: 'var(--text-xs)' }}>{t('ProblemMain.AcRateLabel')}</span>
                         </div>
 
                         <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
@@ -336,16 +384,16 @@ export default function ProblemMain() {
         <aside className={styles.sidebar}>
           <Card variant="side">
             <CtaCard
-              title="准备好开刷了?"
-              subtitle="登录后即可提交代码、查看状态"
-              actionLabel="登录"
+              title={t('ProblemMain.SideCtaTitle')}
+              subtitle={t('ProblemMain.SideCtaSubtitle')}
+              actionLabel={t('ProblemMain.SideCtaAction')}
               onAction={() => { navigate('/login'); }}
             />
           </Card>
 
           {Object.keys(categorySetting).length > 0 && (
             <Card variant="side">
-              <h4 className={styles.sideTitle}>分类</h4>
+              <h4 className={styles.sideTitle}>{t('ProblemMain.SideCategoryTitle')}</h4>
               <div className={styles.catList}>
                 {Object.entries(categorySetting).map(([cat, subs]) => (
                   <div key={cat}>
@@ -371,23 +419,23 @@ export default function ProblemMain() {
           )}
 
           <Card variant="side">
-            <h4 className={styles.sideTitle}>手气不错</h4>
+            <h4 className={styles.sideTitle}>{t('ProblemMain.SideLuckyTitle')}</h4>
             <Link
               href={qs ? buildUrl('problem_random', {}, { q: qs }) : buildUrl('problem_random')}
               className={styles.lucky}
               target="_blank"
               rel="noopener"
             >
-              <span aria-hidden>🎲</span> 随机一题
+              <span aria-hidden>🎲</span> {t('ProblemMain.SideLucky')}
             </Link>
             <p className={styles.luckyHint}>
-              根据当前筛选条件随机抽一道题目;清空搜索可以扩展到全题库。
+              {t('ProblemMain.SideLuckyHint')}
             </p>
           </Card>
 
           {flatTags.length > 0 && (
             <Card variant="side">
-              <h4 className={styles.sideTitle}>本页热门标签</h4>
+              <h4 className={styles.sideTitle}>{t('ProblemMain.SideTagsTitle')}</h4>
               <TagCloud tags={flatTags} />
             </Card>
           )}

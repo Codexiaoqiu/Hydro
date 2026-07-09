@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { difficultyAlgorithm } from './difficulty';
+import { difficultyAlgorithm, formatN } from './difficulty';
 
 describe('difficultyAlgorithm (client port of hydrooj/lib/difficulty.ts)', () => {
     it('returns null when nSubmit is 0 regardless of nAccept', () => {
@@ -68,5 +68,31 @@ describe('difficultyAlgorithm (client port of hydrooj/lib/difficulty.ts)', () =>
             const d = difficultyAlgorithm(nSubmit, nAccept);
             expect(d).toBe(expected);
         }
+    });
+});
+
+describe('formatN', () => {
+    it('returns "?" when value is undefined', () => {
+        expect(formatN(undefined)).toBe('?');
+    });
+
+    it('returns "—" when value is exactly 0', () => {
+        // 0 means "no submissions yet" — we don't want to mislead the user
+        // with a literal "0 提交" in the list, since the server omits the
+        // count when it hasn't been computed.
+        expect(formatN(0)).toBe('—');
+    });
+
+    it('stringifies positive integers as-is', () => {
+        expect(formatN(1)).toBe('1');
+        expect(formatN(42)).toBe('42');
+        expect(formatN(1000000)).toBe('1000000');
+    });
+
+    it('preserves a real zero count passed via explicit assignment', () => {
+        // Belt-and-suspenders: ensure the function isn't accidentally
+        // coercing falsy values into "—".
+        const n: number | undefined = 0;
+        expect(formatN(n)).toBe('—');
     });
 });
