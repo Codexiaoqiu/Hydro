@@ -1,20 +1,20 @@
 import { useEffect, useMemo } from 'react';
 import { STATUS } from '@hydrooj/common';
-import {
-  usePageData, useSetUiContext,
-} from '../context/page-data';
+import { usePageData, useSetUiContext } from '../context/page-data';
 import { Link } from '../components/link';
-import { TopNav } from '../components/nav/TopNav';
-import { NavLink } from '../components/nav/NavLink';
 import { Alert, Chip, Eyebrow } from '../components/primitives';
 import { Article } from '../components/article/Article';
 import { Menu, type MenuItem } from '../components/sidebar/Menu';
+import { Author } from '../components/sidebar/Author';
+import { ContestList, type ContestItem } from '../components/sidebar/ContestList';
+import { TagCloud } from '../components/primitives/TagCloud';
+import { SideCard } from '../components/sidebar/SideCard';
+import { ProblemHero } from '../components/problem/ProblemHero';
 import { useBuildUrl } from '../hooks/use-build-url';
 import { useTranslate } from '../lib/i18n';
 import styles from './problem_detail.module.css';
 
-// ===== Types ===============================================================
-
+// ===== Types (unchanged from existing) =====================================
 interface Pdoc {
   docId: number;
   pid?: string;
@@ -109,7 +109,6 @@ function readContentText(content: Pdoc['content'] | undefined, preferredLang: st
   const pickFromMap = (m: Record<string, unknown>): string => {
     const direct = m[preferredLang];
     if (typeof direct === 'string') return direct;
-    // Fallback: backend may have wrapped the per-language map as a JSON string.
     const directStr = String(direct ?? '');
     if (directStr.trimStart().startsWith('{')) {
       try {
@@ -129,12 +128,6 @@ function readContentText(content: Pdoc['content'] | undefined, preferredLang: st
   };
   return pickFromMap(map);
 }
-
-// ===========================================================================
-// Sidebar helpers (Bug #8) — three views that mirror ui-default's
-// problem_sidebar_{normal,contest,homework}.html so we don't lose context-
-// specific gating when switching modes.
-// ===========================================================================
 
 interface SidebarCtx {
   pdoc: Pdoc;
@@ -167,11 +160,8 @@ function getNormalMenu(ctx: SidebarCtx, t: (k: string, a?: Record<string, unknow
   const canEditProblem =
     (pdoc && UserContext?.own?.(pdoc as unknown as { owner?: number }, 16)) ||
     UserContext?.hasPerm?.(16);
-  // PERM_REJUDGE_PROBLEM = 4096; the original problem is preferred, but if it's
-  // a hack-style reference problem we don't show rejudge either.
   const showRejudge = canRejudge && !pdoc.reference;
 
-  // --- Submit (4 states) ---------------------------------------------------
   if (canSubmit) {
     items.push({
       key: 'submit',
@@ -194,7 +184,6 @@ function getNormalMenu(ctx: SidebarCtx, t: (k: string, a?: Record<string, unknow
     });
   }
 
-  // --- Rejudge --------------------------------------------------------------
   if (showRejudge) {
     items.push({
       key: 'rejudge',
@@ -205,7 +194,6 @@ function getNormalMenu(ctx: SidebarCtx, t: (k: string, a?: Record<string, unknow
     });
   }
 
-  // --- Separator before Discussions/Solutions ------------------------------
   if (canViewDiscussion || canViewSolution) {
     items.push({ key: 'sep-1', separator: true });
   }
@@ -234,7 +222,6 @@ function getNormalMenu(ctx: SidebarCtx, t: (k: string, a?: Record<string, unknow
     href: buildUrl('problem_statistics', { pid: String(pdoc.docId) }, getTidQuery(tdoc)),
   });
 
-  // --- Edit / Judge Config -------------------------------------------------
   if (canEditProblem) {
     items.push({ key: 'sep-2', separator: true });
     items.push({
@@ -251,16 +238,7 @@ function getNormalMenu(ctx: SidebarCtx, t: (k: string, a?: Record<string, unknow
     }
   }
 
-  // --- Download / Copy intentionally omitted in ui-next phase 1 --------------
-  // These used to be empty onClick stubs in this helper. They are now provided
-  // through slots (defineSlot('problem:sidebar:download' | 'problem:sidebar:copy', ...))
-  // by future addons; keeping unimplemented entries here would render menu
-  // items that do nothing when clicked.
-
-  // Scratchpad slot intentionally skipped — ui-next phase 1 does not implement
-  // the Monaco scratchpad panel. See TODO: 接入 scratchpad slot.
   void pdoc;
-
   return items;
 }
 
@@ -269,11 +247,7 @@ function getContestMenu(ctx: SidebarCtx, mode: Mode, t: (k: string, a?: Record<s
   if (!tdoc) return getNormalMenu(ctx, t);
   const items: MenuItem[] = [];
 
-  // mode === 'normal' here means: opened from /problem/<pid>; contest-mode
-  // routes inside a contest call this with mode='contest' | 'view' | 'correction'.
   if (mode === 'view' || mode === 'correction') {
-    // ui-default's contest sidebar shows "Open in Problem Set" when the
-    // contest is done for both correction and post-end viewing.
     items.push({
       key: 'open-in-problem-set',
       title: t('Problem.OpenInProblemSet'),
@@ -287,8 +261,6 @@ function getContestMenu(ctx: SidebarCtx, mode: Mode, t: (k: string, a?: Record<s
     });
   }
 
-  // Submit remains reachable while the contest is ongoing; after it ends we
-  // only show "Open in Problem Set" instead.
   if (mode === 'contest' || (mode !== 'view' && mode !== 'correction')) {
     const isLoggedIn = !!UserContext?._id;
     const canSubmit = UserContext?.hasPerm?.(8) ?? false;
@@ -315,7 +287,6 @@ function getContestMenu(ctx: SidebarCtx, mode: Mode, t: (k: string, a?: Record<s
     }
   }
 
-  // Edit-only sidebar in contest mode (ui-default behavior).
   const canEditProblem =
     (pdoc && UserContext?.own?.(pdoc as unknown as { owner?: number }, 16)) ||
     UserContext?.hasPerm?.(16);
@@ -341,8 +312,6 @@ function getHomeworkMenu(ctx: SidebarCtx, mode: Mode, t: (k: string, a?: Record<
   if (!tdoc) return getNormalMenu(ctx, t);
   const items: MenuItem[] = [];
 
-  // ui-default: hide Discussions / Solutions / Files / Statistics for homework
-  // rule; only show View Problem + Submit (or "Open in Problem Set" once done).
   const showSubmitArea = mode === 'contest' || mode === 'correction' || mode === 'normal';
 
   if (showSubmitArea) {
@@ -375,7 +344,6 @@ function getHomeworkMenu(ctx: SidebarCtx, mode: Mode, t: (k: string, a?: Record<
       });
     }
   } else {
-    // view / done: replace the contest submit block with a single link out.
     items.push({
       key: 'open-in-problem-set',
       title: t('Problem.OpenInProblemSet'),
@@ -409,10 +377,7 @@ function pickSidebarItems(ctx: SidebarCtx, mode: Mode, t: (k: string, a?: Record
   return getContestMenu(ctx, mode, t);
 }
 
-// ===========================================================================
-// Page
-// ===========================================================================
-
+// ===== Page ================================================================
 export default function ProblemDetailPage() {
   const { args } = usePageData() as unknown as { args: Args };
   const {
@@ -425,8 +390,6 @@ export default function ProblemDetailPage() {
   const setUiContext = useSetUiContext();
   const t = useTranslate();
 
-  // --- Bug #10: push problem/t/contest context fields into UiContext using
-  // the reactive setter. Downstream slot panels read these via useUiContext().
   useEffect(() => {
     const userCtx = UserContext as unknown as {
       viewLang?: string;
@@ -459,9 +422,6 @@ export default function ProblemDetailPage() {
     });
   }, [pdoc, tdoc, tsdoc, UserContext, buildUrl, setUiContext]);
 
-  // --- Bug #6: preferred language fallback that respects the available keys
-  // in pdoc.content. Mirrors ui-default's i18n lookup chain:
-  //   ?lang= → viewLang → viewLang's prefix ('zh' matches 'zh_CN') → first key.
   const preferredLang = useMemo(() => {
     const userLang = (UserContext as unknown as { viewLang?: string })?.viewLang;
     const baseLang = userLang?.split(/[-_]/)[0];
@@ -516,96 +476,199 @@ export default function ProblemDetailPage() {
     t,
   );
 
-  return (
-    <>
-      <TopNav brand="Hydro" currentRoute="problem_detail">
-        <NavLink to="homepage">{t('ProblemDetail.Home')}</NavLink>
-        <NavLink to="problem_main">{t('ProblemDetail.Problems')}</NavLink>
-        <NavLink to="contest_main">{t('ProblemDetail.Contests')}</NavLink>
-      </TopNav>
+  const subtitle = useMemo(() => {
+    if (contentText) {
+      const lines = contentText.split('\n');
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (trimmed && !trimmed.startsWith('#') && !trimmed.startsWith('```')) {
+          return trimmed.slice(0, 200);
+        }
+      }
+    }
+    return undefined;
+  }, [contentText]);
 
+  const contestItems: ContestItem[] = useMemo(() => [
+    ...ctdocs.map((c) => ({ title: c.title, emoji: '🏆', date: '' })),
+    ...tdocs.map((tt) => ({ title: tt.title, emoji: '📚', date: '' })),
+    ...htdocs.map((h) => ({ title: h.title, emoji: '📝', date: '' })),
+  ], [ctdocs, tdocs, htdocs]);
+
+  const isLoggedIn = !!UserContext?._id;
+  const canSubmit = UserContext?.hasPerm?.(8) ?? false;
+
+  // === Normal mode: new hero + content + sidebar layout ===
+  if (mode === 'normal') {
+    return (
       <main className={styles.page}>
-        <header className={styles.header}>
-          <h1 className={styles.title}>
-            {rdoc && rdoc.status !== undefined && (
-              <Link to="record_detail" params={{ rid: String(rdoc._id) }} className={styles.statusBadge}>
-                <span className={`${styles.statusIcon} ${styles[statusClassName(rdoc.status)]}`} />
-                <span>{rdoc.score}</span>
-              </Link>
-            )}
-            {canStar && (
-              <form action="" method="post" className={styles.starForm}>
-                <input type="hidden" name="star" value={psdoc?.star ? 'false' : 'true'} />
-                <input type="hidden" name="operation" value="star" />
-                <button type="submit" className={`${styles.star} ${psdoc?.star ? styles.starOn : ''}`} aria-label={t('Problem.Star')}>
-                  {psdoc?.star ? '★' : '☆'}
-                </button>
-              </form>
-            )}
-            <span className={styles.prefix}>{headerPrefix}</span>
-            <span>{pdoc.title}</span>
-          </h1>
-
-          {tdoc && (tdoc.pids?.length ?? 0) > 1 && (tdoc.pids?.length ?? 0) <= 26 && (
-            // > 26: alphabet runs out (Z, AA-...); ui-default同样skip
-            <nav className={styles.contestNav}>
-              {tdoc.pids?.map((pid, i) => {
-                const status = tsdoc?.detail?.[String(pid)]?.status;
-                const pass = status === STATUS.STATUS_ACCEPTED;
-                const fail = status !== undefined && !pass;
-                return (
-                  <Link
-                    key={String(pid)}
-                    to="problem_detail"
-                    params={{ pid: String(pid) }}
-                    searchParams={getTidQuery(tdoc)}
-                    className={`${styles.contestNavItem} ${pass ? styles.contestNavPass : fail ? styles.contestNavFail : ''}`}
-                  >
-                    {getAlphabeticId(i)}
-                  </Link>
-                );
-              })}
-            </nav>
-          )}
-        </header>
-
-        <ProblemTagRow pdoc={pdoc} mode={mode} tdoc={tdoc} />
+        <ProblemHero pdoc={pdoc} subtitle={subtitle} />
 
         <div className={styles.layout}>
           <article className={styles.content}>
-            {contentLangs.length > 1 && (
-              <div className={styles.langTabs}>
-                {contentLangs.map((l) => (
-                  <Link
-                    key={l}
-                    to="problem_detail"
-                    params={{ pid: pdoc.pid ?? String(pdoc.docId) }}
-                    searchParams={l === preferredLang ? {} : { lang: l }}
-                    className={l === preferredLang ? styles.langTabActive : styles.langTab}
-                  >
-                    {l}
-                  </Link>
-                ))}
-              </div>
-            )}
-
-            <ProblemContent pdoc={pdoc} contentText={contentText} mode={mode} />
-            <Article content={contentText} />
+            <div className={styles.sidebarCard}>
+              {contentLangs.length > 1 && (
+                <div className={styles.cardHead}>
+                  <h3>{t('Problem.Statement')}</h3>
+                  <div className={styles.langTabs}>
+                    {contentLangs.map((l) => (
+                      <Link
+                        key={l}
+                        to="problem_detail"
+                        params={{ pid: pdoc.pid ?? String(pdoc.docId) }}
+                        searchParams={l === preferredLang ? {} : { lang: l }}
+                        className={l === preferredLang ? styles.langTabActive : styles.langTab}
+                      >
+                        {l}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+              <ProblemContent pdoc={pdoc} contentText={contentText} mode={mode} />
+              <Article content={contentText} />
+            </div>
           </article>
 
           <aside className={styles.sidebar}>
-            <Menu items={sidebarItems} />
-            <InformationCard pdoc={pdoc} owner_udoc={owner_udoc} />
-            {(tdocs.length > 0 || ctdocs.length > 0 || htdocs.length > 0) && (
-              <RelatedCard tdocs={tdocs} ctdocs={ctdocs} htdocs={htdocs} />
+            <div className={styles.sidebarCard}>
+              {canSubmit ? (
+                <Link
+                  to="problem_submit"
+                  params={{ pid: String(pdoc.docId) }}
+                  className={styles.ctaBlock}
+                  style={{ display: 'flex' }}
+                >
+                  <div className={styles.ctaBlockText}>
+                    <b>{t('Problem.ReadyToSubmit') ?? '准备好开题了?'}</b>
+                    <small>{t('Problem.SubmitHint') ?? '提交你的答案'}</small>
+                  </div>
+                  <button type="button" className={styles.ctaBlockBtn}>{t('Problem.Submit')}</button>
+                </Link>
+              ) : (
+                <div className={styles.ctaBlock}>
+                  <div className={styles.ctaBlockText}>
+                    <b>{isLoggedIn ? t('Problem.NoPermissionToSubmit') : t('Problem.LoginToSubmit')}</b>
+                    <small>{t('Problem.SubmitHint') ?? '提交你的答案'}</small>
+                  </div>
+                  <button type="button" className={styles.ctaBlockBtn} disabled>{t('Problem.Submit')}</button>
+                </div>
+              )}
+              <Menu items={sidebarItems} />
+            </div>
+
+            {owner_udoc && (
+              <SideCard title={t('Problem.Uploader') ?? '出题人'}>
+                <Author name={owner_udoc.uname ?? `User ${owner_udoc._id}`} contribution={t('Problem.UploaderContribution') ?? '题目贡献者'} />
+              </SideCard>
             )}
+
+            {contestItems.length > 0 && (
+              <SideCard title={t('Problem.RelatedEvents') ?? '出现于比赛'}>
+                <ContestList items={contestItems} />
+              </SideCard>
+            )}
+
+            {pdoc.tag && pdoc.tag.length > 0 && (
+              <SideCard title={t('Problem.RelatedTags') ?? '相关标签'}>
+                <TagCloud tags={pdoc.tag} />
+              </SideCard>
+            )}
+
+            <InformationCard pdoc={pdoc} owner_udoc={owner_udoc} />
           </aside>
         </div>
       </main>
-    </>
+    );
+  }
+
+  // === Contest / view / correction mode: fallback ===
+  return (
+    <main className={styles.page}>
+      <header className={styles.header}>
+        <h1 className={styles.titleFallback}>
+          {rdoc && rdoc.status !== undefined && (
+            <Link to="record_detail" params={{ rid: String(rdoc._id) }} className={styles.statusBadge}>
+              <span className={`${styles.statusIcon} ${styles[statusClassName(rdoc.status)]}`} />
+              <span>{rdoc.score}</span>
+            </Link>
+          )}
+          {canStar && (
+            <form action="" method="post">
+              <input type="hidden" name="star" value={psdoc?.star ? 'false' : 'true'} />
+              <input type="hidden" name="operation" value="star" />
+              <button type="submit" aria-label={t('Problem.Star')}>
+                {psdoc?.star ? '★' : '☆'}
+              </button>
+            </form>
+          )}
+          <span className={styles.prefixFallback}>{headerPrefix}</span>
+          <span>{pdoc.title}</span>
+        </h1>
+        {tdoc && (tdoc.pids?.length ?? 0) > 1 && (tdoc.pids?.length ?? 0) <= 26 && (
+          <nav className={styles.contestNav}>
+            {tdoc.pids?.map((pid, i) => {
+              const status = tsdoc?.detail?.[String(pid)]?.status;
+              const pass = status === STATUS.STATUS_ACCEPTED;
+              const fail = status !== undefined && !pass;
+              return (
+                <Link
+                  key={String(pid)}
+                  to="problem_detail"
+                  params={{ pid: String(pid) }}
+                  searchParams={getTidQuery(tdoc)}
+                  className={`${styles.contestNavItem} ${pass ? styles.contestNavPass : fail ? styles.contestNavFail : ''}`}
+                >
+                  {getAlphabeticId(i)}
+                </Link>
+              );
+            })}
+          </nav>
+        )}
+      </header>
+
+      <ProblemTagRow pdoc={pdoc} mode={mode} tdoc={tdoc} />
+
+      <div className={styles.layout}>
+        <article className={styles.content}>
+          <div className={styles.sidebarCard}>
+            {contentLangs.length > 1 && (
+              <div className={styles.cardHead}>
+                <h3>{t('Problem.Statement')}</h3>
+                <div className={styles.langTabs}>
+                  {contentLangs.map((l) => (
+                    <Link
+                      key={l}
+                      to="problem_detail"
+                      params={{ pid: pdoc.pid ?? String(pdoc.docId) }}
+                      searchParams={l === preferredLang ? {} : { lang: l }}
+                      className={l === preferredLang ? styles.langTabActive : styles.langTab}
+                    >
+                      {l}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+            <ProblemContent pdoc={pdoc} contentText={contentText} mode={mode} />
+            <Article content={contentText} />
+          </div>
+        </article>
+
+        <aside className={styles.sidebar}>
+          <div className={styles.sidebarCard}>
+            <Menu items={sidebarItems} />
+          </div>
+          {(tdocs.length > 0 || ctdocs.length > 0 || htdocs.length > 0) && (
+            <RelatedCard tdocs={tdocs} ctdocs={ctdocs} htdocs={htdocs} />
+          )}
+        </aside>
+      </div>
+    </main>
   );
 }
 
+// === Sub-components (unchanged from existing) ===
 function ProblemTagRow({ pdoc, mode, tdoc }: { pdoc: Pdoc; mode: string; tdoc?: Tdoc }) {
   const buildUrl = useBuildUrl();
   const t = useTranslate();
@@ -677,35 +740,37 @@ function ProblemContent({ pdoc, contentText, mode }: { pdoc: Pdoc; contentText: 
 function InformationCard({ pdoc, owner_udoc }: { pdoc: Pdoc; owner_udoc?: Udoc }) {
   const t = useTranslate();
   return (
-    <div className={styles.infoCard}>
-      <h3 className={styles.cardTitle}>{t('Problem.Information')}</h3>
-      <dl className={styles.dl}>
-        <dt>{t('Common.ID')}</dt><dd>{pdoc.docId}</dd>
+    <div className={styles.sidebarCard}>
+      <h4 style={{ fontFamily: 'var(--font-display)', fontSize: 15, fontWeight: 600, margin: '0 0 14px', color: 'var(--text)' }}>
+        {t('Problem.Information')}
+      </h4>
+      <dl style={{ margin: 0, display: 'grid', gridTemplateColumns: 'max-content 1fr', gap: '8px 16px', fontSize: 13 }}>
+        <dt style={{ color: 'var(--text-mute)' }}>{t('Common.ID')}</dt><dd style={{ margin: 0 }}>{pdoc.docId}</dd>
         {typeof pdoc.config === 'object' && pdoc.config && (
           <>
-            <dt>{t('Common.Time')}</dt>
-            <dd>
+            <dt style={{ color: 'var(--text-mute)' }}>{t('Common.Time')}</dt>
+            <dd style={{ margin: 0 }}>
               {pdoc.config.timeMin === pdoc.config.timeMax
                 ? `${pdoc.config.timeMin}ms`
                 : `${pdoc.config.timeMin}~${pdoc.config.timeMax}ms`}
             </dd>
-            <dt>{t('Problem.Memory')}</dt>
-            <dd>
+            <dt style={{ color: 'var(--text-mute)' }}>{t('Problem.Memory')}</dt>
+            <dd style={{ margin: 0 }}>
               {pdoc.config.memoryMin === pdoc.config.memoryMax
                 ? `${pdoc.config.memoryMin}MB`
                 : `${pdoc.config.memoryMin}~${pdoc.config.memoryMax}MB`}
             </dd>
           </>
         )}
-        {pdoc.difficulty !== undefined && <><dt>{t('Problem.Difficulty')}</dt><dd>{pdoc.difficulty}</dd></>}
+        {pdoc.difficulty !== undefined && <><dt style={{ color: 'var(--text-mute)' }}>{t('Problem.Difficulty')}</dt><dd style={{ margin: 0 }}>{pdoc.difficulty}</dd></>}
         {pdoc.tag && pdoc.tag.length > 0 && (
           <>
-            <dt>{t('Common.Tags')}</dt><dd>{pdoc.tag.join(', ')}</dd>
+            <dt style={{ color: 'var(--text-mute)' }}>{t('Common.Tags')}</dt><dd style={{ margin: 0 }}>{pdoc.tag.join(', ')}</dd>
           </>
         )}
-        <dt>{t('Problem.Submissions')}</dt><dd>{pdoc.nSubmit ?? '?'}</dd>
-        <dt>{t('Problem.Accepted')}</dt><dd>{pdoc.nAccept ?? '?'}</dd>
-        {owner_udoc && <><dt>{t('Problem.UploadedBy')}</dt><dd>{owner_udoc.uname ?? owner_udoc._id}</dd></>}
+        <dt style={{ color: 'var(--text-mute)' }}>{t('Problem.Submissions')}</dt><dd style={{ margin: 0 }}>{pdoc.nSubmit ?? '?'}</dd>
+        <dt style={{ color: 'var(--text-mute)' }}>{t('Problem.Accepted')}</dt><dd style={{ margin: 0 }}>{pdoc.nAccept ?? '?'}</dd>
+        {owner_udoc && <><dt style={{ color: 'var(--text-mute)' }}>{t('Problem.UploadedBy')}</dt><dd style={{ margin: 0 }}>{owner_udoc.uname ?? owner_udoc._id}</dd></>}
       </dl>
     </div>
   );
@@ -718,9 +783,11 @@ function RelatedCard({ tdocs, ctdocs, htdocs }: {
 }) {
   const t = useTranslate();
   return (
-    <div className={styles.infoCard}>
-      <h3 className={styles.cardTitle}>{t('Problem.Related')}</h3>
-      <ul className={styles.relatedList}>
+    <div className={styles.sidebarCard}>
+      <h4 style={{ fontFamily: 'var(--font-display)', fontSize: 15, fontWeight: 600, margin: '0 0 14px', color: 'var(--text)' }}>
+        {t('Problem.Related')}
+      </h4>
+      <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
         {tdocs.map((tt) => (
           <li key={tt.docId}><Link to="training_detail" params={{ tid: tt.docId }}>{tt.title}</Link></li>
         ))}
