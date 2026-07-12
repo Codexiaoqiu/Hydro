@@ -121,6 +121,8 @@ export function preprocessContent(raw: string): ContentBlock[] {
         blocks.push({ type: 'samples', pairs });
         sampleCounter += pairs.length;
         current = remaining ? remaining.split('\n') : [];
+        i = sectionEnd;
+        continue;
       } else {
         // Anchor matched but no fenced code follows: fold the entire
         // unmatched section (anchor + intervening prose) into a single

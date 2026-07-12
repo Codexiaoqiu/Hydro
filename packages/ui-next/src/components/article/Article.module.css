@@ -5,3 +5,28 @@
 .article :global(code),
 .article :global(em) { font-family: var(--font-mono); font-style: italic; color: var(--cyan); font-size: 0.94em; padding: 1px 7px; background: var(--tint-cyan-08); border-radius: 5px; border: 1px solid var(--tint-cyan-18); }
 .article :global(strong) { color: var(--text); font-weight: 600; }
+.samples { display: grid; grid-template-columns: 1fr; gap: 14px; margin: 18px 0 8px; }
+.article :global(mark) {
+  background: var(--tint-cyan-18);
+  color: var(--cyan);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-style: normal;
+}
+.article :global(pre) {
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.article :global(pre code) {
+  background: transparent;
+  padding: 0;
+  border: 0;
+  font-style: normal;
+}
+.article :global(.katex) { font-size: 1.05em; }

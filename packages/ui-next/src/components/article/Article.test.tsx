@@ -56,3 +56,30 @@ describe('Article', () => {
     expect(a?.textContent).toBe('link');
   });
 });
+
+describe('Article — extended plugins', () => {
+  it('renders ==mark== as <mark>', () => {
+    const { container } = render(<Article content={'==highlight=='} />);
+    expect(container.querySelector('mark')?.textContent).toBe('highlight');
+  });
+
+  it('renders KaTeX inline formula', () => {
+    const { container } = render(<Article content={'$a + b$'} />);
+    expect(container.querySelector('.katex')).toBeTruthy();
+  });
+
+  it('renders fenced code with language class for highlight.js', () => {
+    const { container } = render(
+      <Article content={'```js\nconst x = 1;\n```'} />,
+    );
+    const code = container.querySelector('pre code');
+    expect(code).toBeTruthy();
+  });
+
+  it('extracts sample pair into SamplePair component', () => {
+    const md = '## 样例输入\n```\n1 2\n```\n```\n3\n```';
+    const { container } = render(<Article content={md} />);
+    expect(container.textContent).toContain('1 2');
+    expect(container.textContent).toContain('3');
+  });
+});
