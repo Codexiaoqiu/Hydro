@@ -1,30 +1,36 @@
+// @vitest-environment happy-dom
+import { render } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import { render, screen } from '@testing-library/react';
 import { Ring } from './Ring';
 
 describe('Ring', () => {
-    it('renders an SVG with track and bar', () => {
-        const { container } = render(<Ring percent={45} />);
-        expect(container.querySelector('svg')).toBeInTheDocument();
-        expect(container.querySelectorAll('circle').length).toBe(2);
-    });
+  it('renders SVG with two circles', () => {
+    const { container } = render(<Ring percent={50} />);
+    const circles = container.querySelectorAll('circle');
+    expect(circles.length).toBe(2);
+  });
 
-    it('renders label text when provided', () => {
-        render(<Ring percent={45} label="AC" />);
-        expect(screen.getByText('45%')).toBeInTheDocument();
-        expect(screen.getByText('AC')).toBeInTheDocument();
-    });
+  it('clamps percent to 0', () => {
+    const { container } = render(<Ring percent={-10} />);
+    const bar = container.querySelectorAll('circle')[1];
+    expect(bar?.getAttribute('style')).toContain('stroke-dashoffset: 251');
+  });
 
-    it('clamps percent to [0, 100]', () => {
-        render(<Ring percent={150} label="X" />);
-        // Math.round(150) = 150 still, but it should render gracefully without throwing
-        expect(screen.getByText(/150/)).toBeInTheDocument();
-    });
+  it('clamps percent to 100', () => {
+    const { container } = render(<Ring percent={150} />);
+    const bar = container.querySelectorAll('circle')[1];
+    expect(bar?.getAttribute('style')).toContain('stroke-dashoffset: 0');
+  });
 
-    it('honors size and strokeWidth props', () => {
-        const { container } = render(<Ring percent={50} size={120} strokeWidth={12} />);
-        const svg = container.querySelector('svg');
-        expect(svg?.getAttribute('width')).toBe('120');
-        expect(svg?.getAttribute('height')).toBe('120');
-    });
+  it('renders mid value correctly', () => {
+    const { container } = render(<Ring percent={50} />);
+    const bar = container.querySelectorAll('circle')[1];
+    expect(bar?.getAttribute('style')).toContain('stroke-dashoffset: 125');
+  });
+
+  it('uses custom size when provided', () => {
+    const { container } = render(<Ring percent={50} size={100} />);
+    const svg = container.querySelector('svg');
+    expect(svg?.getAttribute('width')).toBe('100');
+  });
 });
