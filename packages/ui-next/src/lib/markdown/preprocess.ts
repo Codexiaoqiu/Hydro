@@ -122,11 +122,13 @@ export function preprocessContent(raw: string): ContentBlock[] {
         sampleCounter += pairs.length;
         current = remaining ? remaining.split('\n') : [];
       } else {
-        // Anchor matches but no fenced code follows: keep the
-        // anchor line as plain markdown and continue scanning.
-        current.push(lines[i]);
+        // Anchor matched but no fenced code follows: fold the entire
+        // unmatched section (anchor + intervening prose) into a single
+        // markdown block so we don't silently drop content.
+        blocks.push({ type: 'markdown', body: section.trim() });
+        i = sectionEnd;
+        current = remaining ? remaining.split('\n') : [];
       }
-      i = sectionEnd;
     } else {
       current.push(lines[i]);
       i++;
