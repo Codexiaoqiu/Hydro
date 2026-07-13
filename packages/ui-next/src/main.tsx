@@ -1,6 +1,8 @@
 import './styles/tokens.css';
 import './styles/reset.css';
 import './styles/globals.css';
+import 'katex/dist/katex.min.css';
+import 'highlight.js/styles/github-dark.css';
 
 import './pages';
 // Side-effect imports: register layout/auth slot defaults with the registry on startup.
