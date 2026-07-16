@@ -94,8 +94,9 @@ describe('Homepage (integration)', () => {
       domain: { _id: 'system' },
     };
     render(<Providers args={args}><Homepage /></Providers>);
-    expect(screen.getByText('首页')).toBeTruthy();
-    expect(screen.getByText('题库')).toBeTruthy();
+    // The global nav is now injected by `layout:default` (see components/layout.tsx)
+    // and tested separately by GlobalNav.test.tsx. The page itself only renders
+    // the content sections.
     expect(screen.getByText('Round 1')).toBeTruthy();
     expect(screen.getByText('P1000')).toBeTruthy();
     // ErrorSection placeholder for the unknown section name (appears in

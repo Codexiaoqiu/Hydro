@@ -2,8 +2,6 @@ import { useState, type FormEvent, type ReactNode } from 'react';
 import { usePageData } from '../context/page-data';
 import { Link } from '../components/link';
 import { AuthShell } from '../components/auth/AuthShell';
-import { TopNav } from '../components/nav/TopNav';
-import { NavLink } from '../components/nav/NavLink';
 import { Alert, Button, Checkbox, Input, RateLimitAlert } from '../components/primitives';
 import { HydroClientError, request } from '../hooks/use-api';
 import { useTranslate } from '../lib/i18n';
@@ -32,10 +30,6 @@ function ProblemImportShell({ title, subtitle, children }: { title: string; subt
   const t = useTranslate();
   return (
     <>
-      <TopNav brand="Hydro" currentRoute="problem_import">
-        <NavLink to="homepage">{t('Common.Home')}</NavLink>
-        <NavLink to="problem_main">{t('Common.Problems')}</NavLink>
-      </TopNav>
       <AuthShell
         title={title}
         subtitle={subtitle}

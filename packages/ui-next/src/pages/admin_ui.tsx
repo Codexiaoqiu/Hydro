@@ -1,7 +1,5 @@
 import { useState, type FormEvent } from 'react';
 import { usePageData } from '../context/page-data';
-import { TopNav } from '../components/nav/TopNav';
-import { NavLink } from '../components/nav/NavLink';
 import { Alert, Button, Switch } from '../components/primitives';
 import { HydroClientError, request } from '../hooks/use-api';
 
@@ -44,9 +42,6 @@ export default function AdminUiPage() {
 
   return (
     <>
-      <TopNav brand="Hydro" currentRoute="admin_ui">
-        <NavLink to="homepage">Home</NavLink>
-      </TopNav>
       <main style={{ maxWidth: 720, margin: '0 auto', padding: 'var(--space-6)' }}>
         <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-2xl)' }}>UI renderer</h1>
         <p style={{ color: 'var(--text-mute)' }}>

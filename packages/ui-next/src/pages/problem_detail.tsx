@@ -2,7 +2,7 @@ import { useEffect, useMemo } from 'react';
 import { STATUS } from '@hydrooj/common';
 import { usePageData, useSetUiContext } from '../context/page-data';
 import { Link } from '../components/link';
-import { Alert, Chip, Eyebrow } from '../components/primitives';
+import { Alert, Button, Chip, Eyebrow } from '../components/primitives';
 import { Article } from '../components/article/Article';
 import { Menu, type MenuItem } from '../components/sidebar/Menu';
 import { Author } from '../components/sidebar/Author';
@@ -101,11 +101,31 @@ function statusClassName(status?: number): string {
   }
 }
 
-function readContentText(content: Pdoc['content'] | undefined, preferredLang: string): string {
+export function readContentText(content: Pdoc['content'] | undefined, preferredLang: string): string {
   if (!content) return '';
-  if (typeof content === 'string') return content;
-  if (typeof content !== 'object') return '';
-  const map = content as Record<string, unknown>;
+  // The server stores pdoc.content as a JSON string of the form
+  //   {"zh":"...markdown...","en":"...markdown..."}
+  // (see packages/hydrooj/src/model/problem.ts). Normalize it to a locale map
+  // before picking the requested language. If the string is not JSON-shaped we
+  // assume it is already raw markdown and return it as-is.
+  let map: Record<string, unknown> | null = null;
+  if (typeof content === 'string') {
+    if (content.trimStart().startsWith('{')) {
+      try {
+        const parsed = JSON.parse(content);
+        if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+          map = parsed as Record<string, unknown>;
+        }
+      } catch {
+        /* fall through */
+      }
+    }
+    if (!map) return content;
+  } else if (typeof content === 'object') {
+    map = content as Record<string, unknown>;
+  } else {
+    return '';
+  }
   const pickFromMap = (m: Record<string, unknown>): string => {
     const direct = m[preferredLang];
     if (typeof direct === 'string') return direct;
@@ -113,7 +133,7 @@ function readContentText(content: Pdoc['content'] | undefined, preferredLang: st
     if (directStr.trimStart().startsWith('{')) {
       try {
         const parsed = JSON.parse(directStr);
-        if (parsed && typeof parsed === 'object') {
+        if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
           const parsedMap = parsed as Record<string, unknown>;
           if (typeof parsedMap[preferredLang] === 'string') return parsedMap[preferredLang] as string;
           const first = Object.values(parsedMap).find((v) => typeof v === 'string');
@@ -476,19 +496,6 @@ export default function ProblemDetailPage() {
     t,
   );
 
-  const subtitle = useMemo(() => {
-    if (contentText) {
-      const lines = contentText.split('\n');
-      for (const line of lines) {
-        const trimmed = line.trim();
-        if (trimmed && !trimmed.startsWith('#') && !trimmed.startsWith('```')) {
-          return trimmed.slice(0, 200);
-        }
-      }
-    }
-    return undefined;
-  }, [contentText]);
-
   const contestItems: ContestItem[] = useMemo(() => [
     ...ctdocs.map((c) => ({ title: c.title, emoji: '🏆', date: '' })),
     ...tdocs.map((tt) => ({ title: tt.title, emoji: '📚', date: '' })),
@@ -502,7 +509,7 @@ export default function ProblemDetailPage() {
   if (mode === 'normal') {
     return (
       <main className={styles.page}>
-        <ProblemHero pdoc={pdoc} subtitle={subtitle} />
+        <ProblemHero pdoc={pdoc} />
 
         <div className={styles.layout}>
           <article className={styles.content}>

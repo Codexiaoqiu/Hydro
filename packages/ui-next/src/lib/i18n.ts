@@ -90,6 +90,9 @@ export const zhCN: Catalog = {
   'ProblemDetail.Home': '首页',
   'ProblemDetail.Problems': '题库',
   'ProblemDetail.Contests': '比赛',
+  'ProblemDetail.Discussions': '讨论',
+  'ProblemDetail.Login': '登录',
+  'ProblemDetail.Register': '注册',
 
   'ProblemFiles.Title': '附加文件',
   'ProblemFiles.Empty': '此题暂无附加文件。',
@@ -403,6 +406,9 @@ export const en: Catalog = {
   'ProblemDetail.Home': 'Home',
   'ProblemDetail.Problems': 'Problems',
   'ProblemDetail.Contests': 'Contests',
+  'ProblemDetail.Discussions': 'Discussions',
+  'ProblemDetail.Login': 'Login',
+  'ProblemDetail.Register': 'Register',
 
   'ProblemFiles.Title': 'Additional files',
   'ProblemFiles.Empty': 'No additional files for this problem.',

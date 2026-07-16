@@ -1,9 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { usePageData } from '../context/page-data';
-import { useNavigate } from '../context/router';
 import { HydroClientError } from '../hooks/use-api';
-import { TopNav } from '../components/nav/TopNav';
-import { NavLink } from '../components/nav/NavLink';
 import { Link } from '../components/link';
 import { Alert, Button } from '../components/primitives';
 import { useTranslate } from '../lib/i18n';
@@ -102,10 +99,6 @@ export default function RecordMainPage() {
 
   return (
     <>
-      <TopNav brand="Hydro" currentRoute="record_main">
-        <NavLink to="homepage">{t('RecordMain.Home')}</NavLink>
-        <NavLink to="problem_main">{t('RecordMain.Problems')}</NavLink>
-      </TopNav>
       <main style={{ maxWidth: 1320, margin: '0 auto', padding: 'var(--space-6)' }}>
         <header style={{ marginBottom: 'var(--space-4)' }}>
           <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-2xl)', margin: 0 }}>{t('RecordMain.Title')}</h1>

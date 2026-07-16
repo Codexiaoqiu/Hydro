@@ -1,8 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { usePageData } from '../context/page-data';
 import { Link } from '../components/link';
-import { TopNav } from '../components/nav/TopNav';
-import { NavLink } from '../components/nav/NavLink';
 import { Alert, Button, Checkbox, RateLimitAlert } from '../components/primitives';
 import { HydroClientError, request } from '../hooks/use-api';
 import { useTranslate } from '../lib/i18n';
@@ -53,10 +51,6 @@ export default function ProblemHackPage() {
 
   return (
     <>
-      <TopNav brand="Hydro" currentRoute="problem_hack">
-        <NavLink to="homepage">{t('Common.Home')}</NavLink>
-        <NavLink to="problem_main">{t('Common.Problems')}</NavLink>
-      </TopNav>
       <main style={{ maxWidth: 720, margin: '0 auto', padding: 'var(--space-6)' }}>
         <header style={{ marginBottom: 'var(--space-4)' }}>
           <Link to="problem_detail" params={{ pid: pdoc?.pid ?? String(pdoc?.docId ?? '') }}>{t('ProblemHack.BackToProblem')}</Link>

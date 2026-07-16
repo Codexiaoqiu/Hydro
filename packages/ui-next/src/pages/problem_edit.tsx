@@ -1,8 +1,6 @@
 import { usePageData } from '../context/page-data';
 import { AuthShell } from '../components/auth/AuthShell';
 import { ProblemForm } from '../components/problem/ProblemForm';
-import { TopNav } from '../components/nav/TopNav';
-import { NavLink } from '../components/nav/NavLink';
 import { Link } from '../components/link';
 import { useTranslate } from '../lib/i18n';
 
@@ -35,10 +33,6 @@ export default function ProblemEditPage() {
 
   return (
     <>
-      <TopNav brand="Hydro" currentRoute="problem_edit">
-        <NavLink to="homepage">{t('Common.Home')}</NavLink>
-        <NavLink to="problem_main">{t('Common.Problems')}</NavLink>
-      </TopNav>
       <AuthShell
         title={pdoc?.title || t('Problem.EditProblem')}
         subtitle={pdoc?.pid ? `${t('ProblemEdit.Editing')}${pdoc.pid}` : t('ProblemEdit.EditingGeneric')}

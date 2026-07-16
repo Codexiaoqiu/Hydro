@@ -4,13 +4,9 @@ import { Button } from '../components/primitives/Button';
 import { Card } from '../components/primitives/Card';
 import { CtaCard } from '../components/sidebar/CtaCard';
 import { Eyebrow } from '../components/primitives/Eyebrow';
-import { LangPill } from '../components/nav/LangPill';
 import { Link } from '../components/link';
-import { NavLink } from '../components/nav/NavLink';
 import { Select } from '../components/primitives/Select';
 import { TagCloud } from '../components/primitives/TagCloud';
-import { ThemeToggle } from '../components/ThemeToggle';
-import { TopNav } from '../components/nav/TopNav';
 import { usePageData } from '../context/page-data';
 import { useNavigate } from '../context/router';
 import { useBuildUrl } from '../hooks/use-build-url';
@@ -228,28 +224,6 @@ export default function ProblemMain() {
 
   return (
     <>
-      <TopNav
-        brand="Hydro"
-        currentRoute="problem_main"
-        right={
-          <>
-            <LangPill label={UserContext?.viewLangName || '中文'} />
-            <ThemeToggle />
-            <Button variant="ghost" onClick={() => { navigate('/login'); }}>
-              {t('ProblemMain.Login')}
-            </Button>
-            <Button variant="primary" onClick={() => { navigate('/register'); }}>
-              {t('ProblemMain.Register')}
-            </Button>
-          </>
-        }
-      >
-        <NavLink to="homepage">{t('ProblemMain.Problems')}</NavLink>
-        <NavLink to="problem_main">{t('Common.Problems')}</NavLink>
-        <NavLink to="contest_main">{t('ProblemMain.Contests')}</NavLink>
-        <NavLink to="discussion_main">{t('ProblemMain.Discussions')}</NavLink>
-      </TopNav>
-
       <div className={styles.shell}>
         <main>
           <Card

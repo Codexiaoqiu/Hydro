@@ -1,8 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { usePageData } from '../context/page-data';
 import { useNavigate } from '../context/router';
-import { TopNav } from '../components/nav/TopNav';
-import { NavLink } from '../components/nav/NavLink';
 import { Link } from '../components/link';
 import { Alert, Button, RateLimitAlert } from '../components/primitives';
 import { HydroClientError, request } from '../hooks/use-api';
@@ -71,10 +69,6 @@ export default function ProblemSubmitPage() {
 
   return (
     <>
-      <TopNav brand="Hydro" currentRoute="problem_submit">
-        <NavLink to="homepage">{t('Common.Home')}</NavLink>
-        <NavLink to="problem_main">{t('Common.Problems')}</NavLink>
-      </TopNav>
       <main style={{ maxWidth: 1080, margin: '0 auto', padding: 'var(--space-6)' }}>
         <header style={{ marginBottom: 'var(--space-4)' }}>
           <Link to="problem_detail" params={{ pid: pdoc?.pid ?? String(pdoc?.docId ?? '') }}>{t('ProblemSubmit.BackToProblem')}</Link>

@@ -23,10 +23,9 @@ interface PdocLite {
 
 interface Props {
   pdoc: PdocLite;
-  subtitle?: string;
 }
 
-export function ProblemHero({ pdoc, subtitle }: Props) {
+export function ProblemHero({ pdoc }: Props) {
   const cfg = typeof pdoc.config === 'object' && pdoc.config ? pdoc.config : null;
   const nSubmit = pdoc.nSubmit ?? 0;
   const nAccept = pdoc.nAccept ?? 0;
@@ -43,7 +42,6 @@ export function ProblemHero({ pdoc, subtitle }: Props) {
           <span className={styles.prefix}>{prefix}</span>
           {pdoc.title}
         </h1>
-        {subtitle && <p className={styles.subtitle}>{subtitle}</p>}
         <div className={styles.chips}>
           <Chip>ID <strong>{pdoc.docId}</strong></Chip>
           {cfg?.timeMin != null && cfg?.timeMax != null && (

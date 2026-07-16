@@ -1,7 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { usePageData } from '../context/page-data';
-import { TopNav } from '../components/nav/TopNav';
-import { NavLink } from '../components/nav/NavLink';
 import { Link } from '../components/link';
 import { Alert, Button } from '../components/primitives';
 import { Menu } from '../components/sidebar/Menu';
@@ -113,10 +111,6 @@ export default function RecordDetailPage() {
 
   return (
     <>
-      <TopNav brand="Hydro" currentRoute="record_detail">
-        <NavLink to="homepage">{t('RecordDetail.Home')}</NavLink>
-        <NavLink to="record_main">{t('RecordDetail.Submissions')}</NavLink>
-      </TopNav>
       <main style={{ maxWidth: 1320, margin: '0 auto', padding: 'var(--space-6)' }}>
         <header style={{ marginBottom: 'var(--space-4)' }}>
           <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-2xl)', margin: 0 }}>

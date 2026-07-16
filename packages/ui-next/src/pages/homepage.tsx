@@ -1,9 +1,5 @@
 import { usePageData } from '../context/page-data';
 import { SectionSlot } from '../registry/sections';
-import { TopNav } from '../components/nav/TopNav';
-import { NavLink } from '../components/nav/NavLink';
-import { LangPill } from '../components/nav/LangPill';
-import { ThemeToggle } from '../components/ThemeToggle';
 import { Button } from '../components/primitives/Button';
 import type { SectionProps } from '../sections/types';
 import styles from '../styles/homepage.module.css';
@@ -28,24 +24,6 @@ export default function Homepage() {
   console.log(cols)
   return (
     <>
-      <TopNav
-        brand="Hydro"
-        currentRoute="homepage"
-        right={
-          <>
-            <LangPill label={UserContext?.viewLangName || '中文'} />
-            <ThemeToggle />
-            <Button variant="ghost">登录</Button>
-            <Button variant="primary">注册</Button>
-          </>
-        }
-      >
-        <NavLink to="homepage">首页</NavLink>
-        <NavLink to="problem_main">题库</NavLink>
-        <NavLink to="contest_main">比赛</NavLink>
-        <NavLink to="discussion_main">讨论</NavLink>
-      </TopNav>
-
       <main className={styles.page}>
         <div className={styles.columns}>
           {cols.map((col, ci) => (
