@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Chip } from '../components/primitives/Chip';
 import { Card } from '../components/primitives/Card';
 import { Eyebrow } from '../components/primitives/Eyebrow';
@@ -18,6 +18,15 @@ import type { SerializedContestStatusDoc, SerializedTdoc } from '../sections/typ
 import styles from './contest_main.module.css';
 
 const PAGE_SIZE = 20;
+
+function useNow() {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const timer = window.setInterval(() => setNow(Date.now()), 60_000);
+    return () => window.clearInterval(timer);
+  }, []);
+  return now;
+}
 
 type Translate = ReturnType<typeof useTranslate>;
 type BuildUrl = ReturnType<typeof useBuildUrl>;
@@ -94,6 +103,8 @@ function Toolbar({ initialQ, rule, group, groups, rulesOptions }: ToolbarProps) 
     <div className={styles.toolbar}>
       <form
         className={styles.toolbarRow}
+        role="search"
+        aria-label={t('ContestMain.SearchAria')}
         onSubmit={(event) => {
           event.preventDefault();
           goWith({});
@@ -134,7 +145,7 @@ function Toolbar({ initialQ, rule, group, groups, rulesOptions }: ToolbarProps) 
 }
 
 function EmptyState({ t }: { t: Translate }) {
-  return <div className={styles.empty}>{t('ContestMain.NoContests')}</div>;
+  return <div className={styles.empty} role="status">{t('ContestMain.NoContests')}</div>;
 }
 
 function contestDay(iso: string): string {
@@ -275,6 +286,7 @@ function Pager({ page, tpcount, qs, rule, group, q, buildUrl }: PagerProps) {
             key={item}
             href={buildUrl('contest_main', {}, paramsFor(item))}
             className={`${styles.pagerItem} ${item === page ? styles.pagerActive : ''}`}
+            aria-current={item === page ? 'page' : undefined}
           >
             {item}
           </Link>
@@ -300,7 +312,7 @@ export default function ContestMain() {
   const group = String(args.group ?? '');
   const q = String(args.q ?? '');
   const groups = Array.isArray(args.groups) ? args.groups : [];
-  const now = useMemo(() => Date.now(), []);
+  const now = useNow();
 
   const ongoing = useMemo(() => tdocs.filter((tdoc) => isOngoing(tdoc, now)), [tdocs, now]);
   const upcoming = useMemo(

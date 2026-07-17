@@ -1,10 +1,11 @@
 /* @vitest-environment happy-dom */
 
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { PageDataProvider, type PageData } from '../context/page-data';
 import * as routerMod from '../context/router';
 import { routeMapStore } from '../globals';
+import { PERM } from '../lib/perm-constants';
 import { ThemeProvider } from '../theme/ThemeProvider';
 import ContestMain from './contest_main';
 
@@ -137,8 +138,8 @@ describe('ContestMain', () => {
   });
 
   it('shows the create CTA only with the create permission', () => {
-    const permCreate = `BigInt::${(1n << 41n) | (1n << 44n)}`;
-    const permViewOnly = `BigInt::${1n << 41n}`;
+    const permCreate = `BigInt::${PERM.PERM_VIEW_CONTEST | PERM.PERM_CREATE_CONTEST}`;
+    const permViewOnly = `BigInt::${PERM.PERM_VIEW_CONTEST}`;
     const args = { tdocs: [], tsdict: {}, tpcount: 0, page: 1, qs: '', rule: '', group: '', q: '', groups: [] };
 
     const firstRender = renderPage(args, { perm: permCreate });
@@ -147,6 +148,23 @@ describe('ContestMain', () => {
 
     renderPage(args, { perm: permViewOnly });
     expect(screen.queryByRole('button', { name: '+ 新建比赛' })).not.toBeInTheDocument();
+  });
+
+  it('refreshes live status as time passes', () => {
+    const tdoc = makeTdoc({
+      title: 'Ending Soon',
+      beginAt: '2026-07-17T10:00:00.000Z',
+      endAt: '2026-07-17T14:00:00.000Z',
+    });
+    renderPage({ tdocs: [tdoc], tsdict: {}, tpcount: 1, page: 1, qs: '', rule: '', group: '', q: '', groups: [] });
+    expect(screen.getAllByText(/Live/i).length).toBeGreaterThan(0);
+
+    act(() => {
+      vi.setSystemTime(new Date('2026-07-17T15:00:00.000Z'));
+      vi.advanceTimersByTime(60_000);
+    });
+    expect(screen.queryByText('Live 进行中')).not.toBeInTheDocument();
+    expect(screen.getByText('已结束')).toBeInTheDocument();
   });
 
   it('renders pagination when the total exceeds one page', () => {

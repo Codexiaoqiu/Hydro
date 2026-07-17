@@ -14,6 +14,7 @@ import { expect, type Page, test } from '@playwright/test';
 const ROUTES = [
     { name: 'homepage', path: '/' },
     { name: 'problem_main', path: '/p' },
+    { name: 'contest_main', path: '/contest' },
 ];
 
 async function seedTheme(page: Page, theme: 'dark' | 'light') {
