@@ -14,3 +14,5 @@ export { Select } from './Select';
 export { Switch } from './Switch';
 export type { SwitchProps } from './Switch';
 export { TagCloud } from './TagCloud';
+export { Loading } from './Loading';
+export type { LoadingProps, LoadingSize } from './Loading';
