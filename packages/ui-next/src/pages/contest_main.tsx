@@ -1,15 +1,15 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Chip } from '../components/primitives/Chip';
+import { Link } from '../components/link';
 import { Card } from '../components/primitives/Card';
+import { Chip } from '../components/primitives/Chip';
 import { Eyebrow } from '../components/primitives/Eyebrow';
 import { Select } from '../components/primitives/Select';
 import { CtaCard } from '../components/sidebar/CtaCard';
-import { Link } from '../components/link';
 import { usePageData } from '../context/page-data';
 import { useNavigate } from '../context/router';
 import { useBuildUrl } from '../hooks/use-build-url';
-import { isDone, isOngoing, isUpcoming, renderDuration } from '../lib/contest-status';
 import { KNOWN_RULES, rulesFromTdocs } from '../lib/contest-flags';
+import { isDone, isOngoing, isUpcoming, renderDuration } from '../lib/contest-status';
 import { formatDateTime } from '../lib/datetime';
 import { useTranslate } from '../lib/i18n';
 import { canCreateContest } from '../lib/perms';
@@ -88,7 +88,7 @@ function Toolbar({ initialQ, rule, group, groups, rulesOptions }: ToolbarProps) 
   const buildUrl = useBuildUrl();
   const [query, setQuery] = useState(initialQ);
 
-  const goWith = (next: { q?: string; rule?: string; group?: string }) => {
+  const goWith = (next: { q?: string, rule?: string, group?: string }) => {
     const finalQ = next.q !== undefined ? next.q : query;
     const finalRule = next.rule !== undefined ? next.rule : rule;
     const finalGroup = next.group !== undefined ? next.group : group;

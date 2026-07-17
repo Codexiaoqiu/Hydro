@@ -2,7 +2,7 @@
 
 import { act, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { PageDataProvider, type PageData } from '../context/page-data';
+import { type PageData, PageDataProvider } from '../context/page-data';
 import * as routerMod from '../context/router';
 import { routeMapStore } from '../globals';
 import { PERM } from '../lib/perm-constants';
@@ -52,7 +52,7 @@ function renderPage(args: Record<string, unknown>, UserContext: Record<string, u
   );
 }
 
-describe('ContestMain', () => {
+describe('contestMain', () => {
   let originalRouteMap: Record<string, string>;
   let navigateSpy: ReturnType<typeof vi.fn>;
 
