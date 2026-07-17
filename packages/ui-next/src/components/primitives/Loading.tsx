@@ -13,15 +13,17 @@ export interface LoadingProps {
 
 export function Loading({
   size = 'block',
-  ariaLabel = 'Loading',
+  label,
+  ariaLabel,
   className,
 }: LoadingProps) {
   const sizeClass = size === 'inline' ? styles.inline : styles.block;
+  const resolvedAriaLabel = ariaLabel ?? (typeof label === 'string' ? label : 'Loading');
   return (
     <div
       role="status"
       aria-live="polite"
-      aria-label={ariaLabel}
+      aria-label={resolvedAriaLabel}
       className={[styles.root, sizeClass, className].filter(Boolean).join(' ')}
     >
       <svg
@@ -40,6 +42,7 @@ export function Loading({
           strokeDasharray="9.42 28.27"
         />
       </svg>
+      {label != null && <span className={styles.label}>{label}</span>}
     </div>
   );
 }

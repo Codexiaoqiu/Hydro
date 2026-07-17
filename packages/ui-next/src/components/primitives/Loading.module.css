@@ -32,3 +32,10 @@
 @media (prefers-reduced-motion: reduce) {
   .ring { animation-play-state: paused; }
 }
+
+.label {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--text-mute);
+  letter-spacing: 0.02em;
+}

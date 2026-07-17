@@ -16,4 +16,25 @@ describe('loading', () => {
     const root = container.firstElementChild as HTMLElement;
     expect(root.className).toMatch(/inline/);
   });
+
+  it('renders the label text inside a span when provided', () => {
+    render(<Loading label="加载中…" />);
+    const text = screen.getByText('加载中…');
+    expect(text).toBeInTheDocument();
+    expect(text.tagName.toLowerCase()).toBe('span');
+  });
+
+  it('renders no span when label is omitted', () => {
+    const { container } = render(<Loading />);
+    const root = container.firstElementChild as HTMLElement;
+    expect(root.querySelector('span')).toBeNull();
+  });
+
+  it('uses ariaLabel when provided and label as fallback otherwise', () => {
+    const { rerender } = render(<Loading ariaLabel="Custom" />);
+    expect(screen.getByRole('status')).toHaveAttribute('aria-label', 'Custom');
+
+    rerender(<Loading label="加载中…" />);
+    expect(screen.getByRole('status')).toHaveAttribute('aria-label', '加载中…');
+  });
 });
