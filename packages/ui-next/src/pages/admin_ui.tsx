@@ -2,13 +2,12 @@ import { type FormEvent, useState } from 'react';
 import { Alert, Button, Switch } from '../components/primitives';
 import { usePageData } from '../context/page-data';
 import { HydroClientError, request } from '../hooks/use-api';
+import { canEditSystem } from '../lib/perms';
 
 interface Args {
-  UserContext?: { hasPriv?: (p: number) => boolean };
+  UserContext?: Record<string, unknown>;
   uiNext?: boolean;
 }
-
-const PRIV_EDIT_SYSTEM = 8;
 
 /**
  * `/admin/ui` — toggle ui-next on/off globally. Writes the boolean to
@@ -17,7 +16,7 @@ const PRIV_EDIT_SYSTEM = 8;
  */
 export default function AdminUiPage() {
   const { args } = usePageData() as unknown as { args: Args };
-  const canEdit = !!args?.UserContext?.hasPriv?.(PRIV_EDIT_SYSTEM);
+  const canEdit = canEditSystem(args?.UserContext as any);
   const [enabled, setEnabled] = useState(!!args?.uiNext);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<HydroClientError | null>(null);

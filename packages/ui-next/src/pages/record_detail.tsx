@@ -4,6 +4,7 @@ import { Alert, Button } from '../components/primitives';
 import { Menu } from '../components/sidebar/Menu';
 import { usePageData } from '../context/page-data';
 import { useTranslate } from '../lib/i18n';
+import { canRejudgeAny, isLoggedIn } from '../lib/perms';
 
 interface Rdoc {
   _id: string;
@@ -86,9 +87,9 @@ export default function RecordDetailPage() {
     return () => es.close();
   }, [rdoc._id, rdoc.domainId, rev]);
 
-  const isAdmin = !!UserContext?.hasPerm?.(/* PERM_REJUDGE */ 4096);
-  const isOwner = UserContext?._id === rdoc.uid;
-  const canHack = !rdoc.hackTarget && !isOwner && pdoc.config?.hackable && liveStatus === 0 && !!UserContext?._id;
+  const isAdmin = canRejudgeAny(UserContext);
+  const isOwner = isLoggedIn(UserContext) && UserContext?._id === rdoc.uid;
+  const canHack = !rdoc.hackTarget && !isOwner && pdoc.config?.hackable && liveStatus === 0 && isLoggedIn(UserContext);
 
   const code = rdoc.code ?? '';
   const codeLang = highlightFor(rdoc.lang);

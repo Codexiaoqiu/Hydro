@@ -84,9 +84,9 @@
   text-decoration: none;
   color: inherit;
 }
-.ctaBlockText { font-size: 14px; flex: 1; }
-.ctaBlockText b { display: block; font-size: 15px; font-weight: 600; }
-.ctaBlockText small { color: var(--text-mute); font-size: 12px; }
+.ctaBlockText { font-size: 14px; flex: 1; min-width: 0; overflow: hidden; }
+.ctaBlockText b { display: block; font-size: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ctaBlockText small { color: var(--text-mute); font-size: 12px; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ctaBlockBtn {
   background: var(--text);
   color: var(--bg-0);
@@ -97,6 +97,8 @@
   font-family: inherit;
   font-size: 13px;
   cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 /* Fallback header for contest mode */

@@ -1,8 +1,5 @@
-import { AuthShell } from '../components/auth/AuthShell';
-import { Link } from '../components/link';
 import { ProblemForm } from '../components/problem/ProblemForm';
 import { usePageData } from '../context/page-data';
-import { useTranslate } from '../lib/i18n';
 
 interface Args {
   statementLangs?: string[];
@@ -11,22 +8,12 @@ interface Args {
 
 export default function ProblemCreatePage() {
   const { args } = usePageData() as unknown as { args: Args };
-  const t = useTranslate();
   return (
-    <>
-      <AuthShell
-        title={t('ProblemCreate.Title')}
-        subtitle={t('ProblemCreate.Subtitle')}
-        hideTopNav
-        footLinks={<Link to="problem_main">{t('ProblemCreate.BackToList')}</Link>}
-      >
-        <ProblemForm
-          pageName="problem_create"
-          statementLangs={args?.statementLangs ?? ['zh_CN', 'en']}
-          categoryTree={args?.categoryTree}
-          additionalFile={[]}
-        />
-      </AuthShell>
-    </>
+    <ProblemForm
+      pageName="problem_create"
+      statementLangs={args?.statementLangs ?? ['zh_CN', 'en']}
+      categoryTree={args?.categoryTree}
+      additionalFile={[]}
+    />
   );
 }

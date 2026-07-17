@@ -181,6 +181,9 @@ export function ProblemForm({
   return (
     <form className={styles.form} method="POST" onSubmit={submit}>
       <div className={styles.fields}>
+        <h1 className={styles.pageTitle}>
+          {pageName === 'problem_create' ? t('ProblemForm.CreateTitle') : t('ProblemForm.EditTitle')}
+        </h1>
         {error && error.code !== 429 && <Alert variant="error" message={error.message} />}
         <RateLimitAlert error={error} />
 

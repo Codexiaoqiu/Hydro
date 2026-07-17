@@ -12,6 +12,10 @@ import { SideCard } from '../components/sidebar/SideCard';
 import { usePageData, useSetUiContext } from '../context/page-data';
 import { useBuildUrl } from '../hooks/use-build-url';
 import { useTranslate } from '../lib/i18n';
+import {
+  canEditProblem, canRejudgeProblem, canSubmitProblem, canViewAcceptedSolution,
+  canViewDiscussion, canViewProblemSolution, isLoggedIn,
+} from '../lib/perms';
 import styles from './problem_detail.module.css';
 
 // ===== Types (unchanged from existing) =====================================
@@ -101,6 +105,51 @@ function statusClassName(status?: number): string {
   }
 }
 
+/**
+ * Pick the best content-language key for a problem given the user's profile,
+ * the URL `?lang=` override, the server-injected locale, and the browser's
+ * `navigator.language`. Exported for unit testing.
+ *
+ * Resolution order:
+ *   1. `fromQuery` (URL override) if it exists in `contentLangs`
+ *   2. `userLang` (UserContext.viewLang) if it exists in `contentLangs`
+ *   3. The first content-language whose name matches any *base* locale we
+ *      know about, in priority order: userBaseLang, injectedLocale's base,
+ *      navigatorLanguage's base. We try every base because the user's
+ *      stored preference (`"de"`) might not exist in this problem at all
+ *      — in that case we don't want it to shadow the browser's `"zh"`.
+ *   4. The first available content language
+ *   5. A region-appropriate default: `zh_CN` for zh-base, otherwise `en`
+ */
+export function pickPreferredLang(
+  contentLangs: string[],
+  options: {
+    userLang?: string;
+    fromQuery?: string | null;
+    injectedLocale?: string;
+    navigatorLanguage?: string;
+  } = {},
+): string {
+  const { userLang, fromQuery = null, injectedLocale, navigatorLanguage } = options;
+  if (fromQuery && contentLangs.includes(fromQuery)) return fromQuery;
+  if (userLang && contentLangs.includes(userLang)) return userLang;
+  const baseCandidates = [
+    userLang?.split(/[-_]/)[0],
+    injectedLocale?.split(/[-_]/)[0],
+    navigatorLanguage?.split(/[-_]/)[0],
+  ].filter((s): s is string => !!s);
+  // Try each base locale in priority order. Earlier bases win even if a
+  // later base also matches: the user's stored `de` should not silently
+  // shadow the browser's `zh`, and the server-injected `zh_CN` should
+  // beat `navigator.language = en-US` when both have content.
+  for (const base of baseCandidates) {
+    const matched = contentLangs.find((lang) => lang === base || lang.startsWith(`${base}_`));
+    if (matched) return matched;
+  }
+  const activeBaseLang = baseCandidates[0];
+  return contentLangs[0] || (activeBaseLang === 'zh' ? 'zh_CN' : 'en');
+}
+
 export function readContentText(content: Pdoc['content'] | undefined, preferredLang: string): string {
   if (!content) return '';
   // The server stores pdoc.content as a JSON string of the form
@@ -127,20 +176,40 @@ export function readContentText(content: Pdoc['content'] | undefined, preferredL
     return '';
   }
   const pickFromMap = (m: Record<string, unknown>): string => {
-    const direct = m[preferredLang];
-    if (typeof direct === 'string') return direct;
-    const directStr = String(direct ?? '');
-    if (directStr.trimStart().startsWith('{')) {
-      try {
-        const parsed = JSON.parse(directStr);
-        if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
-          const parsedMap = parsed as Record<string, unknown>;
-          if (typeof parsedMap[preferredLang] === 'string') return parsedMap[preferredLang] as string;
-          const first = Object.values(parsedMap).find((v) => typeof v === 'string');
-          if (typeof first === 'string') return first;
+    // Try the requested locale, then a base-locale fallback (e.g. `zh_CN`
+    // -> `zh`). This is the critical fix vs. the old "fall through to
+    // firstAny" behaviour, which silently returned the English content for
+    // every Chinese viewer because the server persists `en` first in the
+    // locale map and `m['zh_CN']` was undefined for content keyed `{"en",
+    // "zh"}`.
+    const base = preferredLang.split(/[-_]/)[0];
+    const candidateKeys: string[] = [];
+    if (preferredLang) candidateKeys.push(preferredLang);
+    if (base && base !== preferredLang) {
+      candidateKeys.push(base);
+      // Also try regional siblings (`zh_TW`, `zh_HK`, …) and the exact base.
+      for (const key of Object.keys(m)) {
+        if (key === base || key.startsWith(`${base}_`)) candidateKeys.push(key);
+      }
+    }
+    for (const key of candidateKeys) {
+      const direct = m[key];
+      if (typeof direct === 'string') return direct;
+      const directStr = String(direct ?? '');
+      if (directStr.trimStart().startsWith('{')) {
+        try {
+          const parsed = JSON.parse(directStr);
+          if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+            const parsedMap = parsed as Record<string, unknown>;
+            for (const k of candidateKeys) {
+              if (typeof parsedMap[k] === 'string') return parsedMap[k] as string;
+            }
+            const first = Object.values(parsedMap).find((v) => typeof v === 'string');
+            if (typeof first === 'string') return first;
+          }
+        } catch {
+          /* fall through */
         }
-      } catch {
-        /* fall through */
       }
     }
     const firstAny = Object.values(m).find((v) => typeof v === 'string');
@@ -169,17 +238,15 @@ function getNormalMenu(ctx: SidebarCtx, t: (k: string, a?: Record<string, unknow
   } = ctx;
 
   const items: MenuItem[] = [];
-  const isLoggedIn = !!UserContext?._id;
-  const canSubmit = UserContext?.hasPerm?.(8) ?? false;
-  const canRejudge = UserContext?.hasPerm?.(4096) ?? false;
-  const canViewDiscussion = UserContext?.hasPerm?.(256) ?? false;
+  const loggedIn = isLoggedIn(UserContext);
+  const canSubmit = canSubmitProblem(UserContext);
+  const canRejudge = canRejudgeProblem(UserContext);
+  const canViewDisc = canViewDiscussion(UserContext);
   const psdocAccepted = psdoc?.status === STATUS.STATUS_ACCEPTED;
   const canViewSolution =
-    UserContext?.hasPerm?.(1)
-    || (UserContext?.hasPerm?.(2) && psdocAccepted);
-  const canEditProblem =
-    (pdoc && UserContext?.own?.(pdoc as unknown as { owner?: number }, 16))
-    || UserContext?.hasPerm?.(16);
+    canViewProblemSolution(UserContext)
+    || (canViewAcceptedSolution(UserContext) && psdocAccepted);
+  const editable = canEditProblem(UserContext, pdoc as unknown as { owner?: number });
   const showRejudge = canRejudge && !pdoc.reference;
 
   if (canSubmit) {
@@ -188,7 +255,7 @@ function getNormalMenu(ctx: SidebarCtx, t: (k: string, a?: Record<string, unknow
       title: t('Problem.Submit'),
       href: buildUrl('problem_submit', { pid: String(pdoc.docId) }, getTidQuery(tdoc)),
     });
-  } else if (isLoggedIn) {
+  } else if (loggedIn) {
     items.push({
       key: 'submit',
       title: t('Problem.NoPermissionToSubmit'),
@@ -214,10 +281,10 @@ function getNormalMenu(ctx: SidebarCtx, t: (k: string, a?: Record<string, unknow
     });
   }
 
-  if (canViewDiscussion || canViewSolution) {
+  if (canViewDisc || canViewSolution) {
     items.push({ key: 'sep-1', separator: true });
   }
-  if (canViewDiscussion) {
+  if (canViewDisc) {
     items.push({
       key: 'discussions',
       title: `${t('Problem.Discussions')} (${discussionCount})`,
@@ -242,7 +309,7 @@ function getNormalMenu(ctx: SidebarCtx, t: (k: string, a?: Record<string, unknow
     href: buildUrl('problem_statistics', { pid: String(pdoc.docId) }, getTidQuery(tdoc)),
   });
 
-  if (canEditProblem) {
+  if (editable) {
     items.push({ key: 'sep-2', separator: true });
     items.push({
       key: 'edit',
@@ -282,15 +349,15 @@ function getContestMenu(ctx: SidebarCtx, mode: Mode, t: (k: string, a?: Record<s
   }
 
   if (mode === 'contest' || (mode !== 'view' && mode !== 'correction')) {
-    const isLoggedIn = !!UserContext?._id;
-    const canSubmit = UserContext?.hasPerm?.(8) ?? false;
+    const loggedIn = isLoggedIn(UserContext);
+    const canSubmit = canSubmitProblem(UserContext);
     if (canSubmit) {
       items.push({
         key: 'submit',
         title: t('Problem.Submit'),
         href: buildUrl('problem_submit', { pid: String(pdoc.docId) }, getTidQuery(tdoc)),
       });
-    } else if (isLoggedIn) {
+    } else if (loggedIn) {
       items.push({
         key: 'submit',
         title: t('Problem.NoPermissionToSubmit'),
@@ -307,10 +374,8 @@ function getContestMenu(ctx: SidebarCtx, mode: Mode, t: (k: string, a?: Record<s
     }
   }
 
-  const canEditProblem =
-    (pdoc && UserContext?.own?.(pdoc as unknown as { owner?: number }, 16))
-    || UserContext?.hasPerm?.(16);
-  if (canEditProblem) {
+  const editable = canEditProblem(UserContext, pdoc as unknown as { owner?: number });
+  if (editable) {
     items.push({ key: 'sep-1', separator: true });
     items.push({
       key: 'edit',
@@ -340,15 +405,15 @@ function getHomeworkMenu(ctx: SidebarCtx, mode: Mode, t: (k: string, a?: Record<
       title: t('Problem.ViewProblem'),
       href: buildUrl('problem_detail', { pid: String(pdoc.docId) }, getTidQuery(tdoc)),
     });
-    const isLoggedIn = !!UserContext?._id;
-    const canSubmit = UserContext?.hasPerm?.(8) ?? false;
+    const loggedIn = isLoggedIn(UserContext);
+    const canSubmit = canSubmitProblem(UserContext);
     if (canSubmit) {
       items.push({
         key: 'submit',
         title: t('Problem.Submit'),
         href: buildUrl('problem_submit', { pid: String(pdoc.docId) }, getTidQuery(tdoc)),
       });
-    } else if (isLoggedIn) {
+    } else if (loggedIn) {
       items.push({
         key: 'submit',
         title: t('Problem.NoPermissionToSubmit'),
@@ -371,10 +436,8 @@ function getHomeworkMenu(ctx: SidebarCtx, mode: Mode, t: (k: string, a?: Record<
     });
   }
 
-  const canEditProblem =
-    (pdoc && UserContext?.own?.(pdoc as unknown as { owner?: number }, 16))
-    || UserContext?.hasPerm?.(16);
-  if (canEditProblem) {
+  const editable = canEditProblem(UserContext, pdoc as unknown as { owner?: number });
+  if (editable) {
     items.push({ key: 'sep-1', separator: true });
     items.push({
       key: 'edit',
@@ -444,7 +507,6 @@ export default function ProblemDetailPage() {
 
   const preferredLang = useMemo(() => {
     const userLang = (UserContext as unknown as { viewLang?: string })?.viewLang;
-    const baseLang = userLang?.split(/[-_]/)[0];
     const contentLangs: string[] =
       pdoc.content && typeof pdoc.content === 'object'
         ? Object.keys(pdoc.content)
@@ -457,15 +519,18 @@ export default function ProblemDetailPage() {
         fromQuery = null;
       }
     }
-    const matchesBase = (lang: string) =>
-      !!baseLang && (lang === baseLang || lang.startsWith(`${baseLang}_`));
-    return (
-      (fromQuery && contentLangs.includes(fromQuery) ? fromQuery : null)
-      || (userLang && contentLangs.includes(userLang) ? userLang : null)
-      || contentLangs.find(matchesBase)
-      || contentLangs[0]
-      || 'zh_CN'
-    );
+    const injectedLocale = typeof window !== 'undefined'
+      ? (window as unknown as { __hydro_locale?: string }).__hydro_locale
+      : undefined;
+    const navigatorLanguage = typeof navigator !== 'undefined'
+      ? (navigator.language || '')
+      : '';
+    return pickPreferredLang(contentLangs, {
+      userLang,
+      fromQuery,
+      injectedLocale,
+      navigatorLanguage,
+    });
   }, [pdoc.content, UserContext]);
 
   const contentText = useMemo(
@@ -487,7 +552,7 @@ export default function ProblemDetailPage() {
     return `#${pdoc.pid ?? pdoc.docId}`;
   }, [pdoc, tdoc]);
 
-  const canStar = !tdoc && UserContext?.hasPriv?.(1);
+  const canStar = !tdoc && isLoggedIn(UserContext);
   const sidebarItems = pickSidebarItems(
     {
       pdoc, tdoc, UserContext, buildUrl, discussionCount, solutionCount, psdoc,
@@ -502,8 +567,8 @@ export default function ProblemDetailPage() {
     ...htdocs.map((h) => ({ title: h.title, emoji: '📝', date: '' })),
   ], [ctdocs, tdocs, htdocs]);
 
-  const isLoggedIn = !!UserContext?._id;
-  const canSubmit = UserContext?.hasPerm?.(8) ?? false;
+  const loggedIn = isLoggedIn(UserContext);
+  const canSubmit = canSubmitProblem(UserContext);
 
   // === Normal mode: new hero + content + sidebar layout ===
   if (mode === 'normal') {
@@ -555,7 +620,7 @@ export default function ProblemDetailPage() {
               ) : (
                 <div className={styles.ctaBlock}>
                   <div className={styles.ctaBlockText}>
-                    <b>{isLoggedIn ? t('Problem.NoPermissionToSubmit') : t('Problem.LoginToSubmit')}</b>
+                    <b>{loggedIn ? t('Problem.NoPermissionToSubmit') : t('Problem.LoginToSubmit')}</b>
                     <small>{t('Problem.SubmitHint') ?? '提交你的答案'}</small>
                   </div>
                   <button type="button" className={styles.ctaBlockBtn} disabled>{t('Problem.Submit')}</button>

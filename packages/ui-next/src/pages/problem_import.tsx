@@ -5,10 +5,11 @@ import { Alert, Button, Checkbox, Input, Loading, RateLimitAlert } from '../comp
 import { usePageData } from '../context/page-data';
 import { HydroClientError, request } from '../hooks/use-api';
 import { useTranslate } from '../lib/i18n';
+import { canEditSystem } from '../lib/perms';
 
 interface Args {
   type?: string;
-  UserContext?: { hasPriv?: (priv: number) => boolean };
+  UserContext?: Record<string, unknown>;
 }
 
 interface ImportPageData {
@@ -52,7 +53,7 @@ function ProblemImportForm({ args, importerType }: { args: Args, importerType: s
   const [done, setDone] = useState(false);
   const t = useTranslate();
 
-  const showKeepUser = !!args.UserContext?.hasPriv?.(8) && !importerType;
+  const showKeepUser = canEditSystem(args.UserContext) && !importerType;
   const actionUrl = `/problem/import/${encodeURIComponent(importerType)}`;
 
   const submit = async (e: FormEvent<HTMLFormElement>) => {

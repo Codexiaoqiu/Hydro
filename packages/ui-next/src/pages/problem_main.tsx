@@ -12,6 +12,7 @@ import { useBuildUrl } from '../hooks/use-build-url';
 import { Avatar } from '../lib/avatar';
 import { difficultyAlgorithm, formatN } from '../lib/difficulty';
 import { useTranslate } from '../lib/i18n';
+import { canCreateProblem, isLoggedIn } from '../lib/perms';
 import styles from './problem_main.module.css';
 
 interface Pdoc {
@@ -217,6 +218,8 @@ export default function ProblemMain() {
   };
 
   const extraTitle = UiContext?.extraTitleContent as string | undefined;
+  const loggedIn = isLoggedIn(UserContext);
+  const canCreate = canCreateProblem(UserContext);
   const statText = pcount > 0
     ? (args.pcountRelation === 'eq' ? `${pcount}${t('ProblemMain.ProblemCount')}` : `${pcount}${t('ProblemMain.ProblemCountRelation')}`)
     : t('ProblemMain.NoProblems');
@@ -356,12 +359,21 @@ export default function ProblemMain() {
 
         <aside className={styles.sidebar}>
           <Card variant="side">
-            <CtaCard
-              title={t('ProblemMain.SideCtaTitle')}
-              subtitle={t('ProblemMain.SideCtaSubtitle')}
-              actionLabel={t('ProblemMain.SideCtaAction')}
-              onAction={() => { navigate('/login'); }}
-            />
+            {!loggedIn ? (
+              <CtaCard
+                title={t('ProblemMain.SideCtaTitle')}
+                subtitle={t('ProblemMain.SideCtaSubtitle')}
+                actionLabel={t('ProblemMain.SideCtaAction')}
+                onAction={() => { navigate('/login'); }}
+              />
+            ) : canCreate ? (
+              <CtaCard
+                title={t('ProblemMain.SideCreateTitle')}
+                subtitle={t('ProblemMain.SideCreateSubtitle')}
+                actionLabel={t('ProblemMain.SideCreateAction')}
+                onAction={() => { navigate('/problem/create'); }}
+              />
+            ) : null}
           </Card>
 
           {Object.keys(categorySetting).length > 0 && (
