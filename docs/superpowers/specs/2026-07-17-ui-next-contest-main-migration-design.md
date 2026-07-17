@@ -317,7 +317,7 @@ function hasCreatePerm(UserContext: any): boolean {
 }
 ```
 
-(`PERM_CREATE_CONTEST = 64` is verified by reading `packages/hydrooj/src/model/builtin.ts`.)
+(`PERM_CREATE_CONTEST = 1n << 44n` is verified by reading `packages/common/permission.ts:63`. The mask check `(big & mask) !== 0n` is bit-index-independent, so the safe plan-side check never references the bit position explicitly.)
 
 ## 5. Components (existing reused)
 
@@ -360,10 +360,10 @@ This duplicates labels already in `lib/rule-text.ts` to avoid coupling the toolb
 ### `src/lib/perms.ts` — small perm helpers
 
 ```ts
-const PERM_VIEW_CONTEST = 1n << 5n;       // PERM.PERM_VIEW_CONTEST = 32 (verify in builtin.ts)
-const PERM_CREATE_CONTEST = 1n << 6n;     // PERM.PERM_CREATE_CONTEST = 64 (verify in builtin.ts)
-const PERM_VIEW_HIDDEN_CONTEST = 1n << 13n; // PERM.PERM_VIEW_HIDDEN_CONTEST — verify
+import { PERM } from './perm-constants';
 
+// hasPerm uses BigInt AND-masking (never bit-shifts by an index), so it's safe
+// regardless of where the perm bit lives in the bitfield.
 export function hasPerm(UserContext: any, mask: bigint): boolean {
   const permStr = (UserContext?.perm ?? '') as string;
   const m = permStr.match(/^BigInt::(\d+)$/);
@@ -374,24 +374,28 @@ export function hasPerm(UserContext: any, mask: bigint): boolean {
 
 // Specific:
 export function canCreateContest(UserContext: any): boolean {
-  return hasPerm(UserContext, PERM_CREATE_CONTEST);
+  return hasPerm(UserContext, PERM.PERM_CREATE_CONTEST);
 }
 export function canViewHiddenContest(UserContext: any): boolean {
-  return hasPerm(UserContext, PERM_VIEW_HIDDEN_CONTEST);
+  return hasPerm(UserContext, PERM.PERM_VIEW_HIDDEN_CONTEST);
+}
+export function canViewContest(UserContext: any): boolean {
+  return hasPerm(UserContext, PERM.PERM_VIEW_CONTEST);
 }
 ```
 
-The implementation uses `(big & mask) !== 0n` — never bit-shift the mask index.
+Note: masks live in `perm-constants.ts` so a single edit keeps perm checks consistent. The check `(big & mask) !== 0n` works for masks of any bit-width (1<<41 also works correctly).
 
 ### `src/lib/perm-constants.ts` — single source of truth
 
 ```ts
-// Mirror of packages/hydrooj/src/model/builtin.ts — manually kept in sync.
-// Update if backend adds new PERM bits.
+// Mirror of packages/common/permission.ts PERM block.
+// Verified values (2026-07-17): PERM_VIEW_CONTEST=1n<<41n, PERM_CREATE_CONTEST=1n<<44n,
+// PERM_VIEW_HIDDEN_CONTEST=1n<<68n. Update if backend shifts bits.
 export const PERM = {
-  PERM_VIEW_CONTEST:        1n << 5n,
-  PERM_CREATE_CONTEST:      1n << 6n,
-  PERM_VIEW_HIDDEN_CONTEST: 1n << 13n,
+  PERM_VIEW_CONTEST:        1n << 41n,
+  PERM_VIEW_HIDDEN_CONTEST: 1n << 68n,
+  PERM_CREATE_CONTEST:      1n << 44n,
 };
 ```
 
@@ -690,9 +694,9 @@ Mirrors `problem_main.tsx`'s catalog block style. No new i18n library.
 
 | Test file | Coverage |
 |---|---|
-| `src/lib/perms.test.ts` | `hasPerm` matches `BigInt::<n>` strings, returns false on null/empty/unknown, verifies `(big & mask) !== 0n` against 64 (`PERM_CREATE_CONTEST`), 32, 8192 |
+| `src/lib/perms.test.ts` | `hasPerm` matches `BigInt::<n>` strings; returns false on null/empty/unknown; verifies `(big & mask) !== 0n` against the actual perm constants from `perm-constants.ts` (PERM_CREATE_CONTEST = 1n<<44n, PERM_VIEW_HIDDEN_CONTEST = 1n<<68n) |
 | `src/lib/contest-flags.test.ts` | `KNOWN_RULES` length = 6, all keys exist in `ruleText` map, label positions are stable |
-| `src/pages/contest_main.test.tsx` | Wrap `PageDataProvider`; render with mocked args; verify: (a) empty tdocs shows `EmptyState`; (b) 1 acm contest shows row with rule tag; (c) 1 ongoing contest shows `HeroBanner` of variant `live`; (d) 1 upcoming shows `ready`; (e) `attended=1` shows "已报名" Chip; (f) rated shows "Rated" Chip; (g) perm-gated CTA renders when `UserContext.perm = "BigInt::96"` (bits 5+6 = `PERM_VIEW_CONTEST \| PERM_CREATE_CONTEST`) but not when `perm = "BigInt::32"` (only `PERM_VIEW_CONTEST`); (h) pager renders when `tpcount > PAGE_SIZE`; (i) no console errors |
+| `src/pages/contest_main.test.tsx` | Wrap `PageDataProvider`; render with mocked args; verify: (a) empty tdocs shows `EmptyState`; (b) 1 acm contest shows row with rule tag; (c) 1 ongoing contest shows `HeroBanner` of variant `live`; (d) 1 upcoming shows `ready`; (e) `attended=1` shows "已报名" Chip; (f) rated shows "Rated" Chip; (g) perm-gated CTA renders when `UserContext.perm = "BigInt::${1n<<41n \| 1n<<44n}"` (PERM_VIEW_CONTEST + PERM_CREATE_CONTEST) but not when `perm = "BigInt::${1n<<41n}"` (only PERM_VIEW_CONTEST); (h) pager renders when `tpcount > PAGE_SIZE`; (i) no console errors |
 | `src/pages/contest_main.module.css` | (no test) — captured by visual regression |
 
 Visual regression:
@@ -805,7 +809,7 @@ packages/ui-next/
 | `KNOWN_RULES` may go stale if backend adds a rule | Document the list as a soft mirror; **manual sync requirement** noted in code. Adding a new rule only requires updating this file and `lib/rule-text.ts` — no backend changes. URL filtering via `?rule=<new>` still works without UI showing it in the dropdown. |
 | Hero banner links open in same tab vs new tab | `<Link>` opens same tab — matches ui-default. No target change. |
 | Perm parsing wrong if backend changes `BigInt::` format | The `hasPerm` helper does **string match** first, then `BigInt` parse — if format changes, returns false (safe default). Comments call out the assumption. |
-| PERM bit indices in `perm-constants.ts` wrong | Plan review explicitly cross-references `packages/hydrooj/src/model/builtin.ts`. If any bit is wrong, `PERM_CREATE_CONTEST` won't show when it should (or will show when it shouldn't). Verified in `perms.test.ts` with `BigInt::64` (= `0b1000000`). |
+| PERM bit indices in `perm-constants.ts` wrong | Plan reviewer cross-referenced `packages/common/permission.ts:60-67` — actual values are PERM_VIEW_CONTEST=1n<<41n, PERM_CREATE_CONTEST=1n<<44n, PERM_VIEW_HIDDEN_CONTEST=1n<<68n (NOT 5/6/13). `hasPerm` uses `(big & mask) !== 0n` mask-style check so it never references the bit index anyway; only the imported mask constant needs the right value. |
 | Light theme hero gradient looks washed out | Light overrides use `--text → --text-soft` (neutral gray) per the existing `tokens.css` rule "Components MUST use these variables instead of hardcoded rgba() so the light theme can remap them to neutral monochrome." Visual regen catches this. |
 | tsdict missing/empty when not logged in | `tsdict[docId]` returns `undefined`; `attended === 1` is false; "已报名" chip hidden. Tests cover this. |
 | ObjectId parse fails if backend returns invalid string | `new Date(...)` returns `Invalid Date` whose `getTime()` is NaN. `isOngoing/Upcoming/Done` then short-circuit `false`. Safe degenerate. |
