@@ -1,7 +1,7 @@
 import { type FormEvent, type ReactNode, useState } from 'react';
 import { AuthShell } from '../components/auth/AuthShell';
 import { Link } from '../components/link';
-import { Alert, Button, Checkbox, Input, RateLimitAlert } from '../components/primitives';
+import { Alert, Button, Checkbox, Input, Loading, RateLimitAlert } from '../components/primitives';
 import { usePageData } from '../context/page-data';
 import { HydroClientError, request } from '../hooks/use-api';
 import { useTranslate } from '../lib/i18n';
@@ -128,7 +128,7 @@ export default function ProblemImportPage() {
   if (!isPageDataReady(pageData)) {
     return (
       <ProblemImportShell title={t('ProblemImport.ShellTitle')} subtitle={t('ProblemImport.ShellSubtitle')}>
-        <p style={{ margin: 0 }}>{t('ProblemImport.Loading')}</p>
+        <Loading size="inline" label={t('ProblemImport.Loading')} />
       </ProblemImportShell>
     );
   }

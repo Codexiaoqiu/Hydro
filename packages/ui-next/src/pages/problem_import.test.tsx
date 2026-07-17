@@ -89,7 +89,7 @@ describe('problemImportPage', () => {
   it('waits for PageData before rendering the import form', () => {
     renderImport();
 
-    expect(screen.getByText('Loading...')).toBeInTheDocument();
+    expect(screen.getByText(/Loading/)).toBeInTheDocument();
     expect(screen.queryByLabelText('Package (.zip)')).not.toBeInTheDocument();
   });
   it('submits to the importer endpoint from loaded PageData type', async () => {
