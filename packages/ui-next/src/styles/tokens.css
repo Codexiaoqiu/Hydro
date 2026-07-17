@@ -223,3 +223,25 @@
   /* Text on a primary button → white (the button itself is black in light mode). */
   --text-on-cyan: #ffffff;
 }
+
+:root {
+  --tint-rule-acm: 107, 182, 122;
+  --tint-rule-oi: 245, 199, 53;
+  --tint-rule-ioi: 46, 154, 254;
+  --tint-rule-ledo: 128, 118, 163;
+  --tint-rule-homework: 255, 205, 205;
+  --tint-rule-strictioi: 110, 162, 199;
+  --gradient-contest-live: linear-gradient(135deg, var(--pink), var(--violet));
+  --gradient-contest-ready: linear-gradient(135deg, var(--cyan), var(--blue));
+}
+
+[data-theme="light"] {
+  --tint-rule-acm: 23, 23, 23;
+  --tint-rule-oi: 23, 23, 23;
+  --tint-rule-ioi: 23, 23, 23;
+  --tint-rule-ledo: 23, 23, 23;
+  --tint-rule-homework: 23, 23, 23;
+  --tint-rule-strictioi: 23, 23, 23;
+  --gradient-contest-live: linear-gradient(135deg, var(--text), var(--text-soft));
+  --gradient-contest-ready: linear-gradient(135deg, var(--text-soft), var(--text-mute));
+}
