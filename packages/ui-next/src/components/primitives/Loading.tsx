@@ -16,6 +16,7 @@ export function Loading({
   label,
   ariaLabel,
   className,
+  style,
 }: LoadingProps) {
   const sizeClass = size === 'inline' ? styles.inline : styles.block;
   const resolvedAriaLabel = ariaLabel ?? (typeof label === 'string' ? label : 'Loading');
@@ -25,6 +26,7 @@ export function Loading({
       aria-live="polite"
       aria-label={resolvedAriaLabel}
       className={[styles.root, sizeClass, className].filter(Boolean).join(' ')}
+      style={style}
     >
       <svg
         className={styles.ring}

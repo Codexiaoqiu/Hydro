@@ -92,7 +92,12 @@ function ProblemImportForm({ args, importerType }: { args: Args, importerType: s
       {done ? (
         <Alert variant="success" title={t('ProblemImport.ImportCompleteTitle')} message={t('ProblemImport.ImportCompleteMessage')} />
       ) : (
-        <form onSubmit={submit} method="POST" encType="multipart/form-data" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+        <form
+          onSubmit={submit}
+          method="POST"
+          encType="multipart/form-data"
+          style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}
+        >
           <label style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
             <span style={{ fontSize: 'var(--text-sm)', fontWeight: 600 }}>{t('ProblemImport.PackageLabel')}</span>
             <input
@@ -111,7 +116,14 @@ function ProblemImportForm({ args, importerType }: { args: Args, importerType: s
             placeholder={t('ProblemImport.PreferredPrefixPlaceholder')}
           />
           <Checkbox name="hidden" label={t('ProblemImport.HiddenLabel')} checked={hidden} onChange={(e) => setHidden(e.currentTarget.checked)} />
-          {showKeepUser && <Checkbox name="keepUser" label={t('ProblemImport.KeepUserLabel')} checked={keepUser} onChange={(e) => setKeepUser(e.currentTarget.checked)} />}
+          {showKeepUser && (
+            <Checkbox
+              name="keepUser"
+              label={t('ProblemImport.KeepUserLabel')}
+              checked={keepUser}
+              onChange={(e) => setKeepUser(e.currentTarget.checked)}
+            />
+          )}
           <Button type="submit" variant="primary" disabled={submitting || !file}>
             {submitting ? t('ProblemImport.Importing') : t('ProblemImport.Import')}
           </Button>

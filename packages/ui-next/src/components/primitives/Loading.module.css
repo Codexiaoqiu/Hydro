@@ -36,6 +36,6 @@
 .label {
   font-family: var(--font-mono);
   font-size: var(--text-xs);
-  color: var(--text-mute);
+  color: var(--text-soft);
   letter-spacing: 0.02em;
 }

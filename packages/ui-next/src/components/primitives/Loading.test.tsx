@@ -4,11 +4,13 @@ import { Loading } from './Loading';
 
 describe('loading', () => {
   it('renders block variant by default with role=status and an svg ring', () => {
-    render(<Loading />);
+    render(<Loading style={{ marginTop: '12px' }} />);
     const status = screen.getByRole('status');
     expect(status).toBeInTheDocument();
     expect(status).toHaveAttribute('aria-label', 'Loading');
-    expect(status.querySelector('svg')).toBeTruthy();
+    expect(status.className).toMatch(/block/);
+    expect(status).toHaveStyle({ marginTop: '12px' });
+    expect(status.querySelectorAll('svg').length).toBe(1);
   });
 
   it('uses inline-flex layout when size="inline"', () => {
@@ -22,6 +24,7 @@ describe('loading', () => {
     const text = screen.getByText('加载中…');
     expect(text).toBeInTheDocument();
     expect(text.tagName.toLowerCase()).toBe('span');
+    expect(text.className).toMatch(/label/);
   });
 
   it('renders no span when label is omitted', () => {
