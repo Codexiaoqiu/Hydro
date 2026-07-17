@@ -1,11 +1,11 @@
 import { Suspense, useMemo, useSyncExternalStore } from 'react';
 import DefaultLayout from './components/layout';
+import { Loading } from './components/primitives';
 import { usePageData } from './context/page-data';
+import { useTranslate } from './lib/i18n';
 import { defineSlot } from './registry';
 import { SlotErrorBoundary } from './registry/error-boundary';
 import { store } from './registry/store';
-import { Loading } from './components/primitives';
-import { useTranslate } from './lib/i18n';
 
 const App = defineSlot('app:root', () => {
   const { name, template, args } = usePageData();
