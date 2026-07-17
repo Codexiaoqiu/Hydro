@@ -4,9 +4,12 @@ import { usePageData } from './context/page-data';
 import { defineSlot } from './registry';
 import { SlotErrorBoundary } from './registry/error-boundary';
 import { store } from './registry/store';
+import { Loading } from './components/primitives';
+import { useTranslate } from './lib/i18n';
 
 const App = defineSlot('app:root', () => {
   const { name, template, args } = usePageData();
+  const t = useTranslate();
 
   const isError = !!(args as Record<string, unknown>).error;
 
@@ -54,7 +57,7 @@ const App = defineSlot('app:root', () => {
     <SlotErrorBoundary slotName={slotName} label="renderer">
       <Suspense fallback={null}>
         <Layout>
-          <Suspense fallback={<div>Loading...</div>}>
+          <Suspense fallback={<Loading size="block" ariaLabel={t('Common.Loading')} />}>
             <Page />
           </Suspense>
         </Layout>
