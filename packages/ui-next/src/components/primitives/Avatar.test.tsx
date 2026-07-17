@@ -1,6 +1,6 @@
 /* @vitest-environment happy-dom */
-import { render, screen } from '@testing-library/react';
 import { readFileSync } from 'node:fs';
+import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { Avatar } from './Avatar';
 

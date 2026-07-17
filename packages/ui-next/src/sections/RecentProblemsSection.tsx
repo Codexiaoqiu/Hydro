@@ -1,6 +1,5 @@
 import { Link } from '../components/link';
 import { Card } from '../components/primitives/Card';
-import { objectIdTime, timeAgo } from '../lib/datetime';
 import styles from './RecentProblemsSection.module.css';
 import type { SectionProps, SerializedPdoc } from './types';
 

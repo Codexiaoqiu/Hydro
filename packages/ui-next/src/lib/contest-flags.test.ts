@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import type { SerializedTdoc } from '../sections/types';
 import { KNOWN_RULES, rulesFromTdocs } from './contest-flags';
 
-describe('KNOWN_RULES', () => {
+describe('kNOWN_RULES', () => {
   it('has six backend contest rule keys', () => {
     expect(KNOWN_RULES).toHaveLength(6);
     expect(KNOWN_RULES.map((rule) => rule.key)).toEqual([
