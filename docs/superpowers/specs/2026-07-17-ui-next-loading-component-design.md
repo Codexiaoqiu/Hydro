@@ -32,7 +32,8 @@ The goal: **one Loading primitive** that
 |---|---|---|
 | Form factor surface | **Two sizes via `size` prop**: `block` (fills parent, centered) + `inline` (inline-flex with surrounding text) | Matches the two existing call sites and the foreseeable ones (Button submitting state) |
 | Animation | **Thin rotating arc** (1.5px stroke, 16×16, ~1/4 arc visible, 0.9s rotation) | Closest to Vercel/Geist; minimal visual weight; works on any background |
-| Label | **Optional, default hidden**; mono 12px in `--text-mute` when shown | Block fallback stays clean by default; problem_import's existing i18n string preserved |
+| Label | **Optional, default hidden**; mono 12px in `--text-soft` when shown | Block fallback stays clean by default; problem_import's existing i18n string preserved |
+| Label contrast | **Use `--text-soft` rather than the original `--text-mute`** | Intentional accessibility refinement: the stronger token gives the visible label WCAG AA contrast in both dark and light themes without changing global tokens |
 | Color source | **Token-driven**: `color: var(--cyan)` in dark, `--cyan` already maps to `#171717` in light via `tokens.css:157` | Single source of truth; no new theme logic |
 | Compound API (`<Loading.Spinner/>`) | **No** | Two call sites don't justify the API surface; mirrors `Button`/`Chip`/`Alert` pattern of single component + variants |
 | Hook (`useLoading`) | **No** | Would push markup into every call site; defeats "unify" goal |
@@ -65,6 +66,7 @@ interface LoadingProps {
   label?: ReactNode;           // optional caption; omitted → no text rendered
   ariaLabel?: string;          // default: label ?? 'Loading'
   className?: string;          // optional container override
+  style?: CSSProperties;       // optional inline styles for the container
 }
 ```
 
@@ -109,7 +111,7 @@ The SVG inherits color from `currentColor`, so the parent's `color: var(--cyan)`
 .label {
   font-family: var(--font-mono);
   font-size: var(--text-xs);
-  color: var(--text-mute);
+  color: var(--text-soft);
   letter-spacing: 0.02em;
 }
 @media (prefers-reduced-motion: reduce) {
