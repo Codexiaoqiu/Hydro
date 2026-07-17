@@ -14,7 +14,7 @@
 .item {
   display: grid;
   /* Three fixed columns: [pid + title flexes] | [time 64px] | [status 56px] */
-  grid-template-columns: minmax(0, 1fr) 64px 56px;
+  grid-template-columns: minmax(0, 1fr) 64px;
   align-items: center;
   gap: var(--space-3);
   padding: var(--space-2) 0;
@@ -45,6 +45,7 @@
 }
 
 .pid {
+  flex: 1;
   font-family: var(--font-mono);
   color: var(--cyan);
   font-size: var(--text-sm);

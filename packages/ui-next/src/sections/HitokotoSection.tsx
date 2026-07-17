@@ -17,7 +17,6 @@ export function HitokotoSection(_props: SectionProps): JSX.Element {
     <Card variant="default">
       <blockquote className={styles.quote}>
         {line}
-        <footer className={styles.attr}>—— hitokoto</footer>
       </blockquote>
     </Card>
   );

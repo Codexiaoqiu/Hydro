@@ -38,7 +38,6 @@ export function RecentProblemsSection({ payload }: SectionProps): JSX.Element | 
     <Card variant="default" header={<h3 className={styles.title}>最新题目</h3>}>
       <ol className={styles.list}>
         {pdocs.map((p) => {
-          const when = p._id ? timeAgo(new Date(objectIdTime(p._id)).toISOString()) : '';
           const ps = psdict[p.docId];
           const status = ps?.status;
           // Build the detail URL only when we have a usable pid. When both
@@ -63,9 +62,6 @@ export function RecentProblemsSection({ payload }: SectionProps): JSX.Element | 
                 ) : (
                   <span className={styles.labelMuted} title={p.title}>{p.title || '未命名题目'}</span>
                 )}
-              </div>
-              <div className={styles.cellTime}>
-                {when && <span className={styles.time}>{when}</span>}
               </div>
               <div className={styles.cellStatus}>
                 {status !== undefined && (

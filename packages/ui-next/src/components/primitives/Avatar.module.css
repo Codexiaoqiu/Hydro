@@ -1,1 +1,14 @@
-.avatar { display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; background: var(--gradient-avatar); font-weight: 700; color: #0a0a0a; box-shadow: var(--shadow-avatar-glow); }
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--gradient-avatar);
+  font-weight: 700;
+  /* Dark mode: avatar background is cyan→violet (light), use a dark letter.
+     Light mode: --gradient-avatar collapses to solid black, so the letter
+     must flip to white. `--text-on-cyan` is the shared token used by
+     Button.primary, pager, Switch, and Checkbox for the same purpose. */
+  color: var(--text-on-cyan);
+  box-shadow: var(--shadow-avatar-glow);
+}
