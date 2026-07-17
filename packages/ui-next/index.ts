@@ -199,7 +199,7 @@ export async function apply(ctx: Context) {
                 },
             },
             appType: 'custom',
-            plugins: [hydroPlugins(), react()],
+            plugins: [hydroPlugins()],
         });
         const middleware = c2k(vite.middlewares);
         const capture = ['/@vite/', '/src/', '/node_modules/', '/@react-refresh', '/@fs', '/@id/'];
