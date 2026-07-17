@@ -18,6 +18,13 @@
   animation: loading-spin 0.9s linear infinite;
 }
 
+.inline {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  vertical-align: middle;
+}
+
 @keyframes loading-spin {
   to { transform: rotate(360deg); }
 }

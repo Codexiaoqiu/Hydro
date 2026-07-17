@@ -10,4 +10,10 @@ describe('loading', () => {
     expect(status).toHaveAttribute('aria-label', 'Loading');
     expect(status.querySelector('svg')).toBeTruthy();
   });
+
+  it('uses inline-flex layout when size="inline"', () => {
+    const { container } = render(<Loading size="inline" />);
+    const root = container.firstElementChild as HTMLElement;
+    expect(root.className).toMatch(/inline/);
+  });
 });
