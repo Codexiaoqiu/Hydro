@@ -106,7 +106,7 @@ async function parseError(res: Response): Promise<HydroClientError> {
     message: `${res.status} ${res.statusText || 'Request failed'}`,
     isUserFacingError: false,
   });
-  let payload: { error?: ErrorPayload; UserFacingError?: boolean } | null = null;
+  let payload: { error?: ErrorPayload, UserFacingError?: boolean } | null = null;
   try {
     payload = await res.clone().json();
   } catch {

@@ -1,6 +1,6 @@
 import styles from './Trend.module.css';
 
-interface Props { values: number[]; color?: 'cyan' | 'blue'; height?: number; }
+interface Props { values: number[], color?: 'cyan' | 'blue', height?: number }
 
 export function Trend({ values, color = 'cyan', height = 50 }: Props) {
   const max = Math.max(...values, 1);

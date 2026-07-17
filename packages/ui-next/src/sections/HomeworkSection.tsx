@@ -1,10 +1,10 @@
+import { Link } from '../components/link';
 import { Card } from '../components/primitives/Card';
 import { Chip } from '../components/primitives/Chip';
-import { Link } from '../components/link';
 import { isExtended } from '../lib/contest-status';
 import { formatDate } from '../lib/datetime';
-import type { SectionProps, SerializedTdoc } from './types';
 import styles from './HomeworkSection.module.css';
+import type { SectionProps, SerializedTdoc } from './types';
 
 export function HomeworkSection({ payload }: SectionProps): JSX.Element | null {
   const [htdocs = [], htsdict = {}] = Array.isArray(payload) ? payload : [[], {}];

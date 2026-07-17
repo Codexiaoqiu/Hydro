@@ -1,12 +1,13 @@
 import type { ReactNode } from 'react';
-import { useNavigate } from '../../context/router';
 import { usePageData } from '../../context/page-data';
+import { useNavigate } from '../../context/router';
 import { useTranslate } from '../../lib/i18n';
 import { Button } from '../primitives/Button';
 import { ThemeToggle } from '../ThemeToggle';
-import { TopNav } from './TopNav';
-import { NavLink } from './NavLink';
 import { LangPill } from './LangPill';
+import { NavLink } from './NavLink';
+import { TopNav } from './TopNav';
+import { UserMenu, type UserMenuUser } from './UserMenu';
 
 interface Props {
   /**
@@ -30,10 +31,13 @@ interface Props {
 interface MinimalUserContext {
   _id?: number;
   uname?: string;
+  mail?: string;
+  avatar?: string;
+  role?: string;
   viewLangName?: string;
 }
 
-const STANDARD_LINKS: Array<{ to: string; key: 'Home' | 'Problems' | 'Contests' | 'Discussions' }> = [
+const STANDARD_LINKS: Array<{ to: string, key: 'Home' | 'Problems' | 'Contests' | 'Discussions' }> = [
   { to: 'homepage', key: 'Home' },
   { to: 'problem_main', key: 'Problems' },
   { to: 'contest_main', key: 'Contests' },
@@ -63,7 +67,9 @@ export function GlobalNav({ currentRoute, extraLinks, extraRight }: Props) {
           {extraRight}
           <LangPill label={user?.viewLangName || '中文'} />
           <ThemeToggle />
-          {isLoggedIn ? null : (
+          {isLoggedIn ? (
+            <UserMenu user={user as UserMenuUser} />
+          ) : (
             <>
               <Button variant="ghost" onClick={() => navigate('/login')}>
                 {t('Common.Login')}

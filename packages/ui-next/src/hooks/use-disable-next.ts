@@ -40,7 +40,7 @@ export function useDisableNext(): DisableNextState {
   const ui = useUiContext();
   const [queryFlag, setQueryFlag] = useState<boolean>(() => readPersistedFlag());
   const [globalFlag, setGlobalFlag] = useState<boolean>(() =>
-    !!(ui as unknown as { uiNext?: boolean })?.uiNext === false
+    !!(ui as unknown as { uiNext?: boolean })?.uiNext === false,
   );
 
   useEffect(() => {

@@ -25,7 +25,9 @@ export function Ring({ percent, size = 86, gradientFrom, gradientTo }: Props) {
         <circle className={styles.track} cx="50" cy="50" r="40" />
         <circle
           className={styles.bar}
-          cx="50" cy="50" r="40"
+          cx="50"
+          cy="50"
+          r="40"
           style={{ strokeDashoffset: offset }}
         />
       </svg>

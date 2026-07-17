@@ -1,14 +1,14 @@
 import type { PropsWithChildren, ReactElement, ReactNode } from 'react';
 import { useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
+import rehypeHighlight from 'rehype-highlight';
+import rehypeKatex from 'rehype-katex';
 import remarkGfm from 'remark-gfm';
 import { remarkHighlightMark } from 'remark-highlight-mark';
 import remarkMath from 'remark-math';
-import rehypeKatex from 'rehype-katex';
-import rehypeHighlight from 'rehype-highlight';
-import { preprocessContent, type ContentBlock } from '../../lib/markdown/preprocess';
 import { remarkImageSize } from '../../lib/markdown/plugins/remarkImageSize';
 import { remarkMedia } from '../../lib/markdown/plugins/remarkMedia';
+import { type ContentBlock, preprocessContent } from '../../lib/markdown/preprocess';
 import { SamplePair } from '../ide/SamplePair';
 import styles from './Article.module.css';
 
@@ -64,7 +64,7 @@ function MarkdownBlock({ body }: { body: string }): ReactElement {
 function SamplePairsBlock({
   pairs,
 }: {
-  pairs: Array<{ num: number; input: string; output: string }>;
+  pairs: Array<{ num: number, input: string, output: string }>;
 }): ReactElement {
   return (
     <div className={styles.samples}>

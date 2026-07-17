@@ -1,7 +1,7 @@
-import { describe, expect, it } from 'vitest';
-import { unified } from 'unified';
 import remarkParse from 'remark-parse';
 import remarkStringify from 'remark-stringify';
+import { unified } from 'unified';
+import { describe, expect, it } from 'vitest';
 import { remarkImageSize } from './remarkImageSize';
 
 function process(md: string): string {

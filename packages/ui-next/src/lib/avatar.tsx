@@ -8,7 +8,7 @@ import styles from './avatar.module.css';
 // The asserted hash f3ada405ce890b6f8204094deb12d8a8 == MD5("foo@bar.com").
 function md5(s: string): string {
   function r(n: number, c: number) { return (n << c) | (n >>> (32 - c)); }
-  function add32(a: number, b: number) { return (a + b) & 0xffffffff; }
+  function add32(a: number, b: number) { return (a + b) & 0xFFFFFFFF; }
   function cmn(q: number, a: number, b: number, x: number, sft: number, t: number) {
     return add32(r(add32(add32(a, q), add32(x, t)), sft), b);
   }
@@ -29,21 +29,21 @@ function md5(s: string): string {
     for (let i = 0; i < b.length; i++) {
       const v = b[i];
       for (let j = 0; j < 4; j++) {
-        out += ((v >>> (j * 8 + 4)) & 0xf).toString(16) + ((v >>> (j * 8)) & 0xf).toString(16);
+        out += ((v >>> (j * 8 + 4)) & 0xF).toString(16) + ((v >>> (j * 8)) & 0xF).toString(16);
       }
     }
     return out;
   }
-  const x = new Array<number>(16).fill(0);
+  const x = Array.from({ length: 16 }).fill(0);
   const len = s.length;
   for (let i = 0; i < len; i++) x[i >> 2] |= s.charCodeAt(i) << ((i % 4) * 8);
   x[len >> 2] |= 0x80 << ((len % 4) * 8);
   x[((len + 8) >> 6) * 16 + 14] = len * 8;
 
-  let a = 1732584193, b = -271733879, c = -1732584194, d = 271733878;
+  let a = 1732584193; let b = -271733879; let c = -1732584194; let d = 271733878;
   for (let i = 0; i < x.length; i += 16) {
     if (i + 16 > x.length) break;
-    const oa = a, ob = b, oc = c, od = d;
+    const oa = a; const ob = b; const oc = c; const od = d;
     a = ff(a, b, c, d, x[i], 7, -680876936);
     d = ff(d, a, b, c, x[i + 1], 12, -389564586);
     c = ff(c, d, a, b, x[i + 2], 17, 606105819);
@@ -113,7 +113,7 @@ function md5(s: string): string {
   return bytesToHex([a, b, c, d]).toLowerCase().padStart(32, '0').slice(0, 32);
 }
 
-function splitSpec(spec: string): { provider: string; value: string } | null {
+function splitSpec(spec: string): { provider: string, value: string } | null {
   const idx = spec.indexOf(':');
   if (idx === -1) return null;
   return { provider: spec.slice(0, idx), value: spec.slice(idx + 1) };

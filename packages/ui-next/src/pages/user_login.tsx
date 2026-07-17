@@ -1,14 +1,14 @@
-import { usePageData } from '../context/page-data';
-import { Link } from '../components/link';
 import { AuthShell } from '../components/auth/AuthShell';
 import { LoginForm, type LoginMethod } from '../components/auth/LoginForm';
+import { Link } from '../components/link';
+import { usePageData } from '../context/page-data';
 import { useTranslate } from '../lib/i18n';
 
 interface UserLoginArgs {
   builtInLogin?: boolean;
   loginMethods?: LoginMethod[];
   redirect?: string;
-  UserContext?: { _id?: number; uname?: string };
+  UserContext?: { _id?: number, uname?: string };
 }
 
 export default function UserLoginPage() {

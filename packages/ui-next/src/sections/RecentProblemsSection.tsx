@@ -1,8 +1,8 @@
-import { Card } from '../components/primitives/Card';
 import { Link } from '../components/link';
+import { Card } from '../components/primitives/Card';
 import { objectIdTime, timeAgo } from '../lib/datetime';
-import type { SectionProps, SerializedPdoc } from './types';
 import styles from './RecentProblemsSection.module.css';
+import type { SectionProps, SerializedPdoc } from './types';
 
 // Local short label table. Mirrors @hydrooj/common's STATUS_SHORT_TEXTS so
 // this package stays free of @hydrooj/common as a runtime dep (see
@@ -32,7 +32,7 @@ function statusBadgeClass(status: number): string {
 export function RecentProblemsSection({ payload }: SectionProps): JSX.Element | null {
   const t = Array.isArray(payload) ? payload : [[], {}];
   const pdocs: SerializedPdoc[] = t[0] ?? [];
-  const psdict = (t[1] ?? {}) as Record<string, { status?: number; rid?: string }>;
+  const psdict = (t[1] ?? {}) as Record<string, { status?: number, rid?: string }>;
   if (!pdocs.length) return null;
   return (
     <Card variant="default" header={<h3 className={styles.title}>最新题目</h3>}>

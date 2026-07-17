@@ -129,7 +129,7 @@ function MenuRow({ item: it }: { item: MenuItem }) {
   return <span className={styles.row}>{body}</span>;
 }
 
-function FormRow({ form, body }: { form: MenuItemForm; body: ReactNode }) {
+function FormRow({ form, body }: { form: MenuItemForm, body: ReactNode }) {
   // Read the CSRF token once on mount. Browsers cache `<meta>` and `<input>`
   // contents for the lifetime of the page, so re-reading on every render
   // would just churn React state for no benefit.

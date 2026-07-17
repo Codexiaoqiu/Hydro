@@ -1,8 +1,8 @@
-import { useEffect, useState, type FormEvent } from 'react';
-import { Alert, Button, Checkbox, Input, RateLimitAlert } from '../primitives';
+import { type FormEvent, useEffect, useState } from 'react';
 import { HydroClientError, request } from '../../hooks/use-api';
 import { usePostLoginRedirect } from '../../hooks/use-post-login-redirect';
 import { useTranslate } from '../../lib/i18n';
+import { Alert, Button, Checkbox, Input, RateLimitAlert } from '../primitives';
 import styles from './LoginForm.module.css';
 
 export interface LoginMethod {

@@ -1,6 +1,6 @@
-import { useId, type PropsWithChildren } from 'react';
-import { Card } from '../primitives';
+import { type PropsWithChildren, useId } from 'react';
 import { useTranslate } from '../../lib/i18n';
+import { Card } from '../primitives';
 
 export interface ScratchpadProps {
   pdoc: unknown;

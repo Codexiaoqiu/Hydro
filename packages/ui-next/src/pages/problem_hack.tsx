@@ -1,12 +1,12 @@
-import { useState, type FormEvent } from 'react';
-import { usePageData } from '../context/page-data';
+import { type FormEvent, useState } from 'react';
 import { Link } from '../components/link';
 import { Alert, Button, Checkbox, RateLimitAlert } from '../components/primitives';
+import { usePageData } from '../context/page-data';
 import { HydroClientError, request } from '../hooks/use-api';
 import { useTranslate } from '../lib/i18n';
 
 interface Args {
-  pdoc?: { docId: number; pid?: string; title: string };
+  pdoc?: { docId: number, pid?: string, title: string };
   rdoc?: { _id: string };
   tid?: string;
 }

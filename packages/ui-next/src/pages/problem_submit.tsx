@@ -1,14 +1,14 @@
-import { useState, type FormEvent } from 'react';
-import { usePageData } from '../context/page-data';
-import { useNavigate } from '../context/router';
+import { type FormEvent, useState } from 'react';
 import { Link } from '../components/link';
 import { Alert, Button, RateLimitAlert } from '../components/primitives';
+import { usePageData } from '../context/page-data';
+import { useNavigate } from '../context/router';
 import { HydroClientError, request } from '../hooks/use-api';
 import { useTranslate } from '../lib/i18n';
 
-interface LangOption { value: string; label: string; }
+interface LangOption { value: string, label: string }
 interface Args {
-  pdoc?: { docId: number; pid?: string; title: string; config?: { langs?: string[]; type?: string } };
+  pdoc?: { docId: number, pid?: string, title: string, config?: { langs?: string[], type?: string } };
   langRange?: LangOption[];
   codeLang?: string;
   tid?: string;
@@ -42,14 +42,14 @@ export default function ProblemSubmitPage() {
         if (code) mfd.set('code', code);
         mfd.set('file', file);
         if (pretestInput) mfd.set('input', pretestInput);
-        const resp = await request.postFile<{ rid?: string; tid?: string }>(url, mfd);
+        const resp = await request.postFile<{ rid?: string, tid?: string }>(url, mfd);
         afterSubmit(resp);
       } else {
         const fd = new URLSearchParams();
         fd.set('lang', lang);
         fd.set('code', code);
         if (pretestInput) fd.set('input', pretestInput);
-        const resp = await request.post<{ rid?: string; tid?: string }>(url, fd);
+        const resp = await request.post<{ rid?: string, tid?: string }>(url, fd);
         afterSubmit(resp);
       }
     } catch (err) {
@@ -59,9 +59,9 @@ export default function ProblemSubmitPage() {
     }
   };
 
-  const afterSubmit = (resp: { rid?: string; tid?: string }) => {
+  const afterSubmit = (resp: { rid?: string, tid?: string }) => {
     if (resp.rid) navigate(`/record/${encodeURIComponent(resp.rid)}`);
-    else if (resp.tid) navigate(`/`);
+    else if (resp.tid) navigate('/');
     else if (typeof window !== 'undefined') window.location.reload();
   };
 

@@ -1,8 +1,8 @@
 /* @vitest-environment happy-dom */
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import type { ReactNode } from 'react';
-import { PageDataProvider, type PageData } from '../context/page-data';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { type PageData, PageDataProvider } from '../context/page-data';
 import { RouterProvider } from '../context/router';
 import { routeMapStore } from '../globals';
 import { ThemeProvider } from '../theme/ThemeProvider';
@@ -37,7 +37,7 @@ function buildPageData(args: PageData['args']): PageData {
   };
 }
 
-function Providers({ args, children }: { args: PageData['args']; children: ReactNode }) {
+function Providers({ args, children }: { args: PageData['args'], children: ReactNode }) {
   return (
     <ThemeProvider>
       <PageDataProvider initial={buildPageData(args)}>
@@ -58,7 +58,7 @@ afterEach(() => {
   vi.useRealTimers();
 });
 
-describe('ContestSection', () => {
+describe('contestSection', () => {
   it('renders a row per contest', () => {
     render(
       <Providers args={{}}>

@@ -1,9 +1,9 @@
 /* @vitest-environment happy-dom */
-import { describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
 import { RankingSection } from './RankingSection';
 
-describe('RankingSection', () => {
+describe('rankingSection', () => {
   it('renders a row per uid with rank + RP', () => {
     const udict = {
       1: { _id: 1, uname: 'alice', avatar: 'github:alice', bio: 'cpp', perm: 'BigInt::0', rp: 2400 },

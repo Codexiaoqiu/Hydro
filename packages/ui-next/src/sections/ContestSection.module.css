@@ -1,13 +1,36 @@
-.header { font-family: var(--font-display); font-size: var(--text-base); font-weight: 600; margin: 0; }
-.list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.headerContent{
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+.header {
+  font-family: var(--font-display);
+  font-size: var(--text-base);
+  font-weight: 600;
+  margin: 0;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
 .item {
   display: flex;
   gap: var(--space-4);
   padding: var(--space-3) 0;
   border-bottom: 1px solid var(--border-soft, var(--bg-soft));
 }
-.item:last-child { border-bottom: 0; }
+
+.item:last-child {
+  border-bottom: 0;
+}
+
 .dateBlock {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -18,17 +41,31 @@
   background: var(--bg-soft);
   padding: var(--space-2) 0;
 }
-.dateDay { font-family: var(--font-display); font-size: var(--text-lg); font-weight: 700; line-height: 1; }
-.dateMonth { font-size: var(--text-xs, var(--text-sm)); color: var(--text-mute); margin-top: 2px; }
-.body { flex: 1; min-width: 0; }
+
+.dateDay {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.body {
+  flex: 3;
+  min-width: 0;
+}
+
 .title {
   display: block;
-  font-size: var(--text-base);
+  font-size: var(--text-2xl);
   font-weight: 600;
   color: var(--text);
   text-decoration: none;
 }
-.title:hover { color: var(--cyan); }
+
+.title:hover {
+  color: var(--cyan);
+}
+
 .meta {
   list-style: none;
   margin: var(--space-2) 0 0;
@@ -40,7 +77,35 @@
   font-size: var(--text-sm);
   color: var(--text-soft);
 }
-.text { display: inline-flex; align-items: center; }
-.footer { padding-top: var(--space-3); border-top: 1px solid var(--border-soft, var(--bg-soft)); text-align: right; }
-.more { color: var(--cyan); font-size: var(--text-sm); text-decoration: none; }
-.more:hover { text-decoration: underline; }
+
+.text {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Vertical hairline dividing the static attribute chips (rule / Rated)
+   from the dynamic per-row info (duration, attend, status). */
+.divider {
+  width: 1px;
+  height: 14px;
+  margin: 0 var(--space-2);
+  align-self: center;
+  flex-shrink: 0;
+  background: var(--border-strong);
+  list-style: none;
+}
+
+.footer {
+  border-top: 1px solid var(--border-soft, var(--bg-soft));
+  text-align: right;
+}
+
+.more {
+  color: var(--cyan);
+  font-size: var(--text-sm);
+  text-decoration: none;
+}
+
+.more:hover {
+  text-decoration: underline;
+}

@@ -1,7 +1,7 @@
 import type { PropsWithChildren } from 'react';
 import styles from './Button.module.css';
 
-interface Props { variant?: 'primary' | 'ghost'; onClick?: () => void; type?: 'button' | 'submit'; disabled?: boolean; }
+interface Props { variant?: 'primary' | 'ghost', onClick?: () => void, type?: 'button' | 'submit', disabled?: boolean }
 
 export function Button({ variant = 'ghost', onClick, type = 'button', disabled, children }: PropsWithChildren<Props>) {
   return (

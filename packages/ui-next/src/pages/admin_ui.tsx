@@ -1,6 +1,6 @@
-import { useState, type FormEvent } from 'react';
-import { usePageData } from '../context/page-data';
+import { type FormEvent, useState } from 'react';
 import { Alert, Button, Switch } from '../components/primitives';
+import { usePageData } from '../context/page-data';
 import { HydroClientError, request } from '../hooks/use-api';
 
 interface Args {

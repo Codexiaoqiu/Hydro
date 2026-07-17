@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useState, type FormEvent } from 'react';
+import { type FormEvent, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from '../../context/router';
-import { useBuildUrl } from '../../hooks/use-build-url';
 import { HydroClientError, request } from '../../hooks/use-api';
-import { Alert, Button, Checkbox, Input, LangTabs, RateLimitAlert } from '../primitives';
+import { useBuildUrl } from '../../hooks/use-build-url';
 import { useTranslate } from '../../lib/i18n';
+import { Alert, Button, Checkbox, Input, LangTabs, RateLimitAlert } from '../primitives';
 import styles from './ProblemForm.module.css';
 
 const PID_PATTERN = /^(?:[a-z0-9]{1,10}-)?[a-z][a-z0-9]*$/i;
@@ -21,7 +21,7 @@ interface ProblemDoc {
   tag?: string[];
   difficulty?: number;
   content?: string | Record<string, string>;
-  additional_file?: Array<{ name: string; size: number }>;
+  additional_file?: Array<{ name: string, size: number }>;
 }
 
 export interface ProblemFormProps {
@@ -29,7 +29,7 @@ export interface ProblemFormProps {
   pdoc?: ProblemDoc;
   statementLangs: string[];
   categoryTree?: CategoryNode[];
-  additionalFile?: Array<{ name: string; size: number }>;
+  additionalFile?: Array<{ name: string, size: number }>;
   canDelete?: boolean;
   action?: string;
   isReference?: boolean;

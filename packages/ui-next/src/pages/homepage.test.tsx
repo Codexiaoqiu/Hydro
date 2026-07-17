@@ -1,13 +1,14 @@
 /* @vitest-environment happy-dom */
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import '../sections';
+
 import { render, screen } from '@testing-library/react';
 import type { ReactNode } from 'react';
-import { PageDataProvider, type PageData } from '../context/page-data';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { type PageData, PageDataProvider } from '../context/page-data';
 import { RouterProvider } from '../context/router';
 import { routeMapStore } from '../globals';
 import { ThemeProvider } from '../theme/ThemeProvider';
 import Homepage from './homepage';
-import '../sections';
 
 const NOW = new Date('2026-07-08T12:00:00Z').getTime();
 
@@ -24,7 +25,7 @@ function buildPageData(args: PageData['args']): PageData {
   };
 }
 
-function Providers({ args, children }: { args: PageData['args']; children: ReactNode }) {
+function Providers({ args, children }: { args: PageData['args'], children: ReactNode }) {
   return (
     <ThemeProvider>
       <PageDataProvider initial={buildPageData(args)}>
@@ -56,7 +57,7 @@ afterEach(() => {
   vi.useRealTimers();
 });
 
-describe('Homepage (integration)', () => {
+describe('homepage (integration)', () => {
   it('renders 2 columns of sections including an ErrorSection fallback', () => {
     const args = {
       contents: [

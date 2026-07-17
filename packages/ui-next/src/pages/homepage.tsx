@@ -1,6 +1,5 @@
 import { usePageData } from '../context/page-data';
 import { SectionSlot } from '../registry/sections';
-import { Button } from '../components/primitives/Button';
 import type { SectionProps } from '../sections/types';
 import styles from '../styles/homepage.module.css';
 
@@ -21,13 +20,13 @@ export default function Homepage() {
   const { args } = usePageData() as unknown as { args: HomepageArgs };
   const { UserContext, contents, udict = {}, domain = { _id: '' } } = args ?? {};
   const cols = Array.isArray(contents) ? contents : [];
-  console.log(cols)
+  console.log(cols);
   return (
     <>
       <main className={styles.page}>
         <div className={styles.columns}>
           {cols.map((col, ci) => (
-            <div key={ci} className={styles.column} style={{ flexGrow: col.width }}>
+            <div key={ci} className={styles.column} style={{ flex: col.width }}>
               {col.sections.map(([name, payload], si) => (
                 <SectionSlot
                   key={`${ci}-${si}-${name}`}

@@ -31,16 +31,16 @@ const TIB = GIB * 1024;
  * so 1_500_000_000 bytes → "1.4GiB" rather than rounding up to 2GiB.
  */
 export function formatMemoryMB(bytes?: number | null): string {
-    if (bytes === undefined || bytes === null) return '—';
-    if (!Number.isFinite(bytes) || bytes < 0) return '—';
-    if (bytes === 0) return '0B';
-    if (bytes >= TIB && bytes % TIB === 0) return `${bytes / TIB}TiB`;
-    if (bytes >= TIB) return `${(bytes / TIB).toFixed(1)}TiB`;
-    if (bytes >= GIB && bytes % GIB === 0) return `${bytes / GIB}GiB`;
-    if (bytes >= GIB) return `${(bytes / GIB).toFixed(1)}GiB`;
-    if (bytes >= MIB && bytes % MIB === 0) return `${bytes / MIB}MiB`;
-    if (bytes >= MIB) return `${(bytes / MIB).toFixed(1)}MiB`;
-    if (bytes >= KIB && bytes % KIB === 0) return `${bytes / KIB}KiB`;
-    if (bytes >= KIB) return `${(bytes / KIB).toFixed(1)}KiB`;
-    return `${bytes}B`;
+  if (bytes === undefined || bytes === null) return '—';
+  if (!Number.isFinite(bytes) || bytes < 0) return '—';
+  if (bytes === 0) return '0B';
+  if (bytes >= TIB && bytes % TIB === 0) return `${bytes / TIB}TiB`;
+  if (bytes >= TIB) return `${(bytes / TIB).toFixed(1)}TiB`;
+  if (bytes >= GIB && bytes % GIB === 0) return `${bytes / GIB}GiB`;
+  if (bytes >= GIB) return `${(bytes / GIB).toFixed(1)}GiB`;
+  if (bytes >= MIB && bytes % MIB === 0) return `${bytes / MIB}MiB`;
+  if (bytes >= MIB) return `${(bytes / MIB).toFixed(1)}MiB`;
+  if (bytes >= KIB && bytes % KIB === 0) return `${bytes / KIB}KiB`;
+  if (bytes >= KIB) return `${(bytes / KIB).toFixed(1)}KiB`;
+  return `${bytes}B`;
 }

@@ -1,8 +1,8 @@
-import { useState, type FormEvent, type ReactNode } from 'react';
-import { usePageData } from '../context/page-data';
-import { Link } from '../components/link';
+import { type FormEvent, type ReactNode, useState } from 'react';
 import { AuthShell } from '../components/auth/AuthShell';
+import { Link } from '../components/link';
 import { Alert, Button, Checkbox, Input, RateLimitAlert } from '../components/primitives';
+import { usePageData } from '../context/page-data';
 import { HydroClientError, request } from '../hooks/use-api';
 import { useTranslate } from '../lib/i18n';
 
@@ -26,7 +26,7 @@ function getImporterType(args: Args) {
   return args.type ?? (typeof window !== 'undefined' ? window.location.pathname.split('/').pop() ?? '' : '');
 }
 
-function ProblemImportShell({ title, subtitle, children }: { title: string; subtitle: string; children: ReactNode }) {
+function ProblemImportShell({ title, subtitle, children }: { title: string, subtitle: string, children: ReactNode }) {
   const t = useTranslate();
   return (
     <>
@@ -42,7 +42,7 @@ function ProblemImportShell({ title, subtitle, children }: { title: string; subt
   );
 }
 
-function ProblemImportForm({ args, importerType }: { args: Args; importerType: string }) {
+function ProblemImportForm({ args, importerType }: { args: Args, importerType: string }) {
   const [file, setFile] = useState<File | null>(null);
   const [preferredPrefix, setPreferredPrefix] = useState('');
   const [hidden, setHidden] = useState(false);

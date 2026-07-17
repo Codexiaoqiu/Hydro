@@ -1,15 +1,15 @@
-import { useEffect, useMemo } from 'react';
 import { STATUS } from '@hydrooj/common';
-import { usePageData, useSetUiContext } from '../context/page-data';
-import { Link } from '../components/link';
-import { Alert, Button, Chip, Eyebrow } from '../components/primitives';
+import { useEffect, useMemo } from 'react';
 import { Article } from '../components/article/Article';
-import { Menu, type MenuItem } from '../components/sidebar/Menu';
-import { Author } from '../components/sidebar/Author';
-import { ContestList, type ContestItem } from '../components/sidebar/ContestList';
+import { Link } from '../components/link';
+import { Alert, Chip, Eyebrow } from '../components/primitives';
 import { TagCloud } from '../components/primitives/TagCloud';
-import { SideCard } from '../components/sidebar/SideCard';
 import { ProblemHero } from '../components/problem/ProblemHero';
+import { Author } from '../components/sidebar/Author';
+import { type ContestItem, ContestList } from '../components/sidebar/ContestList';
+import { Menu, type MenuItem } from '../components/sidebar/Menu';
+import { SideCard } from '../components/sidebar/SideCard';
+import { usePageData, useSetUiContext } from '../context/page-data';
 import { useBuildUrl } from '../hooks/use-build-url';
 import { useTranslate } from '../lib/i18n';
 import styles from './problem_detail.module.css';
@@ -35,16 +35,16 @@ interface Pdoc {
     langs?: string[];
     [k: string]: unknown;
   } | string;
-  reference?: { domainId: string; pid: string | number };
+  reference?: { domainId: string, pid: string | number };
   data?: unknown[];
-  additional_file?: Array<{ name: string; size: number }>;
+  additional_file?: Array<{ name: string, size: number }>;
 }
 
-interface Rdoc { _id?: string; status?: number; score?: number; }
-interface Psdoc { star?: boolean; status?: number; }
-interface Tdoc { _id?: string; docId?: string; pids?: Array<number | string>; rule?: string; owner?: number; }
-interface Tsdoc { detail?: Record<string, { status?: number }>; attend?: boolean; startAt?: number; }
-interface Udoc { _id?: number; uname?: string; avatar?: string; }
+interface Rdoc { _id?: string, status?: number, score?: number }
+interface Psdoc { star?: boolean, status?: number }
+interface Tdoc { _id?: string, docId?: string, pids?: Array<number | string>, rule?: string, owner?: number }
+interface Tsdoc { detail?: Record<string, { status?: number }>, attend?: boolean, startAt?: number }
+interface Udoc { _id?: number, uname?: string, avatar?: string }
 interface Args {
   pdoc: Pdoc;
   rdoc?: Rdoc;
@@ -53,9 +53,9 @@ interface Args {
   tdoc?: Tdoc;
   tsdoc?: Tsdoc;
   owner_udoc?: Udoc;
-  tdocs?: Array<{ docId: string; title: string }>;
-  ctdocs?: Array<{ docId: string; title: string }>;
-  htdocs?: Array<{ docId: string; title: string }>;
+  tdocs?: Array<{ docId: string, title: string }>;
+  ctdocs?: Array<{ docId: string, title: string }>;
+  htdocs?: Array<{ docId: string, title: string }>;
   discussionCount?: number;
   solutionCount?: number;
   mode?: 'normal' | 'contest' | 'view' | 'correction';
@@ -175,11 +175,11 @@ function getNormalMenu(ctx: SidebarCtx, t: (k: string, a?: Record<string, unknow
   const canViewDiscussion = UserContext?.hasPerm?.(256) ?? false;
   const psdocAccepted = psdoc?.status === STATUS.STATUS_ACCEPTED;
   const canViewSolution =
-    UserContext?.hasPerm?.(1) ||
-    (UserContext?.hasPerm?.(2) && psdocAccepted);
+    UserContext?.hasPerm?.(1)
+    || (UserContext?.hasPerm?.(2) && psdocAccepted);
   const canEditProblem =
-    (pdoc && UserContext?.own?.(pdoc as unknown as { owner?: number }, 16)) ||
-    UserContext?.hasPerm?.(16);
+    (pdoc && UserContext?.own?.(pdoc as unknown as { owner?: number }, 16))
+    || UserContext?.hasPerm?.(16);
   const showRejudge = canRejudge && !pdoc.reference;
 
   if (canSubmit) {
@@ -193,14 +193,14 @@ function getNormalMenu(ctx: SidebarCtx, t: (k: string, a?: Record<string, unknow
       key: 'submit',
       title: t('Problem.NoPermissionToSubmit'),
       href: '#',
-      onClick: () => {/* TODO: show permission hint */},
+      onClick: () => { /* TODO: show permission hint */ },
     });
   } else {
     items.push({
       key: 'submit',
       title: t('Problem.LoginToSubmit'),
       href: '#',
-      onClick: () => {/* TODO: open sign-in dialog */},
+      onClick: () => { /* TODO: open sign-in dialog */ },
     });
   }
 
@@ -295,21 +295,21 @@ function getContestMenu(ctx: SidebarCtx, mode: Mode, t: (k: string, a?: Record<s
         key: 'submit',
         title: t('Problem.NoPermissionToSubmit'),
         href: '#',
-        onClick: () => {/* TODO */},
+        onClick: () => { /* TODO */ },
       });
     } else {
       items.push({
         key: 'submit',
         title: t('Problem.LoginToSubmit'),
         href: '#',
-        onClick: () => {/* TODO */},
+        onClick: () => { /* TODO */ },
       });
     }
   }
 
   const canEditProblem =
-    (pdoc && UserContext?.own?.(pdoc as unknown as { owner?: number }, 16)) ||
-    UserContext?.hasPerm?.(16);
+    (pdoc && UserContext?.own?.(pdoc as unknown as { owner?: number }, 16))
+    || UserContext?.hasPerm?.(16);
   if (canEditProblem) {
     items.push({ key: 'sep-1', separator: true });
     items.push({
@@ -353,14 +353,14 @@ function getHomeworkMenu(ctx: SidebarCtx, mode: Mode, t: (k: string, a?: Record<
         key: 'submit',
         title: t('Problem.NoPermissionToSubmit'),
         href: '#',
-        onClick: () => {/* TODO */},
+        onClick: () => { /* TODO */ },
       });
     } else {
       items.push({
         key: 'submit',
         title: t('Problem.LoginToSubmit'),
         href: '#',
-        onClick: () => {/* TODO */},
+        onClick: () => { /* TODO */ },
       });
     }
   } else {
@@ -372,8 +372,8 @@ function getHomeworkMenu(ctx: SidebarCtx, mode: Mode, t: (k: string, a?: Record<
   }
 
   const canEditProblem =
-    (pdoc && UserContext?.own?.(pdoc as unknown as { owner?: number }, 16)) ||
-    UserContext?.hasPerm?.(16);
+    (pdoc && UserContext?.own?.(pdoc as unknown as { owner?: number }, 16))
+    || UserContext?.hasPerm?.(16);
   if (canEditProblem) {
     items.push({ key: 'sep-1', separator: true });
     items.push({
@@ -460,11 +460,11 @@ export default function ProblemDetailPage() {
     const matchesBase = (lang: string) =>
       !!baseLang && (lang === baseLang || lang.startsWith(`${baseLang}_`));
     return (
-      (fromQuery && contentLangs.includes(fromQuery) ? fromQuery : null) ||
-      (userLang && contentLangs.includes(userLang) ? userLang : null) ||
-      contentLangs.find(matchesBase) ||
-      contentLangs[0] ||
-      'zh_CN'
+      (fromQuery && contentLangs.includes(fromQuery) ? fromQuery : null)
+      || (userLang && contentLangs.includes(userLang) ? userLang : null)
+      || contentLangs.find(matchesBase)
+      || contentLangs[0]
+      || 'zh_CN'
     );
   }, [pdoc.content, UserContext]);
 
@@ -676,7 +676,7 @@ export default function ProblemDetailPage() {
 }
 
 // === Sub-components (unchanged from existing) ===
-function ProblemTagRow({ pdoc, mode, tdoc }: { pdoc: Pdoc; mode: string; tdoc?: Tdoc }) {
+function ProblemTagRow({ pdoc, mode, tdoc }: { pdoc: Pdoc, mode: string, tdoc?: Tdoc }) {
   const buildUrl = useBuildUrl();
   const t = useTranslate();
   const items: React.ReactNode[] = [];
@@ -714,7 +714,7 @@ function ProblemTagRow({ pdoc, mode, tdoc }: { pdoc: Pdoc; mode: string; tdoc?: 
   return <div className={styles.tagRow}>{items}</div>;
 }
 
-function ProblemContent({ pdoc, contentText, mode }: { pdoc: Pdoc; contentText: string; mode: string }) {
+function ProblemContent({ pdoc, contentText, mode }: { pdoc: Pdoc, contentText: string, mode: string }) {
   const t = useTranslate();
   const cfg = (typeof pdoc.config === 'object' ? pdoc.config : null) as { langs?: string[] } | null;
   const configError = typeof pdoc.config === 'string';
@@ -744,7 +744,7 @@ function ProblemContent({ pdoc, contentText, mode }: { pdoc: Pdoc; contentText: 
   );
 }
 
-function InformationCard({ pdoc, owner_udoc }: { pdoc: Pdoc; owner_udoc?: Udoc }) {
+function InformationCard({ pdoc, owner_udoc }: { pdoc: Pdoc, owner_udoc?: Udoc }) {
   const t = useTranslate();
   return (
     <div className={styles.sidebarCard}>
@@ -784,9 +784,9 @@ function InformationCard({ pdoc, owner_udoc }: { pdoc: Pdoc; owner_udoc?: Udoc }
 }
 
 function RelatedCard({ tdocs, ctdocs, htdocs }: {
-  tdocs: Array<{ docId: string; title: string }>;
-  ctdocs: Array<{ docId: string; title: string }>;
-  htdocs: Array<{ docId: string; title: string }>;
+  tdocs: Array<{ docId: string, title: string }>;
+  ctdocs: Array<{ docId: string, title: string }>;
+  htdocs: Array<{ docId: string, title: string }>;
 }) {
   const t = useTranslate();
   return (

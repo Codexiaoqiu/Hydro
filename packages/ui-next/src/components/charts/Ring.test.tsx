@@ -3,7 +3,7 @@ import { render } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { Ring } from './Ring';
 
-describe('Ring', () => {
+describe('ring', () => {
   it('renders SVG with two circles', () => {
     const { container } = render(<Ring percent={50} />);
     const circles = container.querySelectorAll('circle');

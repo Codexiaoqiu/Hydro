@@ -1,9 +1,9 @@
 import type { JSX } from 'react';
 import { Suspense, useSyncExternalStore } from 'react';
-import { SlotErrorBoundary } from './error-boundary';
-import { store } from './store';
 import { ErrorSection } from '../sections/ErrorSection';
 import type { SectionProps } from '../sections/types';
+import { SlotErrorBoundary } from './error-boundary';
+import { store } from './store';
 
 function slotName(name: string) {
   return `homepage:section:${name}` as const;

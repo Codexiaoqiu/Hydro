@@ -3,3 +3,7 @@
 .chip strong { color: var(--text); font-weight: 600; }
 .diff { color: var(--green); border-color: var(--tint-cyan-30); background: var(--tint-cyan-06); }
 .tag  { color: var(--violet); border-color: var(--tint-violet-30); background: var(--tint-violet-06); }
+/* Contest status chips — semantic colours distinct from `diff`/`tag` (which are reused for Rated/rule). */
+.ongoing  { color: var(--green); border-color: var(--tint-green-30); background: var(--tint-green-12); }
+.upcoming { color: var(--blue);  border-color: var(--tint-blue-30);  background: var(--tint-blue-14); }
+.ended    { color: var(--red);   border-color: rgba(252, 165, 165, 0.30); background: rgba(252, 165, 165, 0.08); }

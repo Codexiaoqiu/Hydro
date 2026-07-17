@@ -3,7 +3,6 @@ import './styles/reset.css';
 import './styles/globals.css';
 import 'katex/dist/katex.min.css';
 import 'highlight.js/styles/github-dark.css';
-
 import './pages';
 // Side-effect imports: register layout/auth slot defaults with the registry on startup.
 import './components/auth/auth-layout';
@@ -14,9 +13,9 @@ import * as api from './api';
 import App from './app';
 import { SignInDialog } from './components/auth/SignInDialog';
 import { PageDataProvider } from './context/page-data';
-import { SignInDialogProvider } from './hooks/use-sign-in-dialog';
 import { RouterProvider } from './context/router';
 import { initialPage, pluginsUrl } from './globals';
+import { SignInDialogProvider } from './hooks/use-sign-in-dialog';
 import { installPlugin } from './registry';
 import { ThemeProvider } from './theme/ThemeProvider';
 

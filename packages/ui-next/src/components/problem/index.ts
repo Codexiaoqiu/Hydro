@@ -4,17 +4,17 @@
  * here can grow (and be reused on `/problem_main` etc.) independently.
  */
 
+export { MonacoEditor } from './MonacoEditor';
+export type { MonacoEditorProps } from './MonacoEditor';
+
 export { ProblemFiles } from './ProblemFiles';
 export type { ProblemFilesProps } from './ProblemFiles';
-
-export { ProblemReference } from './ProblemReference';
-export type { ProblemReferenceProps } from './ProblemReference';
 
 export { ProblemOpenGraph } from './ProblemOpenGraph';
 export type { ProblemOpenGraphProps } from './ProblemOpenGraph';
 
+export { ProblemReference } from './ProblemReference';
+export type { ProblemReferenceProps } from './ProblemReference';
+
 export { Scratchpad } from './Scratchpad';
 export type { ScratchpadProps } from './Scratchpad';
-
-export { MonacoEditor } from './MonacoEditor';
-export type { MonacoEditorProps } from './MonacoEditor';

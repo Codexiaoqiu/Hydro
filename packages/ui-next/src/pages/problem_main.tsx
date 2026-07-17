@@ -1,12 +1,11 @@
-import { useMemo, useState } from 'react';
 import { STATUS, STATUS_SHORT_TEXTS } from '@hydrooj/common';
-import { Button } from '../components/primitives/Button';
-import { Card } from '../components/primitives/Card';
-import { CtaCard } from '../components/sidebar/CtaCard';
-import { Eyebrow } from '../components/primitives/Eyebrow';
+import { useMemo, useState } from 'react';
 import { Link } from '../components/link';
+import { Card } from '../components/primitives/Card';
+import { Eyebrow } from '../components/primitives/Eyebrow';
 import { Select } from '../components/primitives/Select';
 import { TagCloud } from '../components/primitives/TagCloud';
+import { CtaCard } from '../components/sidebar/CtaCard';
 import { usePageData } from '../context/page-data';
 import { useNavigate } from '../context/router';
 import { useBuildUrl } from '../hooks/use-build-url';
@@ -28,7 +27,7 @@ interface Pdoc {
   // Optional uploader info — when present we render an avatar next to the
   // row. Kept separate from `owner` (an id) so future backend payloads can
   // pre-fill the avatar spec without breaking the page.
-  uploadedBy?: { _id?: number; uname?: string; avatar?: string };
+  uploadedBy?: { _id?: number, uname?: string, avatar?: string };
 }
 
 interface Psdoc {
@@ -90,7 +89,7 @@ function SearchIcon() {
   );
 }
 
-function TagRow({ tags, buildUrl }: { tags: string[]; buildUrl: ReturnType<typeof useBuildUrl> }) {
+function TagRow({ tags, buildUrl }: { tags: string[], buildUrl: ReturnType<typeof useBuildUrl> }) {
   // Limit to 5 tags per row by default — beyond that the row gets crowded
   // and the chip strip wraps onto a second line. A "Show all" button expands
   // to reveal every tag, which is more discoverable than horizontal scroll.

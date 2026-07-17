@@ -1,8 +1,8 @@
 /* @vitest-environment happy-dom */
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { render, screen, within } from '@testing-library/react';
-import { PageDataProvider, type PageData } from '../../context/page-data';
+import { type PageData, PageDataProvider } from '../../context/page-data';
 import { RouterProvider } from '../../context/router';
 import { routeMapStore } from '../../globals';
 import { ThemeProvider } from '../../theme/ThemeProvider';
@@ -17,7 +17,7 @@ function buildPageData(args: PageData['args']): PageData {
   };
 }
 
-function Providers({ args, children }: { args: PageData['args']; children: ReactNode }) {
+function Providers({ args, children }: { args: PageData['args'], children: ReactNode }) {
   return (
     <ThemeProvider>
       <PageDataProvider initial={buildPageData(args)}>
@@ -42,7 +42,7 @@ afterEach(() => {
   vi.useRealTimers();
 });
 
-describe('GlobalNav', () => {
+describe('globalNav', () => {
   it('renders the 4 standard links in the requested order', () => {
     render(
       <Providers args={{ UserContext: { _id: 0 } }}>
@@ -90,6 +90,31 @@ describe('GlobalNav', () => {
     );
     expect(screen.queryByRole('button', { name: '登录' })).toBeNull();
     expect(screen.queryByRole('button', { name: '注册' })).toBeNull();
+  });
+
+  it('shows the UserMenu with the username when the user is logged in', () => {
+    render(
+      <Providers args={{ UserContext: { _id: 42, uname: '小邱', mail: 'q@example.com' } }}>
+        <GlobalNav />
+      </Providers>,
+    );
+    // The trigger button shows the username.
+    const trigger = screen.getByRole('button', { name: /小邱/ });
+    expect(trigger.getAttribute('aria-haspopup')).toBe('menu');
+    expect(trigger.getAttribute('aria-expanded')).toBe('false');
+  });
+
+  it('opens the UserMenu dropdown on click and shows profile / settings / logout', () => {
+    render(
+      <Providers args={{ UserContext: { _id: 42, uname: '小邱' } }}>
+        <GlobalNav />
+      </Providers>,
+    );
+    fireEvent.click(screen.getByRole('button', { name: /小邱/ }));
+    const menu = screen.getByRole('menu');
+    expect(within(menu).getByRole('menuitem', { name: '个人主页' })).toBeTruthy();
+    expect(within(menu).getByRole('menuitem', { name: '账号设置' })).toBeTruthy();
+    expect(within(menu).getByRole('menuitem', { name: '退出登录' })).toBeTruthy();
   });
 
   it('shows login/register buttons when the user is not logged in', () => {

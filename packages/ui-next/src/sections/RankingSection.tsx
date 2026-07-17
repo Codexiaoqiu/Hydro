@@ -1,7 +1,7 @@
 import { Card } from '../components/primitives/Card';
 import { Author } from '../components/sidebar/Author';
-import type { SectionProps, SerializedUser } from './types';
 import styles from './RankingSection.module.css';
+import type { SectionProps, SerializedUser } from './types';
 
 export function RankingSection({ payload, udict }: SectionProps): JSX.Element | null {
   const uids: number[] = Array.isArray(payload) ? payload : [];

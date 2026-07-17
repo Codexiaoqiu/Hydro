@@ -1,7 +1,7 @@
 import styles from './LangTabs.module.css';
 
-interface Option { value: string; label: string; }
-interface Props { options: Option[]; active: string; onChange: (v: string) => void; }
+interface Option { value: string, label: string }
+interface Props { options: Option[], active: string, onChange: (v: string) => void }
 
 export function LangTabs({ options, active, onChange }: Props) {
   return (

@@ -1,8 +1,8 @@
-import { useCallback, useEffect, useRef, type ReactNode } from 'react';
+import { type ReactNode, useCallback, useEffect, useRef } from 'react';
 import { usePageData } from '../../context/page-data';
 import { SignInDialogContext, useSignInDialogState } from '../../hooks/use-sign-in-dialog';
-import { LoginForm, type LoginMethod } from './LoginForm';
 import { useTranslate } from '../../lib/i18n';
+import { LoginForm, type LoginMethod } from './LoginForm';
 import styles from './SignInDialog.module.css';
 
 export interface SignInDialogProps {
@@ -71,7 +71,7 @@ export function SignInDialog({ children, passkeyHint, onOpenChange }: SignInDial
   // stays stable when `open` toggles. The destructured `args` is only consumed
   // after the early return below, when the dialog is actually open.
   const { args } = usePageData() as unknown as {
-    args: { builtInLogin?: boolean; loginMethods?: LoginMethod[]; redirect?: string };
+    args: { builtInLogin?: boolean, loginMethods?: LoginMethod[], redirect?: string };
   };
 
   if (!open) return null;

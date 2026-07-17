@@ -1,6 +1,6 @@
-import { usePageData } from '../context/page-data';
 import { AuthShell } from '../components/auth/AuthShell';
 import { LoginForm, type LoginMethod } from '../components/auth/LoginForm';
+import { usePageData } from '../context/page-data';
 import { useTranslate } from '../lib/i18n';
 
 interface Args {

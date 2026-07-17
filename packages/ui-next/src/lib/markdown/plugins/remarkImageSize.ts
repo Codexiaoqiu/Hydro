@@ -1,5 +1,5 @@
+import type { Image, Root, Text } from 'mdast';
 import type { Plugin } from 'unified';
-import type { Root, Image, Text } from 'mdast';
 
 const SIZE_REGEX = /=(\d+)x(\d+)?$|=x(\d+)$/;
 // Match text nodes that are entire markdown images with space in URL (remark-parse
@@ -32,15 +32,15 @@ function imageSizeExtension() {
 
         if (width || height) {
           const sizeAttr =
-            (width && height) ? ` width="${width}" height="${height}"` :
-            width ? ` width="${width}"` :
-            ` height="${height}"`;
+            (width && height) ? ` width="${width}" height="${height}"`
+              : width ? ` width="${width}"`
+                : ` height="${height}"`;
           return `![${alt}](${url}${sizeAttr})`;
         }
 
         return `![${alt}](${url})`;
-      }
-    }
+      },
+    },
   };
 }
 

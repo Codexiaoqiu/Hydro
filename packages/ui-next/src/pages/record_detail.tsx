@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { usePageData } from '../context/page-data';
 import { Link } from '../components/link';
 import { Alert, Button } from '../components/primitives';
 import { Menu } from '../components/sidebar/Menu';
+import { usePageData } from '../context/page-data';
 import { useTranslate } from '../lib/i18n';
 
 interface Rdoc {
@@ -10,18 +10,18 @@ interface Rdoc {
   status?: number;
   score?: number;
   code?: string;
-  files?: { code?: string; hack?: string };
+  files?: { code?: string, hack?: string };
   lang?: string;
   domainId?: string;
   judgeAt?: number;
   hackTarget?: string;
   uid: number;
 }
-interface Pdoc { docId: number; pid?: string; title: string; config?: { hackable?: boolean } }
+interface Pdoc { docId: number, pid?: string, title: string, config?: { hackable?: boolean } }
 interface Args {
   rdoc: Rdoc;
   pdoc: Pdoc;
-  tdoc?: { rule?: string; docId?: string };
+  tdoc?: { rule?: string, docId?: string };
   udoc?: { uname?: string };
   judge_udoc?: { uname?: string };
   allRevs?: Array<[string, number]>;

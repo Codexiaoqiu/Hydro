@@ -3,7 +3,7 @@ import { render } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { SideCard } from './SideCard';
 
-describe('SideCard', () => {
+describe('sideCard', () => {
   it('renders title and children', () => {
     const { container } = render(
       <SideCard title="出题人">

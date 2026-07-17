@@ -39,5 +39,5 @@ export function timeAgo(iso: string, now = Date.now()): string {
 /** Extract the embedded timestamp from a hex ObjectId (first 4 bytes = seconds since epoch). */
 export function objectIdTime(hex: string): number {
   if (!hex || hex.length < 8) return 0;
-  return parseInt(hex.slice(0, 8), 16) * 1000;
+  return Number.parseInt(hex.slice(0, 8), 16) * 1000;
 }

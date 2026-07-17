@@ -68,7 +68,7 @@ export function Alert({
 
 export interface RateLimitAlertProps extends Omit<AlertProps, 'variant' | 'title'> {
   /** The HydroError-like object thrown by the request layer. `code` is the numeric HTTP status. */
-  error?: { code?: number; message?: string } | null;
+  error?: { code?: number, message?: string } | null;
 }
 
 /**
@@ -88,9 +88,9 @@ export interface RateLimitAlertProps extends Omit<AlertProps, 'variant' | 'title
  */
 export function RateLimitAlert({ error, message, children, ...rest }: RateLimitAlertProps) {
   const isRateLimit =
-    error?.code === 403 ||
-    error?.code === 429 ||
-    error?.message?.toLowerCase().includes('too frequent');
+    error?.code === 403
+    || error?.code === 429
+    || error?.message?.toLowerCase().includes('too frequent');
   if (!isRateLimit) return null;
 
   return (

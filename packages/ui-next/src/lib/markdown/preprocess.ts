@@ -7,14 +7,14 @@ export interface SamplePairData {
 }
 
 export type ContentBlock =
-  | { type: 'markdown'; body: string }
-  | { type: 'samples'; pairs: SamplePairData[] };
+  | { type: 'markdown', body: string }
+  | { type: 'samples', pairs: SamplePairData[] };
 
 // Multi-language anchors for sample input/output sections
 const ANCHOR_PATTERNS: RegExp[] = [
-  /^#{1,6}\s*(样例输入|样例输出|样例输入\s*[/／\-\s]*输出|样例输入输出|输入输出样例|输入输出示例|輸入輸出範例)\s*$/i,
+  /^#{1,6}\s*(样例输入|样例输出|样例输入[/／\-\s]*输出|样例输入输出|输入输出样例|输入输出示例|輸入輸出範例)\s*$/,
   /^#{1,6}\s*(Sample Input|Sample Output|Sample Input\s*\/\s*Output|Sample Input and Output|Example Input|Example Input\s*\/\s*Output|Examples?)\s*$/i,
-  /^#{1,6}\s*(サンプル入力|サンプル出力|入力例|出力例|入出力例)\s*$/i,
+  /^#{1,6}\s*(サンプル入力|サンプル出力|入力例|出力例|入出力例)\s*$/,
 ];
 
 const NEXT_HEADING = /^#{1,6}\s+/;

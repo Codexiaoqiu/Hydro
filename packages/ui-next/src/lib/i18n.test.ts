@@ -15,7 +15,7 @@ describe('translate', () => {
     expect(translate(cat, 'Missing')).toBe('Missing');
   });
   it('handles multiple substitutions', () => {
-    const cat = { 'X': 'a {x} b {y}' };
+    const cat = { X: 'a {x} b {y}' };
     expect(translate(cat, 'X', { x: '1', y: '2' })).toBe('a 1 b 2');
   });
 });

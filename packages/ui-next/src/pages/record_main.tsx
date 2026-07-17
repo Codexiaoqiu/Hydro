@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
-import { usePageData } from '../context/page-data';
-import { HydroClientError } from '../hooks/use-api';
 import { Link } from '../components/link';
 import { Alert, Button } from '../components/primitives';
+import { usePageData } from '../context/page-data';
+import { HydroClientError } from '../hooks/use-api';
 import { useTranslate } from '../lib/i18n';
 
 interface Rdoc {
@@ -16,8 +16,8 @@ interface Rdoc {
 }
 interface Args {
   rdocs?: Rdoc[];
-  udict?: Record<number, { uname?: string; avatar?: string }>;
-  pdoc?: { title?: string; pid?: string; docId?: number };
+  udict?: Record<number, { uname?: string, avatar?: string }>;
+  pdoc?: { title?: string, pid?: string, docId?: number };
   UiContext?: {
     socketUrl?: string;
     rids?: string[];
@@ -31,7 +31,7 @@ interface Args {
     all?: boolean;
     allDomain?: boolean;
   };
-  languages?: Array<{ value: string; label: string }>;
+  languages?: Array<{ value: string, label: string }>;
 }
 
 export default function RecordMainPage() {
@@ -57,7 +57,7 @@ export default function RecordMainPage() {
     const es = new EventSource(url);
     es.addEventListener('update', (ev) => {
       try {
-        const data = JSON.parse((ev as MessageEvent).data) as { rid: string; status?: number; score?: number };
+        const data = JSON.parse((ev as MessageEvent).data) as { rid: string, status?: number, score?: number };
         setLive((prev) => ({ ...prev, [data.rid]: { ...prev[data.rid], ...data } }));
       } catch { /* ignore */ }
     });
@@ -72,8 +72,7 @@ export default function RecordMainPage() {
     const params = new URLSearchParams();
     const next = { ...query, ...patch };
     Object.entries(next).forEach(([k, v]) => {
-      if (typeof v === 'boolean') { if (v) params.set(k, '1'); }
-      else if (v) params.set(k, String(v));
+      if (typeof v === 'boolean') { if (v) params.set(k, '1'); } else if (v) params.set(k, String(v));
     });
     if (typeof window === 'undefined') return;
     const qs = params.toString();

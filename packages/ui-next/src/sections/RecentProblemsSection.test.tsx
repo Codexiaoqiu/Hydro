@@ -1,8 +1,8 @@
 /* @vitest-environment happy-dom */
-import { beforeEach, describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import type { ReactNode } from 'react';
-import { PageDataProvider, type PageData } from '../context/page-data';
+import { beforeEach, describe, expect, it } from 'vitest';
+import { type PageData, PageDataProvider } from '../context/page-data';
 import { RouterProvider } from '../context/router';
 import { routeMapStore } from '../globals';
 import { ThemeProvider } from '../theme/ThemeProvider';
@@ -21,11 +21,11 @@ function buildPageData(args: PageData['args']): PageData {
   };
 }
 
-function Providers({ args, children }: { args: PageData['args']; children: ReactNode }) {
+function Providers({ args, children }: { args: PageData['args'], children: ReactNode }) {
   return (
     <ThemeProvider>
       <PageDataProvider initial={buildPageData(args)}>
-        <RouterProvider>{children}</RouterProvider      ></PageDataProvider>
+        <RouterProvider>{children}</RouterProvider></PageDataProvider>
     </ThemeProvider>
   );
 }
@@ -35,7 +35,7 @@ beforeEach(() => {
   routeMapStore.set({ ...original, problem_detail: '/p/:pid' });
 });
 
-describe('RecentProblemsSection', () => {
+describe('recentProblemsSection', () => {
   it('renders pid and title for each problem', () => {
     render(
       <Providers args={{}}>

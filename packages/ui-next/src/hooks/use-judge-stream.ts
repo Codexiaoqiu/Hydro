@@ -18,7 +18,7 @@ export interface JudgeUpdate {
   rid: string;
   status?: number;
   score?: number;
-  cases?: Array<{ id: string; status?: number; time?: number; memory?: number }>;
+  cases?: Array<{ id: string, status?: number, time?: number, memory?: number }>;
   [k: string]: unknown;
 }
 

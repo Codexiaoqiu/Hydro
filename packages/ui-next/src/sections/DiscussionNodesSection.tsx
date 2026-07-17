@@ -1,7 +1,7 @@
-import { Card } from '../components/primitives/Card';
 import { Link } from '../components/link';
-import type { SectionProps } from './types';
+import { Card } from '../components/primitives/Card';
 import styles from './DiscussionNodesSection.module.css';
+import type { SectionProps } from './types';
 
 interface NodeLite {
   _id: string;

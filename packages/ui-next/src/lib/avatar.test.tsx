@@ -1,7 +1,7 @@
 /* @vitest-environment happy-dom */
-import { describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { avatarUrl, Avatar } from './avatar';
+import { describe, expect, it } from 'vitest';
+import { Avatar, avatarUrl } from './avatar';
 
 describe('avatarUrl', () => {
   it('gravatar hashes lowercase email', () => {
@@ -19,12 +19,12 @@ describe('avatarUrl', () => {
     expect(avatarUrl('url:https://example.com/a.png', 32)).toBe('https://example.com/a.png');
     expect(avatarUrl('file:/var/a.png', 32)).toBe('/var/a.png');
   });
-  it("empty spec returns null", () => expect(avatarUrl('', 32)).toBeNull());
+  it('empty spec returns null', () => expect(avatarUrl('', 32)).toBeNull());
   it('undefined spec returns null', () => expect(avatarUrl(undefined, 32)).toBeNull());
   it('unknown provider returns null', () => expect(avatarUrl('weird:foo', 32)).toBeNull());
 });
 
-describe('Avatar component', () => {
+describe('avatar component', () => {
   it('renders <img> when spec resolves', () => {
     render(<Avatar spec="github:baoshuo" name="B" size={64} />);
     const img = screen.getByRole('img', { name: 'B' }) as HTMLImageElement;

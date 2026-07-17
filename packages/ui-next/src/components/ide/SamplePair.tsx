@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { IDEFrame } from './IDEFrame';
 import styles from './SamplePair.module.css';
 
-interface FrameSpec { filename: string; lineNo: number; value: ReactNode; actions?: ReactNode[]; }
+interface FrameSpec { filename: string, lineNo: number, value: ReactNode, actions?: ReactNode[] }
 
 interface Props {
   num: number;

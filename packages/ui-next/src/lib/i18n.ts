@@ -34,6 +34,10 @@ export const zhCN: Catalog = {
   'Common.Score': '分数',
   'Common.Time': '时间',
   'Common.ID': 'ID',
+
+  'UserMenu.Profile': '个人主页',
+  'UserMenu.Settings': '账号设置',
+  'UserMenu.Logout': '退出登录',
   'Common.Title': '标题',
   'Common.Tags': '标签',
   'Common.Hidden': '隐藏',
@@ -350,6 +354,10 @@ export const en: Catalog = {
   'Common.Score': 'Score',
   'Common.Time': 'Time',
   'Common.ID': 'ID',
+
+  'UserMenu.Profile': 'Profile',
+  'UserMenu.Settings': 'Settings',
+  'UserMenu.Logout': 'Sign out',
   'Common.Title': 'Title',
   'Common.Tags': 'Tags',
   'Common.Hidden': 'Hidden',
@@ -647,16 +655,15 @@ export const catalogs: Record<Locale, Catalog> = {
 // actually present in `catalogs`. Skipped in production bundles so that a
 // stale build does not crash at runtime.
 if (typeof import.meta !== 'undefined' && (import.meta as { env?: { DEV?: boolean } }).env?.DEV) {
-    const _catalogKeys = Object.keys(catalogs) as Locale[];
-    const _localeUnion: Locale[] = ['zh_CN', 'zh_TW', 'en'];
-    const _missing = _localeUnion.filter((k) => !(k in catalogs));
-    const _extra = _catalogKeys.filter((k) => !_localeUnion.includes(k));
-    if (_missing.length || _extra.length) {
-        // eslint-disable-next-line no-console
-        console.warn(
-            `[i18n] catalogs and Locale union out of sync: missing=${JSON.stringify(_missing)} extra=${JSON.stringify(_extra)}`,
-        );
-    }
+  const _catalogKeys = Object.keys(catalogs) as Locale[];
+  const _localeUnion: Locale[] = ['zh_CN', 'zh_TW', 'en'];
+  const _missing = _localeUnion.filter((k) => !(k in catalogs));
+  const _extra = _catalogKeys.filter((k) => !_localeUnion.includes(k));
+  if (_missing.length || _extra.length) {
+    console.warn(
+      `[i18n] catalogs and Locale union out of sync: missing=${JSON.stringify(_missing)} extra=${JSON.stringify(_extra)}`,
+    );
+  }
 }
 
 /** Resolve a locale, defaulting to en. */

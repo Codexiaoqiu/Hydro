@@ -1,6 +1,6 @@
 import { Card } from '../components/primitives/Card';
-import type { SectionProps } from './types';
 import styles from './ProblemSearchSection.module.css';
+import type { SectionProps } from './types';
 
 export function ProblemSearchSection(_props: SectionProps): JSX.Element {
   return (

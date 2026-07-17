@@ -1,7 +1,7 @@
 import { Card } from '../components/primitives/Card';
 import { Markdown } from '../lib/markdown';
-import type { SectionProps } from './types';
 import styles from './BulletinSection.module.css';
+import type { SectionProps } from './types';
 
 export function BulletinSection({ domain, payload }: SectionProps): JSX.Element | null {
   const source = (payload && typeof payload === 'string' ? payload : domain.bulletin) ?? '';

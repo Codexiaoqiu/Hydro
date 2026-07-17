@@ -7,7 +7,7 @@
  * (in `components/auth/SignInDialog.tsx`) for backwards compatibility with
  * any inline `onclick="..."` handlers or third-party plugins.
  */
-import { createContext, createElement, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { createContext, createElement, type ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 export interface SignInDialogApi {
   open: boolean;

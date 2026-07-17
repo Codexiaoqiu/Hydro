@@ -1,6 +1,6 @@
 import styles from './ContestList.module.css';
 
-export interface ContestItem { title: string; emoji?: string; date: string; onClick?: () => void; }
+export interface ContestItem { title: string, emoji?: string, date: string, onClick?: () => void }
 
 export function ContestList({ items }: { items: ContestItem[] }) {
   return (

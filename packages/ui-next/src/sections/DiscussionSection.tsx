@@ -1,10 +1,10 @@
+import { Link } from '../components/link';
 import { Card } from '../components/primitives/Card';
 import { Chip } from '../components/primitives/Chip';
-import { Link } from '../components/link';
 import { Avatar } from '../lib/avatar';
 import { timeAgo } from '../lib/datetime';
-import type { SectionProps, SerializedDdoc, SerializedUser } from './types';
 import styles from './DiscussionSection.module.css';
+import type { SectionProps, SerializedDdoc, SerializedUser } from './types';
 
 interface VNodeLite {
   _id: string;

@@ -4,7 +4,7 @@ export interface ProblemOpenGraphProps {
   pdoc: {
     title?: string;
     content?: string | Record<string, string>;
-    config?: { type?: string; subType?: string; [k: string]: unknown } | string;
+    config?: { type?: string, subType?: string, [k: string]: unknown } | string;
   };
   /**
    * Max characters kept from the rendered description (matches ui-default's
@@ -62,7 +62,7 @@ function buildDescription(text: string, limit: number): string {
   // Truncate on a word boundary if possible so we don't break mid-word.
   const slice = stripped.slice(0, limit);
   const lastSpace = slice.lastIndexOf(' ');
-  return (lastSpace > limit * 0.6 ? slice.slice(0, lastSpace) : slice).trimEnd() + '…';
+  return `${(lastSpace > limit * 0.6 ? slice.slice(0, lastSpace) : slice).trimEnd()}…`;
 }
 
 function buildTitle(title: string | undefined, config: ProblemOpenGraphProps['pdoc']['config']): string {

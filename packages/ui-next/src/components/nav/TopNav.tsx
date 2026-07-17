@@ -2,7 +2,7 @@ import type { PropsWithChildren, ReactNode } from 'react';
 import { BrandMark } from './BrandMark';
 import styles from './TopNav.module.css';
 
-interface Props { brand: string; currentRoute?: string; right?: ReactNode; }
+interface Props { brand: string, currentRoute?: string, right?: ReactNode }
 
 export function TopNav({ brand, currentRoute, right, children }: PropsWithChildren<Props>) {
   // currentRoute prop wins; fall back to last path segment

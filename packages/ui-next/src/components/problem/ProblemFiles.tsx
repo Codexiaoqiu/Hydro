@@ -1,8 +1,8 @@
-import { Button, Card } from '../primitives';
-import { Link } from '../link';
 import { useBuildUrl } from '../../hooks/use-build-url';
-import { useTranslate } from '../../lib/i18n';
 import { formatFileSize } from '../../lib/format';
+import { useTranslate } from '../../lib/i18n';
+import { Link } from '../link';
+import { Button, Card } from '../primitives';
 import styles from './ProblemFiles.module.css';
 
 interface ProblemFile {

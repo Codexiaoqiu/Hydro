@@ -3,7 +3,7 @@ import { render } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { Markdown } from './markdown';
 
-describe('Markdown', () => {
+describe('markdown', () => {
   it('renders headings', () => {
     const { container } = render(<Markdown source="# Hello" />);
     expect(container.querySelector('h1')?.textContent).toBe('Hello');

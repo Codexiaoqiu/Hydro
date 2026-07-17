@@ -1,7 +1,7 @@
-import { Card } from '../components/primitives/Card';
 import { Link } from '../components/link';
-import type { SectionProps, SerializedPdoc } from './types';
+import { Card } from '../components/primitives/Card';
 import styles from './StarredProblemsSection.module.css';
+import type { SectionProps, SerializedPdoc } from './types';
 
 export function StarredProblemsSection({ payload }: SectionProps): JSX.Element | null {
   const t = Array.isArray(payload) ? payload : [];

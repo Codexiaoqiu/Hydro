@@ -1,7 +1,7 @@
 import type { PropsWithChildren, ReactNode } from 'react';
 import styles from './IDEFrame.module.css';
 
-interface Props { filename: string; actions?: ReactNode[]; lineNo?: number; }
+interface Props { filename: string, actions?: ReactNode[], lineNo?: number }
 
 export function IDEFrame({ filename, actions = [], lineNo, children }: PropsWithChildren<Props>) {
   return (

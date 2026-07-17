@@ -1,6 +1,6 @@
 import { Card } from '../components/primitives/Card';
-import type { SectionProps } from './types';
 import styles from './ErrorSection.module.css';
+import type { SectionProps } from './types';
 
 export function ErrorSection({ name, payload }: SectionProps): JSX.Element {
   const message = typeof payload === 'string' ? payload : `Section "${name}" is not implemented`;

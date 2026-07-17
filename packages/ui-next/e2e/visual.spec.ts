@@ -1,4 +1,4 @@
-import { test, expect, type Page } from '@playwright/test';
+import { expect, type Page, test } from '@playwright/test';
 
 /**
  * Visual regression tests for ui-next.
@@ -12,7 +12,7 @@ import { test, expect, type Page } from '@playwright/test';
  */
 
 const ROUTES = [
-    { name: 'homepage',     path: '/' },
+    { name: 'homepage', path: '/' },
     { name: 'problem_main', path: '/p' },
 ];
 

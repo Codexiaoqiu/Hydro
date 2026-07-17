@@ -1,5 +1,5 @@
-import { Chip, Eyebrow } from '../primitives';
 import { Ring } from '../charts/Ring';
+import { Chip, Eyebrow } from '../primitives';
 import styles from './ProblemHero.module.css';
 
 interface PdocLite {

@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState, type PropsWithChildren } from 'react';
-import { ThemeContext, type Theme, type ThemeContextValue } from './useTheme';
+import { type PropsWithChildren, useEffect, useMemo, useState } from 'react';
+import { type Theme, ThemeContext, type ThemeContextValue } from './useTheme';
 
 const STORAGE_KEY = 'hydro.theme';
 

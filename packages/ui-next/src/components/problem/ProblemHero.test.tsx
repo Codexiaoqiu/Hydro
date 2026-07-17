@@ -11,7 +11,7 @@ const basePdoc = {
   nAccept: 45,
 };
 
-describe('ProblemHero', () => {
+describe('problemHero', () => {
   it('renders title and prefix', () => {
     const { container } = render(<ProblemHero pdoc={basePdoc} />);
     expect(container.textContent).toContain('A + B Problem');

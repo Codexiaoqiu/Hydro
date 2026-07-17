@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { Card } from '../components/primitives/Card';
-import type { SectionProps } from './types';
 import styles from './HitokotoSection.module.css';
+import type { SectionProps } from './types';
 
 const HITOKOTO = [
   '代码是写给人看的，顺便让机器执行。—— Harold Abelson',

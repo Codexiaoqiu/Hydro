@@ -1,9 +1,9 @@
-import { Card } from '../components/primitives/Card';
 import { Link } from '../components/link';
-import type { SectionProps } from './types';
+import { Card } from '../components/primitives/Card';
 import styles from './SuggestionSection.module.css';
+import type { SectionProps } from './types';
 
-const GROUPS: ReadonlyArray<{ title: string; items: ReadonlyArray<{ label: string; to: string }> }> = [
+const GROUPS: ReadonlyArray<{ title: string, items: ReadonlyArray<{ label: string, to: string }> }> = [
   {
     title: '中文',
     items: [

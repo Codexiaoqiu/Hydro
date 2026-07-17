@@ -1,6 +1,6 @@
 // remarkMedia.ts
-import type { Plugin } from 'unified';
 import type { Root } from 'mdast';
+import type { Plugin } from 'unified';
 
 const MEDIA_RE = /^@\[(youtube|bilibili|pdf|vimeo)\]\(([^)]+)\)$/;
 

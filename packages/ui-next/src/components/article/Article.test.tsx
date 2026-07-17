@@ -3,7 +3,7 @@ import { render } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { Article } from './Article';
 
-describe('Article', () => {
+describe('article', () => {
   it('renders markdown from content prop', () => {
     const { container } = render(<Article content={'# Hello\n\nWorld'} />);
     expect(container.querySelector('h1')?.textContent).toBe('Hello');
@@ -31,13 +31,13 @@ describe('Article', () => {
   });
 
   it('escapes raw HTML (XSS-safe)', () => {
-    const { container } = render(<Article content={'<script>alert(1)</script>'} />);
+    const { container } = render(<Article content="<script>alert(1)</script>" />);
     expect(container.querySelector('script')).toBeNull();
   });
 
   it('prefers content prop over children when both are strings', () => {
     const { container } = render(
-      <Article content={'# From content'}>{'# From children'}</Article>,
+      <Article content="# From content"># From children</Article>,
     );
     expect(container.querySelector('h1')?.textContent).toBe('From content');
   });
@@ -50,21 +50,21 @@ describe('Article', () => {
   });
 
   it('renders links', () => {
-    const { container } = render(<Article content={'[link](https://example.com)'} />);
+    const { container } = render(<Article content="[link](https://example.com)" />);
     const a = container.querySelector('a');
     expect(a?.getAttribute('href')).toBe('https://example.com');
     expect(a?.textContent).toBe('link');
   });
 });
 
-describe('Article — extended plugins', () => {
+describe('article — extended plugins', () => {
   it('renders ==mark== as <mark>', () => {
-    const { container } = render(<Article content={'==highlight=='} />);
+    const { container } = render(<Article content="==highlight==" />);
     expect(container.querySelector('mark')?.textContent).toBe('highlight');
   });
 
   it('renders KaTeX inline formula', () => {
-    const { container } = render(<Article content={'$a + b$'} />);
+    const { container } = render(<Article content="$a + b$" />);
     expect(container.querySelector('.katex')).toBeTruthy();
   });
 

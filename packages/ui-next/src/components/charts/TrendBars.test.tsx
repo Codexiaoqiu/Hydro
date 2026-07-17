@@ -2,7 +2,7 @@ import { render } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { TrendBars } from './TrendBars';
 
-describe('TrendBars', () => {
+describe('trendBars', () => {
   it('renders one bar per value', () => {
     const { container } = render(<TrendBars values={[0.2, 0.5, 0.8]} />);
     const bars = container.querySelectorAll('[data-trend-bar]');

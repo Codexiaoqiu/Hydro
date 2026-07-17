@@ -1,11 +1,11 @@
+import { Ring } from '../components/charts/Ring';
+import { Link } from '../components/link';
 import { Card } from '../components/primitives/Card';
 import { Chip } from '../components/primitives/Chip';
-import { Link } from '../components/link';
-import { Ring } from '../components/charts/Ring';
 import { statusText } from '../lib/contest-status';
 import { ruleText } from '../lib/rule-text';
-import type { SectionProps, SerializedTdoc } from './types';
 import styles from './TrainingSection.module.css';
+import type { SectionProps, SerializedTdoc } from './types';
 
 export function TrainingSection({ payload }: SectionProps): JSX.Element | null {
   const [tdocs = [], tsdict = {}] = Array.isArray(payload) ? payload : [[], {}];

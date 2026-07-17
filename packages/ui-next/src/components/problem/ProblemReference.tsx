@@ -1,11 +1,11 @@
-import { Button, Card } from '../primitives';
-import { Link } from '../link';
 import { useBuildUrl } from '../../hooks/use-build-url';
 import { useTranslate } from '../../lib/i18n';
+import { Link } from '../link';
+import { Button, Card } from '../primitives';
 
 export interface ProblemReferenceProps {
   pdoc: {
-    reference?: { domainId: string; pid: string | number };
+    reference?: { domainId: string, pid: string | number };
   };
 }
 
