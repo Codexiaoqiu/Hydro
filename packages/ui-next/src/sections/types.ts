@@ -31,6 +31,15 @@ export interface SerializedTdoc {
   hidden?: boolean;
 }
 
+export interface SerializedContestStatusDoc {
+  _id?: string;
+  docId?: string;
+  attend?: 0 | 1;
+  subscribe?: 0 | 1;
+  startAt?: string;
+  endAt?: string;
+}
+
 export interface SerializedPdoc {
   _id: string; // ObjectId hex
   docId: number; // numeric
