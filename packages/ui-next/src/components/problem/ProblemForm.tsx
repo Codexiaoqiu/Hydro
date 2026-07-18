@@ -4,6 +4,7 @@ import { HydroClientError, request } from '../../hooks/use-api';
 import { useBuildUrl } from '../../hooks/use-build-url';
 import { useTranslate } from '../../lib/i18n';
 import { Alert, Button, Checkbox, Input, LangTabs, RateLimitAlert } from '../primitives';
+import { ProblemAdditionalFiles, type ProblemAdditionalFile } from './ProblemAdditionalFiles';
 import styles from './ProblemForm.module.css';
 
 const PID_PATTERN = /^(?:[a-z0-9]{1,10}-)?[a-z][a-z0-9]*$/i;
@@ -95,6 +96,15 @@ export function ProblemForm({
   const [submitting, setSubmitting] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState<HydroClientError | null>(null);
+  // Local mirror of `additional_file` so the sidebar's upload/delete actions
+  // can update the list immediately without a round-trip to refresh the page.
+  // Re-syncs when the route's pdoc prop changes (e.g. after a Save).
+  const [fileList, setFileList] = useState<ProblemAdditionalFile[]>(
+    additionalFile ?? pdoc?.additional_file ?? [],
+  );
+  useEffect(() => {
+    setFileList(additionalFile ?? pdoc?.additional_file ?? []);
+  }, [additionalFile, pdoc?.additional_file]);
 
   useEffect(() => {
     if (!statementLangs.includes(activeLang)) setActiveLang(statementLangs[0]);
@@ -272,21 +282,13 @@ export function ProblemForm({
               <li>{t('ProblemForm.MarkdownLang')}</li>
             </ul>
           </div>
-        ) : (
-          <div>
-            <h3 style={{ margin: '0 0 8px', fontSize: 'var(--text-md)' }}>{t('ProblemForm.AdditionalFiles')}</h3>
-            <div className={styles.uploadList}>
-              {(additionalFile ?? pdoc?.additional_file ?? []).map((f) => (
-                <div key={f.name} className={styles.uploadItem}>
-                  <span>{f.name}</span>
-                  <span style={{ color: 'var(--text-mute)' }}>{Math.round(f.size / 1024)} KB</span>
-                </div>
-              ))}
-              {(!(additionalFile ?? pdoc?.additional_file ?? []).length) && (
-                <span style={{ color: 'var(--text-mute)', fontSize: 'var(--text-sm)' }}>{t('ProblemForm.NoneUploaded')}</span>
-              )}
-            </div>
-          </div>
+        ) : (pdoc?.docId !== undefined || pdoc?.pid) && (
+          <ProblemAdditionalFiles
+            pid={pdoc?.pid ?? String(pdoc?.docId ?? '')}
+            files={fileList}
+            disabled={isReference}
+            onChange={setFileList}
+          />
         )}
 
         {flatCategories.length > 0 && (
