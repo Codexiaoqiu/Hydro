@@ -405,6 +405,13 @@ export const zhCN: Catalog = {
   'ContestForm.Saving': '保存中…',
   'ContestForm.Deleting': '删除中…',
   'ContestForm.ErrorTitleRequired': '标题不能为空。',
+
+  'Polyhedron_Intro': '为获得更好的题目版本管理与校验,我们建议使用 Polyhedron 来准备题目。',
+  'Polyhedron_Feature': 'Polyhedron 支持管理题目版本历史、测试解答、检查时间限制、合成比赛题面、协作等功能。',
+  'Polyhedron_Import': '在 Polyhedron 中创建的题目可以直接导入任何基于 Hydro 的在线评测系统。',
+  'Common.OpenPolyhedron': '打开 Polyhedron',
+  'Common.Dismiss': '知道了',
+  'Common.DontShowAgain': '不再显示',
 };
 
 export const en: Catalog = {
@@ -811,6 +818,13 @@ export const en: Catalog = {
   'ContestForm.Saving': 'Saving…',
   'ContestForm.Deleting': 'Deleting…',
   'ContestForm.ErrorTitleRequired': 'Title is required.',
+
+  'Polyhedron_Intro': 'For better problem version management and validation, we suggest using Polyhedron to prepare problems.',
+  'Polyhedron_Feature': 'Polyhedron supports managing problem version history, testing solutions, checking time limits, composing contest statements, cooperation and much more.',
+  'Polyhedron_Import': 'Problems created in Polyhedron can be directly imported into any Hydro based online judge system.',
+  'Common.OpenPolyhedron': 'Open Polyhedron',
+  'Common.Dismiss': 'Dismiss',
+  'Common.DontShowAgain': "Don't show again",
 };
 
 export const catalogs: Record<Locale, Catalog> = {

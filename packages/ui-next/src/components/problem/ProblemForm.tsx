@@ -5,6 +5,7 @@ import { useBuildUrl } from '../../hooks/use-build-url';
 import { useTranslate } from '../../lib/i18n';
 import { Alert, Button, Checkbox, ConfirmDialog, Input, LangTabs, RateLimitAlert } from '../primitives';
 import { ProblemAdditionalFiles, type ProblemAdditionalFile } from './ProblemAdditionalFiles';
+import { PolyhedronHint } from './PolyhedronHint';
 import styles from './ProblemForm.module.css';
 
 const PID_PATTERN = /^(?:[a-z0-9]{1,10}-)?[a-z][a-z0-9]*$/i;
@@ -202,7 +203,9 @@ export function ProblemForm({
 
   return (
     <>
+    {pageName === 'problem_edit' && <PolyhedronHint />}
     <form className={styles.form} method="POST" onSubmit={submit}>
+      <div className={styles.fields}>
       <div className={styles.fields}>
         <h1 className={styles.pageTitle}>
           {pageName === 'problem_create' ? t('ProblemForm.CreateTitle') : t('ProblemForm.EditTitle')}
