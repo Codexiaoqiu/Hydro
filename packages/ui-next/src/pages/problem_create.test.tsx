@@ -1,5 +1,5 @@
 /* @vitest-environment happy-dom */
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { describe, expect, test, vi } from 'vitest';
 import { type PageData, PageDataProvider } from '../context/page-data';
 import { RouterProvider } from '../context/router';
@@ -22,7 +22,7 @@ function buildPageData(args: PageData['args']): PageData {
 }
 
 describe('problem_create page', () => {
-  test('renders empty ProblemForm', () => {
+  test('renders empty ProblemForm', async () => {
     render(
       <PageDataProvider initial={buildPageData({ statementLangs: ['zh_CN', 'en'], UserContext: { _id: 1 }, UiContext: {} })}>
         <RouterProvider>
@@ -30,8 +30,23 @@ describe('problem_create page', () => {
             <ProblemCreatePage />
           </ToastProvider>
         </RouterProvider>
-      </PageDataProvider>
+      </PageDataProvider>,
     );
     expect(screen.getByRole('textbox', { name: /标题|title/i })).toBeInTheDocument();
+  });
+
+  test('renders live preview pane', async () => {
+    render(
+      <PageDataProvider initial={buildPageData({ statementLangs: ['zh_CN', 'en'], UserContext: { _id: 1 }, UiContext: {} })}>
+        <RouterProvider>
+          <ToastProvider>
+            <ProblemCreatePage />
+          </ToastProvider>
+        </RouterProvider>
+      </PageDataProvider>,
+    );
+    await waitFor(() => {
+      expect(screen.getByTestId('markdown-preview-placeholder')).toBeInTheDocument();
+    });
   });
 });
