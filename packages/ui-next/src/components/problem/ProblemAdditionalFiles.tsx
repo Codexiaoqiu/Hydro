@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import { useTranslate } from '../../lib/i18n';
 import { HydroClientError, request } from '../../hooks/use-api';
+import { ConfirmDialog } from '../primitives';
 import styles from './ProblemAdditionalFiles.module.css';
 
 export interface ProblemAdditionalFile {
@@ -34,6 +35,7 @@ export function ProblemAdditionalFiles({ pid, files, disabled, onChange }: Props
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [confirmDelFile, setConfirmDelFile] = useState<string | null>(null);
 
   const upload = async (selected: FileList | null) => {
     if (!selected || !selected.length) return;
@@ -62,7 +64,6 @@ export function ProblemAdditionalFiles({ pid, files, disabled, onChange }: Props
   };
 
   const remove = async (name: string) => {
-    if (!confirm(t('ProblemAdditionalFiles.DeleteConfirm', { name }))) return;
     setError(null);
     try {
       await request.post(`/p/${encodeURIComponent(pid)}/files`, {
@@ -73,10 +74,13 @@ export function ProblemAdditionalFiles({ pid, files, disabled, onChange }: Props
       onChange(files.filter((f) => f.name !== name));
     } catch (err) {
       setError(err instanceof HydroClientError ? err.message : String(err));
+    } finally {
+      setConfirmDelFile(null);
     }
   };
 
   return (
+    <>
     <div className={styles.widget}>
       <div className={styles.head}>
         <h3 className={styles.title}>{t('ProblemAdditionalFiles.Title')}</h3>
@@ -110,7 +114,7 @@ export function ProblemAdditionalFiles({ pid, files, disabled, onChange }: Props
                 className={styles.removeBtn}
                 disabled={disabled}
                 aria-label={t('ProblemAdditionalFiles.Delete')}
-                onClick={() => remove(f.name)}
+                onClick={() => setConfirmDelFile(f.name)}
               >
                 ×
               </button>
@@ -119,5 +123,17 @@ export function ProblemAdditionalFiles({ pid, files, disabled, onChange }: Props
         </ul>
       )}
     </div>
+
+      <ConfirmDialog
+        open={!!confirmDelFile}
+        title={t('ProblemAdditionalFiles.DeleteFileTitle')}
+        message={t('ProblemAdditionalFiles.DeleteFileConfirm', { name: confirmDelFile ?? '' })}
+        confirmLabel={t('ProblemAdditionalFiles.Delete')}
+        cancelLabel={t('Common.Cancel')}
+        variant="danger"
+        onConfirm={() => confirmDelFile && remove(confirmDelFile)}
+        onCancel={() => setConfirmDelFile(null)}
+      />
+    </>
   );
 }
