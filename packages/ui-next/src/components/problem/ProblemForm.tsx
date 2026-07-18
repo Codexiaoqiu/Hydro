@@ -11,6 +11,30 @@ import styles from './ProblemForm.module.css';
 
 const PID_PATTERN = /^(?:[a-z0-9]{1,10}-)?[a-z][a-z0-9]*$/i;
 
+const FALLBACK_STATEMENT_LANGS: Record<string, string> = {
+  zh_CN: '简体中文',
+  en: 'English',
+};
+
+/**
+ * Server-side contract sends `Record<langCode, humanReadableName>`, but tests
+ * sometimes pass a plain `string[]`. Normalize both shapes into a stable
+ * `{ codes, labels }` pair so the rest of the component doesn't need to
+ * branch.
+ */
+function normalizeStatementLangs(input?: Record<string, string> | string[] | null): {
+  codes: string[];
+  labels: Record<string, string>;
+} {
+  if (input && !Array.isArray(input) && typeof input === 'object') {
+    return { codes: Object.keys(input), labels: input };
+  }
+  if (Array.isArray(input)) {
+    return { codes: input, labels: Object.fromEntries(input.map((c) => [c, c])) };
+  }
+  return { codes: Object.keys(FALLBACK_STATEMENT_LANGS), labels: FALLBACK_STATEMENT_LANGS };
+}
+
 interface CategoryNode {
   name: string;
   children?: CategoryNode[];
@@ -30,7 +54,14 @@ interface ProblemDoc {
 export interface ProblemFormProps {
   pageName: 'problem_edit' | 'problem_create';
   pdoc?: ProblemDoc;
-  statementLangs: string[];
+  /**
+   * Server-side contract: `ProblemEditHandler.get` and `ProblemCreateHandler.get`
+   * (packages/hydrooj/src/handler/problem.ts) both inject
+   * `i18n.langs(false)` which is `Record<langCode, humanReadableName>` (e.g.
+   * `{ zh_CN: '简体中文', en: 'English' }`) — NOT a `string[]`. Tests that
+   * pass an array still work via the array branch in `normalizeStatementLangs`.
+   */
+  statementLangs?: Record<string, string>;
   categoryTree?: CategoryNode[];
   additionalFile?: Array<{ name: string, size: number }>;
   canDelete?: boolean;
@@ -62,7 +93,8 @@ export function ProblemForm({
   const t = useTranslate();
   const toast = useToast();
   const user = useUserContext();
-  const userLang = statementLangs[0] ?? 'zh_CN';
+  const { codes: langCodes, labels: langLabels } = normalizeStatementLangs(statementLangs);
+  const userLang = langCodes[0] ?? 'zh_CN';
 
   const [pid, setPid] = useState(pdoc?.pid ?? '');
   const [title, setTitle] = useState(pdoc?.title ?? '');
@@ -112,8 +144,8 @@ export function ProblemForm({
   }, [additionalFile, pdoc?.additional_file]);
 
   useEffect(() => {
-    if (!statementLangs.includes(activeLang)) setActiveLang(statementLangs[0]);
-  }, [statementLangs, activeLang]);
+    if (!langCodes.includes(activeLang)) setActiveLang(langCodes[0]);
+  }, [langCodes, activeLang]);
 
   const submit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -283,7 +315,7 @@ export function ProblemForm({
 
           <div className={styles.markdown}>
             <LangTabs
-              options={statementLangs.map((l) => ({ value: l, label: l }))}
+              options={langCodes.map((code) => ({ value: code, label: langLabels[code] ?? code }))}
               active={activeLang}
               onChange={setActiveLang}
             />

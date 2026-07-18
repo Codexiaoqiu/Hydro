@@ -16,7 +16,10 @@ interface Args {
     owner?: number;
     maintainer?: number[];
   };
-  statementLangs?: string[];
+  /**
+   * Server injects `i18n.langs(false)` — `Record<langCode, displayName>`.
+   */
+  statementLangs?: Record<string, string>;
   categoryTree?: Array<{ name: string, children?: Array<{ name: string }> }>;
   UserContext?: Record<string, unknown>;
 }
@@ -31,7 +34,7 @@ export default function ProblemEditPage() {
     <ProblemForm
       pageName="problem_edit"
       pdoc={pdoc}
-      statementLangs={args?.statementLangs ?? ['zh_CN', 'en']}
+      statementLangs={args?.statementLangs}
       categoryTree={args?.categoryTree}
       additionalFile={pdoc?.additional_file}
       canDelete={canDelete}

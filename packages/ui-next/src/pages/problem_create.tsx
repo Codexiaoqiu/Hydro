@@ -2,7 +2,10 @@ import { ProblemForm } from '../components/problem/ProblemForm';
 import { usePageData } from '../context/page-data';
 
 interface Args {
-  statementLangs?: string[];
+  /**
+   * Server injects `i18n.langs(false)` — `Record<langCode, displayName>`.
+   */
+  statementLangs?: Record<string, string>;
   categoryTree?: Array<{ name: string, children?: Array<{ name: string }> }>;
 }
 
@@ -11,7 +14,7 @@ export default function ProblemCreatePage() {
   return (
     <ProblemForm
       pageName="problem_create"
-      statementLangs={args?.statementLangs ?? ['zh_CN', 'en']}
+      statementLangs={args?.statementLangs}
       categoryTree={args?.categoryTree}
       additionalFile={[]}
     />
