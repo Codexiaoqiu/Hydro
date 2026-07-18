@@ -1,0 +1,23 @@
+.backdrop {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 2000;
+}
+.dialog {
+  background: var(--surface, #fff);
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 420px;
+  width: 90%;
+  box-shadow: 0 12px 48px rgba(0,0,0,0.2);
+}
+.title { margin: 0 0 8px; font-size: 18px; font-weight: 600; }
+.message { margin: 0 0 24px; color: var(--text-muted, #666); line-height: 1.5; }
+.actions { display: flex; justify-content: flex-end; gap: 8px; }
+.cancel, .confirm, .danger {
+  padding: 6px 16px; border-radius: 6px; border: 1px solid var(--border, #ccc);
+  background: var(--surface, #fff); color: inherit; cursor: pointer; font: inherit;
+}
+.confirm { background: var(--primary, #2563eb); color: #fff; border-color: transparent; }
+.danger { background: var(--danger, #dc2626); color: #fff; border-color: transparent; }

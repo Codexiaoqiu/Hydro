@@ -6,6 +6,8 @@ export { Card } from './Card';
 export { Checkbox } from './Checkbox';
 export type { CheckboxProps } from './Checkbox';
 export { Chip } from './Chip';
+export { ConfirmDialog } from './ConfirmDialog';
+export type { ConfirmDialogProps } from './ConfirmDialog';
 export { Dropdown } from './Dropdown';
 export type { DropdownProps } from './Dropdown';
 export { Eyebrow } from './Eyebrow';
