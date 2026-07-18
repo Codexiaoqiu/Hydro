@@ -5,11 +5,11 @@ import rehypeKatex from 'rehype-katex';
 import remarkGfm from 'remark-gfm';
 import { remarkHighlightMark } from 'remark-highlight-mark';
 import remarkMath from 'remark-math';
+import articleSampleStyles from '../../components/article/Article.module.css';
+import { SamplePair } from '../../components/ide/SamplePair';
 import { remarkImageSize } from './plugins/remarkImageSize';
 import { remarkMedia } from './plugins/remarkMedia';
 import { preprocessContent } from './preprocess';
-import { SamplePair } from '../../components/ide/SamplePair';
-import articleSampleStyles from '../../components/article/Article.module.css';
 
 /**
  * Shared remark / rehype plugin pipeline used by both `Article` (problem
@@ -53,6 +53,10 @@ function renderMarkdown(source: string): ReactElement {
   );
 }
 
+function MarkdownBlock({ body }: { body: string }): ReactElement {
+  return renderMarkdown(body);
+}
+
 function SamplePairsBlock({
   pairs,
 }: {
@@ -85,8 +89,4 @@ export function renderArticleBlocks(source: string): ReactNode[] {
       ? <MarkdownBlock key={i} body={b.body} />
       : <SamplePairsBlock key={i} pairs={b.pairs} />,
   );
-}
-
-function MarkdownBlock({ body }: { body: string }): ReactElement {
-  return renderMarkdown(body);
 }

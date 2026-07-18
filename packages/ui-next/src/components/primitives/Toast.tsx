@@ -1,5 +1,5 @@
-import { createContext, useCallback, useContext, useState } from 'react';
 import type { ReactNode } from 'react';
+import { createContext, useCallback, useContext, useState } from 'react';
 import styles from './Toast.module.css';
 
 export type ToastVariant = 'info' | 'success' | 'error';
@@ -16,7 +16,7 @@ interface ToastContextValue {
 
 const ToastContext = createContext<ToastContextValue | null>(null);
 
-export interface ToastProviderProps { children: ReactNode; }
+export interface ToastProviderProps { children: ReactNode }
 
 export function ToastProvider({ children }: ToastProviderProps) {
   const [items, setItems] = useState<ToastItem[]>([]);

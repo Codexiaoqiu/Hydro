@@ -1,12 +1,12 @@
 import { type FormEvent, useCallback, useEffect, useState } from 'react';
-import { useNavigate } from '../../context/router';
 import { useUserContext } from '../../context/page-data';
+import { useNavigate } from '../../context/router';
 import { HydroClientError, request } from '../../hooks/use-api';
 import { useBuildUrl } from '../../hooks/use-build-url';
 import { useTranslate } from '../../lib/i18n';
 import { Alert, Button, Checkbox, ConfirmDialog, Input, LangTabs, MarkdownEditor, RateLimitAlert, useToast } from '../primitives';
-import { ProblemAdditionalFiles, type ProblemAdditionalFile } from './ProblemAdditionalFiles';
 import { PolyhedronHint } from './PolyhedronHint';
+import { type ProblemAdditionalFile, ProblemAdditionalFiles } from './ProblemAdditionalFiles';
 import styles from './ProblemForm.module.css';
 
 const PID_PATTERN = /^(?:[a-z0-9]{1,10}-)?[a-z][a-z0-9]*$/i;
@@ -176,7 +176,7 @@ export function ProblemForm({
     }
   };
 
-  const CategoryTreePicker = useCallback(({ tree, onToggle }: { tree: CategoryNode[]; onToggle: (name: string) => void }) => (
+  const CategoryTreePicker = useCallback(({ tree, onToggle }: { tree: CategoryNode[], onToggle: (name: string) => void }) => (
     <div className={styles.categoryTree}>
       {tree.map((node) => (
         <div key={node.name} className={styles.categoryNode}>
@@ -200,7 +200,7 @@ export function ProblemForm({
   const uploadImage = useCallback(async (files: File[]): Promise<string[]> => {
     if (!files.length) return [];
     try {
-      const endpoint = pageName === 'problem_create' ? '/file' : `./files`;
+      const endpoint = pageName === 'problem_create' ? '/file' : './files';
       const urls: string[] = [];
       for (const f of files) {
         const fd = new FormData();
@@ -229,119 +229,119 @@ export function ProblemForm({
 
   return (
     <>
-    {pageName === 'problem_edit' && <PolyhedronHint />}
-    <form className={styles.form} method="POST" onSubmit={submit}>
-      <div className={styles.fields}>
-        <h1 className={styles.pageTitle}>
-          {pageName === 'problem_create' ? t('ProblemForm.CreateTitle') : t('ProblemForm.EditTitle')}
-        </h1>
-        {error && error.code !== 429 && <Alert variant="error" message={error.message} />}
-        <RateLimitAlert error={error} />
+      {pageName === 'problem_edit' && <PolyhedronHint />}
+      <form className={styles.form} method="POST" onSubmit={submit}>
+        <div className={styles.fields}>
+          <h1 className={styles.pageTitle}>
+            {pageName === 'problem_create' ? t('ProblemForm.CreateTitle') : t('ProblemForm.EditTitle')}
+          </h1>
+          {error && error.code !== 429 && <Alert variant="error" message={error.message} />}
+          <RateLimitAlert error={error} />
 
-        <div className={styles.row}>
+          <div className={styles.row}>
+            <Input
+              label={t('ProblemForm.ProblemID')}
+              name="pid"
+              value={pid}
+              onChange={(e) => setPid(e.currentTarget.value)}
+              placeholder={t('ProblemForm.ProblemIDPlaceholder')}
+              disabled={isReference}
+              hint={t('ProblemForm.ProblemIDHint')}
+            />
+            <Input
+              label={t('ProblemForm.Difficulty')}
+              name="difficulty"
+              type="number"
+              inputMode="numeric"
+              value={difficulty}
+              min={1}
+              max={10}
+              onChange={(e) => setDifficulty(e.currentTarget.value === '' ? '' : Number(e.currentTarget.value))}
+              placeholder={t('ProblemForm.DifficultyPlaceholder')}
+            />
+          </div>
+
           <Input
-            label={t('ProblemForm.ProblemID')}
-            name="pid"
-            value={pid}
-            onChange={(e) => setPid(e.currentTarget.value)}
-            placeholder={t('ProblemForm.ProblemIDPlaceholder')}
-            disabled={isReference}
-            hint={t('ProblemForm.ProblemIDHint')}
+            label={t('ProblemForm.Title')}
+            name="title"
+            required
+            autoFocus={pageName === 'problem_create'}
+            value={title}
+            onChange={(e) => setTitle(e.currentTarget.value)}
           />
+
           <Input
-            label={t('ProblemForm.Difficulty')}
-            name="difficulty"
-            type="number"
-            inputMode="numeric"
-            value={difficulty}
-            min={1}
-            max={10}
-            onChange={(e) => setDifficulty(e.currentTarget.value === '' ? '' : Number(e.currentTarget.value))}
-            placeholder={t('ProblemForm.DifficultyPlaceholder')}
+            label={t('ProblemForm.Tags')}
+            name="tag"
+            value={tagText}
+            onChange={(e) => setTagText(e.currentTarget.value)}
+            hint={t('ProblemForm.TagsHint')}
+            placeholder={t('ProblemForm.TagsPlaceholder')}
           />
-        </div>
 
-        <Input
-          label={t('ProblemForm.Title')}
-          name="title"
-          required
-          autoFocus={pageName === 'problem_create'}
-          value={title}
-          onChange={(e) => setTitle(e.currentTarget.value)}
-        />
+          <Checkbox name="hidden" label={t('ProblemForm.Hidden')} checked={hidden} onChange={(e) => setHidden(e.currentTarget.checked)} />
 
-        <Input
-          label={t('ProblemForm.Tags')}
-          name="tag"
-          value={tagText}
-          onChange={(e) => setTagText(e.currentTarget.value)}
-          hint={t('ProblemForm.TagsHint')}
-          placeholder={t('ProblemForm.TagsPlaceholder')}
-        />
+          <div className={styles.markdown}>
+            <LangTabs
+              options={statementLangs.map((l) => ({ value: l, label: l }))}
+              active={activeLang}
+              onChange={setActiveLang}
+            />
+            <MarkdownEditor
+              value={activeContent}
+              language="markdown"
+              onChange={onContentChange}
+              onUpload={uploadImage}
+              height={420}
+              aria-label="problem content"
+            />
+          </div>
 
-        <Checkbox name="hidden" label={t('ProblemForm.Hidden')} checked={hidden} onChange={(e) => setHidden(e.currentTarget.checked)} />
-
-        <div className={styles.markdown}>
-          <LangTabs
-            options={statementLangs.map((l) => ({ value: l, label: l }))}
-            active={activeLang}
-            onChange={setActiveLang}
-          />
-          <MarkdownEditor
-            value={activeContent}
-            language="markdown"
-            onChange={onContentChange}
-            onUpload={uploadImage}
-            height={420}
-            aria-label="problem content"
-          />
-        </div>
-
-        <div className={styles.actions}>
-          <Button type="submit" variant="primary" disabled={submitting || deleting}>
-            {submitting ? t('ProblemForm.Saving') : pageName === 'problem_create' ? t('ProblemForm.Create') : t('ProblemForm.Update')}
-          </Button>
-          <div className={styles.actionsRight}>
-            {pageName === 'problem_edit' && canDelete && (
-              <Button type="button" variant="ghost" disabled={submitting || deleting} onClick={() => setConfirmDelOpen(true)}>
-                {deleting ? t('ProblemForm.Deleting') : t('ProblemForm.Delete')}
-              </Button>
-            )}
+          <div className={styles.actions}>
+            <Button type="submit" variant="primary" disabled={submitting || deleting}>
+              {submitting ? t('ProblemForm.Saving') : pageName === 'problem_create' ? t('ProblemForm.Create') : t('ProblemForm.Update')}
+            </Button>
+            <div className={styles.actionsRight}>
+              {pageName === 'problem_edit' && canDelete && (
+                <Button type="button" variant="ghost" disabled={submitting || deleting} onClick={() => setConfirmDelOpen(true)}>
+                  {deleting ? t('ProblemForm.Deleting') : t('ProblemForm.Delete')}
+                </Button>
+              )}
+            </div>
           </div>
         </div>
-      </div>
 
-      <aside className={styles.sidebar}>
-        {pageName === 'problem_create' ? (
-          <div className={styles.mdHint}>
-            <strong>{t('ProblemForm.MarkdownTips')}</strong>
-            <ul style={{ margin: '8px 0 0', paddingLeft: '20px' }}>
-              <li>{t('ProblemForm.MarkdownImage').split('file://filename.png').map((part, i, arr) => (
-                <span key={i}>{part}{i < arr.length - 1 ? <code>file://filename.png</code> : null}</span>
-              ))}</li>
-              <li>{t('ProblemForm.MarkdownCode').split('```cpp').map((part, i, arr) => (
-                <span key={i}>{part}{i < arr.length - 1 ? <code>```cpp</code> : null}</span>
-              ))}</li>
-              <li>{t('ProblemForm.MarkdownLang')}</li>
-            </ul>
-          </div>
-        ) : (pdoc?.docId !== undefined || pdoc?.pid) && (
-          <ProblemAdditionalFiles
-            pid={pdoc?.pid ?? String(pdoc?.docId ?? '')}
-            files={fileList}
-            disabled={isReference}
-            onChange={setFileList}
-          />
-        )}
+        <aside className={styles.sidebar}>
+          {pageName === 'problem_create' ? (
+            <div className={styles.mdHint}>
+              <strong>{t('ProblemForm.MarkdownTips')}</strong>
+              <ul style={{ margin: '8px 0 0', paddingLeft: '20px' }}>
+                <li>{t('ProblemForm.MarkdownImage').split('file://filename.png').map((part, i, arr) => (
+                  <span key={i}>{part}{i < arr.length - 1 ? <code>file://filename.png</code> : null}</span>
+                ))}</li>
+                <li>{t('ProblemForm.MarkdownCode').split('```cpp').map((part, i, arr) => (
+                  <span key={i}>{part}{i < arr.length - 1 ? <code>```cpp</code> : null}</span>
+                ))}</li>
+                <li>{t('ProblemForm.MarkdownLang')}</li>
+              </ul>
+            </div>
+          ) : (pdoc?.docId !== undefined || pdoc?.pid) && (
+            <ProblemAdditionalFiles
+              pid={pdoc?.pid ?? String(pdoc?.docId ?? '')}
+              files={fileList}
+              disabled={isReference}
+              onChange={setFileList}
+            />
+          )}
 
-        {categoryTree && categoryTree.length > 0 && (
-          <div>
-            <h3 style={{ margin: '0 0 8px', fontSize: 'var(--text-md)' }}>{t('ProblemForm.Categories')}</h3>
-            <CategoryTreePicker tree={categoryTree} onToggle={appendTag} />
-          </div>
-        )}
-      </aside>
-    </form>
+          {categoryTree && categoryTree.length > 0 && (
+            <div>
+              <h3 style={{ margin: '0 0 8px', fontSize: 'var(--text-md)' }}>{t('ProblemForm.Categories')}</h3>
+              <CategoryTreePicker tree={categoryTree} onToggle={appendTag} />
+            </div>
+          )}
+        </aside>
+      </form>
 
       <ConfirmDialog
         open={confirmDelOpen}

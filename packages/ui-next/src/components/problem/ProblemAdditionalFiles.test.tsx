@@ -1,6 +1,6 @@
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import type { ComponentProps } from 'react';
-import { afterEach, describe, expect, test, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { type PageData, PageDataProvider } from '../../context/page-data';
 import { RouterProvider } from '../../context/router';
 import { ToastProvider } from '../primitives';
@@ -23,25 +23,25 @@ function renderComp(props: Partial<ComponentProps<typeof ProblemAdditionalFiles>
           />
         </ToastProvider>
       </RouterProvider>
-    </PageDataProvider>
+    </PageDataProvider>,
   );
 }
 
-describe('ProblemAdditionalFiles', () => {
+describe('problemAdditionalFiles', () => {
   afterEach(() => { vi.restoreAllMocks(); });
 
-  test('renders existing file list', () => {
+  it('renders existing file list', () => {
     renderComp();
     expect(screen.getByText('a.txt')).toBeInTheDocument();
   });
 
-  test('delete button opens ConfirmDialog', () => {
+  it('delete button opens ConfirmDialog', () => {
     renderComp();
     fireEvent.click(screen.getByRole('button', { name: /删除|delete/i }));
     expect(screen.getByRole('alertdialog')).toBeInTheDocument();
   });
 
-  test('confirming delete calls request and refreshes', async () => {
+  it('confirming delete calls request and refreshes', async () => {
     const onChange = vi.fn();
     const { request } = await import('../../hooks/use-api');
     const postSpy = vi.spyOn(request, 'post').mockResolvedValue({} as never);

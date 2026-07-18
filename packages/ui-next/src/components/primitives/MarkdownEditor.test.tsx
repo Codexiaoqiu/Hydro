@@ -1,9 +1,10 @@
 /* @vitest-environment happy-dom */
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { describe, expect, test, vi } from 'vitest';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { describe, expect, it, vi } from 'vitest';
+import { MarkdownEditor } from './MarkdownEditor';
 
 vi.mock('@monaco-editor/react', () => ({
-  Editor: (props: { value?: string; onChange?: (v: string | undefined) => void }) => (
+  Editor: (props: { value?: string, onChange?: (v: string | undefined) => void }) => (
     <textarea
       data-testid="editor-source"
       value={props.value ?? ''}
@@ -13,10 +14,8 @@ vi.mock('@monaco-editor/react', () => ({
   loader: { config: vi.fn() },
 }));
 
-import { MarkdownEditor } from './MarkdownEditor';
-
-describe('MarkdownEditor (source pane)', () => {
-  test('renders source textarea and preview pane', async () => {
+describe('markdownEditor (source pane)', () => {
+  it('renders source textarea and preview pane', async () => {
     render(<MarkdownEditor value="hello" onChange={() => {}} />);
     await waitFor(() => {
       expect(screen.getByTestId('editor-source')).toBeInTheDocument();
@@ -25,7 +24,7 @@ describe('MarkdownEditor (source pane)', () => {
     expect((screen.getByTestId('editor-source') as HTMLTextAreaElement).value).toBe('hello');
   });
 
-  test('calls onChange when source textarea changes', async () => {
+  it('calls onChange when source textarea changes', async () => {
     const onChange = vi.fn();
     render(<MarkdownEditor value="" onChange={onChange} />);
     await waitFor(() => {
@@ -37,11 +36,11 @@ describe('MarkdownEditor (source pane)', () => {
   });
 });
 
-describe('MarkdownEditor (live preview)', () => {
+describe('markdownEditor (live preview)', () => {
   // Note: do NOT use vi.useFakeTimers() here. The Monaco lazy import uses
   // real microtasks; fake timers block them and `editor-source` never appears.
 
-  test('renders heading into preview pane after debounce', async () => {
+  it('renders heading into preview pane after debounce', async () => {
     render(<MarkdownEditor value="# Heading" onChange={() => {}} />);
     await waitFor(() => {
       expect(screen.getByTestId('editor-source')).toBeInTheDocument();
@@ -52,7 +51,7 @@ describe('MarkdownEditor (live preview)', () => {
     expect(preview.querySelector('h1')?.textContent).toBe('Heading');
   });
 
-  test('renders empty-state placeholder for empty source', async () => {
+  it('renders empty-state placeholder for empty source', async () => {
     render(<MarkdownEditor value="" onChange={() => {}} />);
     await waitFor(() => {
       expect(screen.getByTestId('editor-source')).toBeInTheDocument();
@@ -60,7 +59,7 @@ describe('MarkdownEditor (live preview)', () => {
     expect(screen.getByTestId('markdown-preview-placeholder')).toBeTruthy();
   });
 
-  test('updates preview when value prop changes externally (language switch)', async () => {
+  it('updates preview when value prop changes externally (language switch)', async () => {
     const { rerender } = render(<MarkdownEditor value="# English" onChange={() => {}} />);
     await waitFor(() => {
       expect(screen.getByTestId('editor-source')).toBeInTheDocument();

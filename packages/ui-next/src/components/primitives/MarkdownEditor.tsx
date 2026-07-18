@@ -1,7 +1,7 @@
-import { lazy, Suspense, useEffect, useState } from 'react';
 import type { OnMount } from '@monaco-editor/react';
-import { MarkdownPreview } from './MarkdownPreview';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import styles from './MarkdownEditor.module.css';
+import { MarkdownPreview } from './MarkdownPreview';
 
 const MonacoEditor = lazy(() =>
   import('@monaco-editor/react').then((m) => ({ default: m.Editor })),

@@ -1,8 +1,8 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import { describe, expect, test, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { ConfirmDialog } from './ConfirmDialog';
 
-describe('ConfirmDialog', () => {
+describe('confirmDialog', () => {
   const baseProps = {
     open: true,
     title: 'Delete item?',
@@ -11,12 +11,12 @@ describe('ConfirmDialog', () => {
     onCancel: vi.fn(),
   };
 
-  test('renders nothing when closed', () => {
+  it('renders nothing when closed', () => {
     render(<ConfirmDialog {...baseProps} open={false} />);
     expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
   });
 
-  test('renders title, message, buttons', () => {
+  it('renders title, message, buttons', () => {
     render(<ConfirmDialog {...baseProps} />);
     expect(screen.getByRole('alertdialog')).toBeInTheDocument();
     expect(screen.getByText('Delete item?')).toBeInTheDocument();
@@ -25,7 +25,7 @@ describe('ConfirmDialog', () => {
     expect(screen.getByText('Cancel')).toBeInTheDocument();
   });
 
-  test('calls onConfirm and onCancel', () => {
+  it('calls onConfirm and onCancel', () => {
     const onConfirm = vi.fn();
     const onCancel = vi.fn();
     render(<ConfirmDialog {...baseProps} onConfirm={onConfirm} onCancel={onCancel} />);
@@ -35,14 +35,14 @@ describe('ConfirmDialog', () => {
     expect(onCancel).toHaveBeenCalledTimes(1);
   });
 
-  test('closes on Escape', () => {
+  it('closes on Escape', () => {
     const onCancel = vi.fn();
     render(<ConfirmDialog {...baseProps} onCancel={onCancel} />);
     fireEvent.keyDown(document, { key: 'Escape' });
     expect(onCancel).toHaveBeenCalledTimes(1);
   });
 
-  test('closes on backdrop click', () => {
+  it('closes on backdrop click', () => {
     const onCancel = vi.fn();
     render(<ConfirmDialog {...baseProps} onCancel={onCancel} />);
     fireEvent.click(screen.getByRole('alertdialog').parentElement!);

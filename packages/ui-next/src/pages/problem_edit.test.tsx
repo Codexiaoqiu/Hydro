@@ -1,13 +1,13 @@
 /* @vitest-environment happy-dom */
 import { render, screen } from '@testing-library/react';
-import { describe, expect, test, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+import { ToastProvider } from '../components/primitives';
 import { type PageData, PageDataProvider } from '../context/page-data';
 import { RouterProvider } from '../context/router';
-import { ToastProvider } from '../components/primitives';
 import ProblemEditPage from './problem_edit';
 
 vi.mock('@monaco-editor/react', () => ({
-  Editor: (props: { value?: string; onChange?: (v: string | undefined) => void }) => (
+  Editor: (props: { value?: string, onChange?: (v: string | undefined) => void }) => (
     <textarea
       data-testid="monaco-stub"
       value={props.value ?? ''}
@@ -29,12 +29,12 @@ function renderWith(args: PageData['args']) {
           <ProblemEditPage />
         </ToastProvider>
       </RouterProvider>
-    </PageDataProvider>
+    </PageDataProvider>,
   );
 }
 
 describe('problem_edit page', () => {
-  test('renders ProblemForm with pdoc and statementLangs', () => {
+  it('renders ProblemForm with pdoc and statementLangs', () => {
     renderWith({
       pdoc: { docId: 1, pid: 'p1', title: 'Sample' },
       statementLangs: ['zh_CN', 'en'],
@@ -44,7 +44,7 @@ describe('problem_edit page', () => {
     expect(screen.getByRole('textbox', { name: /标题|title/i })).toBeInTheDocument();
   });
 
-  test('hides delete button when canDelete is false', () => {
+  it('hides delete button when canDelete is false', () => {
     renderWith({
       pdoc: { docId: 1, pid: 'p1', title: 'Sample', owner: 999 },
       statementLangs: ['zh_CN', 'en'],

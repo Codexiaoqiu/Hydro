@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { renderArticleBlocks } from '../../lib/markdown/plugins';
+import { type ReactNode, useEffect, useRef, useState } from 'react';
 import libMarkdownStyles from '../../lib/markdown.module.css';
+import { renderArticleBlocks } from '../../lib/markdown/plugins';
 import styles from './MarkdownPreview.module.css';
 
 export interface MarkdownPreviewProps {

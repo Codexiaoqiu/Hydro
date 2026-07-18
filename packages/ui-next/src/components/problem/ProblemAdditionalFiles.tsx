@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
-import { useTranslate } from '../../lib/i18n';
 import { HydroClientError, request } from '../../hooks/use-api';
+import { useTranslate } from '../../lib/i18n';
 import { ConfirmDialog } from '../primitives';
 import styles from './ProblemAdditionalFiles.module.css';
 
@@ -81,48 +81,48 @@ export function ProblemAdditionalFiles({ pid, files, disabled, onChange }: Props
 
   return (
     <>
-    <div className={styles.widget}>
-      <div className={styles.head}>
-        <h3 className={styles.title}>{t('ProblemAdditionalFiles.Title')}</h3>
-        <button
-          type="button"
-          className={styles.uploadBtn}
-          disabled={disabled || uploading}
-          onClick={() => fileInputRef.current?.click()}
-        >
-          {uploading ? t('ProblemAdditionalFiles.Uploading') : t('ProblemAdditionalFiles.Upload')}
-        </button>
-        <input
-          ref={fileInputRef}
-          type="file"
-          multiple
-          hidden
-          onChange={(e) => upload(e.currentTarget.files)}
-        />
+      <div className={styles.widget}>
+        <div className={styles.head}>
+          <h3 className={styles.title}>{t('ProblemAdditionalFiles.Title')}</h3>
+          <button
+            type="button"
+            className={styles.uploadBtn}
+            disabled={disabled || uploading}
+            onClick={() => fileInputRef.current?.click()}
+          >
+            {uploading ? t('ProblemAdditionalFiles.Uploading') : t('ProblemAdditionalFiles.Upload')}
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            multiple
+            hidden
+            onChange={(e) => upload(e.currentTarget.files)}
+          />
+        </div>
+        {error && <p className={styles.error}>{error}</p>}
+        {files.length === 0 ? (
+          <p className={styles.empty}>{t('ProblemAdditionalFiles.Empty')}</p>
+        ) : (
+          <ul className={styles.list}>
+            {files.map((f) => (
+              <li key={f.name} className={styles.item}>
+                <span className={styles.name} title={f.name}>{f.name}</span>
+                <span className={styles.size}>{formatSize(f.size)}</span>
+                <button
+                  type="button"
+                  className={styles.removeBtn}
+                  disabled={disabled}
+                  aria-label={t('ProblemAdditionalFiles.Delete')}
+                  onClick={() => setConfirmDelFile(f.name)}
+                >
+                  ×
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
-      {error && <p className={styles.error}>{error}</p>}
-      {files.length === 0 ? (
-        <p className={styles.empty}>{t('ProblemAdditionalFiles.Empty')}</p>
-      ) : (
-        <ul className={styles.list}>
-          {files.map((f) => (
-            <li key={f.name} className={styles.item}>
-              <span className={styles.name} title={f.name}>{f.name}</span>
-              <span className={styles.size}>{formatSize(f.size)}</span>
-              <button
-                type="button"
-                className={styles.removeBtn}
-                disabled={disabled}
-                aria-label={t('ProblemAdditionalFiles.Delete')}
-                onClick={() => setConfirmDelFile(f.name)}
-              >
-                ×
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
 
       <ConfirmDialog
         open={!!confirmDelFile}

@@ -22,12 +22,12 @@ import {
 import {
     ProblemDoc, ProblemSearchOptions, ProblemStatusDoc, RecordDoc, User,
 } from '../interface';
+import { parseCategorySetting } from '../lib/category';
 import { PERM, PRIV, STATUS } from '../model/builtin';
 import * as contest from '../model/contest';
 import * as discussion from '../model/discussion';
 import domain from '../model/domain';
 import * as oplog from '../model/oplog';
-import { parseCategorySetting } from '../lib/category';
 import problem from '../model/problem';
 import record from '../model/record';
 import * as setting from '../model/setting';

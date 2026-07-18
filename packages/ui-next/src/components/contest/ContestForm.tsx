@@ -2,10 +2,10 @@ import { type FormEvent, useMemo, useState } from 'react';
 import { useNavigate } from '../../context/router';
 import { HydroClientError, request } from '../../hooks/use-api';
 import { useBuildUrl } from '../../hooks/use-build-url';
+import { KNOWN_RULES } from '../../lib/contest-flags';
 import { useTranslate } from '../../lib/i18n';
 import { canEditSystem } from '../../lib/perms';
 import { Alert, Button, Checkbox, Input, RateLimitAlert } from '../primitives';
-import { KNOWN_RULES } from '../../lib/contest-flags';
 import styles from './ContestForm.module.css';
 
 interface ContestDoc {
@@ -229,8 +229,12 @@ export function ContestForm({ pageName, tdoc, tid, UserContext }: Props) {
             <label className={styles.field} style={{ gridColumn: 'span 2' }}>
               <span className={styles.label}>{t('ContestForm.Title')}</span>
               <input
-                type="text" name="title" required autoFocus={!isEdit}
-                value={form.title} onChange={(e) => set('title', e.currentTarget.value)}
+                type="text"
+                name="title"
+                required
+                autoFocus={!isEdit}
+                value={form.title}
+                onChange={(e) => set('title', e.currentTarget.value)}
                 className={styles.input}
               />
             </label>

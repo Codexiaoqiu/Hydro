@@ -1,13 +1,13 @@
 /* @vitest-environment happy-dom */
 import { render, screen, waitFor } from '@testing-library/react';
-import { describe, expect, test, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+import { ToastProvider } from '../components/primitives';
 import { type PageData, PageDataProvider } from '../context/page-data';
 import { RouterProvider } from '../context/router';
-import { ToastProvider } from '../components/primitives';
 import ProblemCreatePage from './problem_create';
 
 vi.mock('@monaco-editor/react', () => ({
-  Editor: (props: { value?: string; onChange?: (v: string | undefined) => void }) => (
+  Editor: (props: { value?: string, onChange?: (v: string | undefined) => void }) => (
     <textarea
       data-testid="monaco-stub"
       value={props.value ?? ''}
@@ -22,7 +22,7 @@ function buildPageData(args: PageData['args']): PageData {
 }
 
 describe('problem_create page', () => {
-  test('renders empty ProblemForm', async () => {
+  it('renders empty ProblemForm', async () => {
     render(
       <PageDataProvider initial={buildPageData({ statementLangs: ['zh_CN', 'en'], UserContext: { _id: 1 }, UiContext: {} })}>
         <RouterProvider>
@@ -35,7 +35,7 @@ describe('problem_create page', () => {
     expect(screen.getByRole('textbox', { name: /标题|title/i })).toBeInTheDocument();
   });
 
-  test('renders live preview pane', async () => {
+  it('renders live preview pane', async () => {
     render(
       <PageDataProvider initial={buildPageData({ statementLangs: ['zh_CN', 'en'], UserContext: { _id: 1 }, UiContext: {} })}>
         <RouterProvider>

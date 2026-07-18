@@ -1,13 +1,13 @@
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import type { ComponentProps } from 'react';
-import { afterEach, describe, expect, test, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { type PageData, PageDataProvider } from '../../context/page-data';
 import { RouterProvider } from '../../context/router';
 import { ToastProvider } from '../primitives';
 import { ProblemForm } from './ProblemForm';
 
 vi.mock('@monaco-editor/react', () => ({
-  Editor: (props: { value?: string; onChange?: (v: string | undefined) => void }) => (
+  Editor: (props: { value?: string, onChange?: (v: string | undefined) => void }) => (
     <textarea
       data-testid="monaco-stub"
       value={props.value ?? ''}
@@ -41,14 +41,14 @@ function renderForm(props: Partial<ComponentProps<typeof ProblemForm>> = {}) {
           <ProblemForm {...defaultProps} {...props} />
         </ToastProvider>
       </RouterProvider>
-    </PageDataProvider>
+    </PageDataProvider>,
   );
 }
 
-describe('ProblemForm', () => {
+describe('problemForm', () => {
   afterEach(() => { vi.restoreAllMocks(); });
 
-  test('shows title required error when title empty', async () => {
+  it('shows title required error when title empty', async () => {
     renderForm({ pdoc: { docId: 1, pid: 'p1', title: '' } });
     const titleInput = screen.getByRole('textbox', { name: /标题|title/i }) as HTMLInputElement;
     fireEvent.change(titleInput, { target: { value: '' } });
@@ -58,7 +58,7 @@ describe('ProblemForm', () => {
     });
   });
 
-  test('renders category tree when categoryTree provided', () => {
+  it('renders category tree when categoryTree provided', () => {
     const categoryTree = [
       { name: 'DP', children: [{ name: 'Knapsack' }] },
       { name: 'Graph' },
@@ -69,7 +69,7 @@ describe('ProblemForm', () => {
     expect(screen.getByRole('button', { name: /\+ Graph/ })).toBeInTheDocument();
   });
 
-  test('clicking category chip appends to tag input', () => {
+  it('clicking category chip appends to tag input', () => {
     const categoryTree = [{ name: 'DP' }];
     renderForm({ categoryTree });
     const tagInput = screen.getByRole('textbox', { name: /标签|tag/i }) as HTMLInputElement;
@@ -78,7 +78,7 @@ describe('ProblemForm', () => {
     expect(tagInput.value).toContain('DP');
   });
 
-  test('language tab switching changes editor content', () => {
+  it('language tab switching changes editor content', () => {
     const pdoc = {
       docId: 1,
       content: { zh_CN: '# 中文', en: '# English' },
@@ -88,7 +88,7 @@ describe('ProblemForm', () => {
     expect(screen.getByDisplayValue(/# English/)).toBeInTheDocument();
   });
 
-  test('delete button opens ConfirmDialog, confirms deletes', async () => {
+  it('delete button opens ConfirmDialog, confirms deletes', async () => {
     const fetchMock = vi.fn().mockResolvedValue({ url: '/problem' });
     global.fetch = fetchMock as unknown as typeof fetch;
     renderForm();

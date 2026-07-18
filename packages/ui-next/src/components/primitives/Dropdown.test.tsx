@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { Dropdown } from './Dropdown';
 
-describe('Dropdown', () => {
+describe('dropdown', () => {
   it('toggles open on trigger click', () => {
     render(<Dropdown label="Menu"><div>Item</div></Dropdown>);
     const trigger = screen.getByRole('button', { name: 'Menu' });
