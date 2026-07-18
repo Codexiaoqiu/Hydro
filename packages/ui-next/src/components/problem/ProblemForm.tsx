@@ -1,9 +1,9 @@
-import { type FormEvent, useCallback, useEffect, useState } from 'react';
+import { type FormEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from '../../context/router';
 import { HydroClientError, request } from '../../hooks/use-api';
 import { useBuildUrl } from '../../hooks/use-build-url';
 import { useTranslate } from '../../lib/i18n';
-import { Alert, Button, Checkbox, Input, LangTabs, RateLimitAlert } from '../primitives';
+import { Alert, Button, Checkbox, ConfirmDialog, Input, LangTabs, RateLimitAlert } from '../primitives';
 import { ProblemAdditionalFiles, type ProblemAdditionalFile } from './ProblemAdditionalFiles';
 import styles from './ProblemForm.module.css';
 
@@ -95,7 +95,9 @@ export function ProblemForm({
   });
   const [submitting, setSubmitting] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [confirmDelOpen, setConfirmDelOpen] = useState(false);
   const [error, setError] = useState<HydroClientError | null>(null);
+  const titleRef = useRef<HTMLInputElement | null>(null);
   // Local mirror of `additional_file` so the sidebar's upload/delete actions
   // can update the list immediately without a round-trip to refresh the page.
   // Re-syncs when the route's pdoc prop changes (e.g. after a Save).
@@ -116,6 +118,8 @@ export function ProblemForm({
     setError(null);
     if (!title.trim()) {
       setError(new HydroClientError({ code: 400, message: t('ProblemForm.ErrorTitleRequired') }));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      setTimeout(() => titleRef.current?.focus(), 320);
       setSubmitting(false);
       return;
     }
@@ -151,7 +155,6 @@ export function ProblemForm({
   };
 
   const onDelete = async () => {
-    if (!confirm(t('ProblemForm.DeleteConfirm', { name: title || pid }))) return;
     setDeleting(true);
     setError(null);
     try {
@@ -163,6 +166,7 @@ export function ProblemForm({
       if (err instanceof HydroClientError) setError(err);
     } finally {
       setDeleting(false);
+      setConfirmDelOpen(false);
     }
   };
 
@@ -197,6 +201,7 @@ export function ProblemForm({
   const onContentChange = (v: string) => setContentByLang((m) => ({ ...m, [activeLang]: v }));
 
   return (
+    <>
     <form className={styles.form} method="POST" onSubmit={submit}>
       <div className={styles.fields}>
         <h1 className={styles.pageTitle}>
@@ -235,6 +240,7 @@ export function ProblemForm({
           autoFocus={pageName === 'problem_create'}
           value={title}
           onChange={(e) => setTitle(e.currentTarget.value)}
+          ref={(el: HTMLInputElement | null) => { titleRef.current = el; }}
         />
 
         <Input
@@ -268,7 +274,7 @@ export function ProblemForm({
           </Button>
           <div className={styles.actionsRight}>
             {pageName === 'problem_edit' && canDelete && (
-              <Button type="button" variant="ghost" disabled={submitting || deleting} onClick={onDelete}>
+              <Button type="button" variant="ghost" disabled={submitting || deleting} onClick={() => setConfirmDelOpen(true)}>
                 {deleting ? t('ProblemForm.Deleting') : t('ProblemForm.Delete')}
               </Button>
             )}
@@ -307,5 +313,17 @@ export function ProblemForm({
         )}
       </aside>
     </form>
+
+      <ConfirmDialog
+        open={confirmDelOpen}
+        title={t('ProblemForm.DeleteTitle')}
+        message={t('ProblemForm.DeleteConfirm', { name: title || pid || '' })}
+        confirmLabel={t('ProblemForm.Delete')}
+        cancelLabel={t('Common.Cancel')}
+        variant="danger"
+        onConfirm={onDelete}
+        onCancel={() => setConfirmDelOpen(false)}
+      />
+    </>
   );
 }
