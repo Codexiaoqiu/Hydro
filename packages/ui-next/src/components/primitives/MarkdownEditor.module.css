@@ -9,12 +9,23 @@
 }
 
 .pane {
+  /* min-height: 0 lets the grid cell shrink below its content so the
+     embedded Monaco editor's own scrollbar kicks in instead of the
+     cell expanding. */
   min-width: 0;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
   border-right: 1px solid var(--border);
 }
 
 .previewPane {
+  /* Same min-height: 0 trick — without it the preview grows beyond
+     the grid row and overflow: auto on the inner pane never engages. */
   min-width: 0;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
 }
 
 .fallback {
