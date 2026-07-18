@@ -27,6 +27,7 @@ import * as contest from '../model/contest';
 import * as discussion from '../model/discussion';
 import domain from '../model/domain';
 import * as oplog from '../model/oplog';
+import { parseCategorySetting } from '../lib/category';
 import problem from '../model/problem';
 import record from '../model/record';
 import * as setting from '../model/setting';
@@ -616,6 +617,7 @@ export class ProblemEditHandler extends ProblemManageHandler {
     async get() {
         this.response.body.additional_file = sortFiles(this.pdoc.additional_file || []);
         this.response.body.statementLangs = this.ctx.i18n.langs(false);
+        this.response.body.categoryTree = parseCategorySetting(this.ctx.setting.get('problem.categories'));
         this.response.template = 'problem_edit.html';
     }
 
@@ -995,6 +997,7 @@ export class ProblemCreateHandler extends Handler {
         this.response.body = {
             page_name: 'problem_create',
             additional_file: [],
+            categoryTree: parseCategorySetting(this.ctx.setting.get('problem.categories')),
         };
     }
 
