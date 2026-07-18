@@ -1,9 +1,10 @@
 import { type FormEvent, useCallback, useEffect, useState } from 'react';
 import { useNavigate } from '../../context/router';
+import { useUserContext } from '../../context/page-data';
 import { HydroClientError, request } from '../../hooks/use-api';
 import { useBuildUrl } from '../../hooks/use-build-url';
 import { useTranslate } from '../../lib/i18n';
-import { Alert, Button, Checkbox, ConfirmDialog, Input, LangTabs, RateLimitAlert } from '../primitives';
+import { Alert, Button, Checkbox, ConfirmDialog, Input, LangTabs, MarkdownEditor, RateLimitAlert, useToast } from '../primitives';
 import { ProblemAdditionalFiles, type ProblemAdditionalFile } from './ProblemAdditionalFiles';
 import { PolyhedronHint } from './PolyhedronHint';
 import styles from './ProblemForm.module.css';
@@ -59,6 +60,8 @@ export function ProblemForm({
   const navigate = useNavigate();
   const buildUrl = useBuildUrl();
   const t = useTranslate();
+  const toast = useToast();
+  const user = useUserContext();
   const userLang = statementLangs[0] ?? 'zh_CN';
 
   const [pid, setPid] = useState(pdoc?.pid ?? '');
@@ -194,6 +197,27 @@ export function ProblemForm({
     </div>
   ), []);
 
+  const uploadImage = useCallback(async (files: File[]): Promise<string[]> => {
+    if (!files.length) return [];
+    try {
+      const endpoint = pageName === 'problem_create' ? '/file' : `./files`;
+      const urls: string[] = [];
+      for (const f of files) {
+        const fd = new FormData();
+        fd.set('operation', 'upload_file');
+        fd.set('type', 'additional_file');
+        fd.set('filename', f.name);
+        fd.set('file', f);
+        await request.postFile(endpoint, fd);
+        urls.push(`/file/${user._id}/${encodeURIComponent(f.name)}`);
+      }
+      return urls;
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : String(err));
+      return [];
+    }
+  }, [pageName, user._id, toast]);
+
   const appendTag = (name: string) => {
     const cur = tagText.split(',').map((t) => t.trim()).filter(Boolean);
     if (cur.includes(name)) return;
@@ -263,11 +287,13 @@ export function ProblemForm({
             active={activeLang}
             onChange={setActiveLang}
           />
-          <textarea
+          <MarkdownEditor
             value={activeContent}
-            onChange={(e) => onContentChange(e.currentTarget.value)}
-            placeholder={t('ProblemForm.StatementPlaceholder', { lang: activeLang })}
-            spellCheck={false}
+            language="markdown"
+            onChange={onContentChange}
+            onUpload={uploadImage}
+            height={420}
+            aria-label="problem content"
           />
         </div>
 
