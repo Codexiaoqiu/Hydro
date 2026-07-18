@@ -1,5 +1,6 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
 import type { OnMount } from '@monaco-editor/react';
+import { MarkdownPreview } from './MarkdownPreview';
 import styles from './MarkdownEditor.module.css';
 
 const MonacoEditor = lazy(() =>
@@ -55,22 +56,30 @@ export function MarkdownEditor({
 
   return (
     <div className={styles.root} style={{ height }} aria-label={rest['aria-label']}>
-      <Suspense fallback={<textarea className={styles.fallback} value={value} onChange={(e) => onChange(e.target.value)} />}>
-        <MonacoEditor
-          height="100%"
-          language={language}
-          value={value}
-          onChange={(v) => onChange(v ?? '')}
-          onMount={handleMount}
-          theme={theme === 'dark' ? 'vs-dark' : 'light'}
-          options={{
-            fontFamily: 'var(--font-mono)',
-            fontSize: 13,
-            minimap: { enabled: false },
-            wordWrap: 'on',
-          }}
-        />
-      </Suspense>
+      <div className={styles.pane}>
+        <Suspense fallback={<textarea className={styles.fallback} value={value} onChange={(e) => onChange(e.target.value)} />}>
+          <MonacoEditor
+            height="100%"
+            language={language}
+            value={value}
+            onChange={(v) => onChange(v ?? '')}
+            onMount={handleMount}
+            theme={theme === 'dark' ? 'vs-dark' : 'light'}
+            options={{
+              fontFamily: 'var(--font-mono)',
+              fontSize: 13,
+              minimap: { enabled: false },
+              wordWrap: 'on',
+            }}
+          />
+        </Suspense>
+      </div>
+      <div className={styles.previewPane}>
+        {/* key={value} forces remount on language switch (parent passes a new
+            content slice), flushing the preview immediately instead of
+            waiting for the 150ms debounce. */}
+        <MarkdownPreview key={value} source={value} />
+      </div>
     </div>
   );
 }
