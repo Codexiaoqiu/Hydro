@@ -1,4 +1,4 @@
-import { type FormEvent, useEffect, useMemo, useState } from 'react';
+import { type FormEvent, useCallback, useEffect, useState } from 'react';
 import { useNavigate } from '../../context/router';
 import { HydroClientError, request } from '../../hooks/use-api';
 import { useBuildUrl } from '../../hooks/use-build-url';
@@ -166,18 +166,26 @@ export function ProblemForm({
     }
   };
 
-  const flatCategories = useMemo(() => {
-    const out: string[] = [];
-    const walk = (nodes?: CategoryNode[]) => {
-      if (!nodes) return;
-      for (const n of nodes) {
-        out.push(n.name);
-        walk(n.children);
-      }
-    };
-    walk(categoryTree);
-    return out;
-  }, [categoryTree]);
+  const CategoryTreePicker = useCallback(({ tree, onToggle }: { tree: CategoryNode[]; onToggle: (name: string) => void }) => (
+    <div className={styles.categoryTree}>
+      {tree.map((node) => (
+        <div key={node.name} className={styles.categoryNode}>
+          <button type="button" className={styles.categoryChip} onClick={() => onToggle(node.name)}>
+            + {node.name}
+          </button>
+          {node.children && node.children.length > 0 && (
+            <div className={styles.subcategoryList}>
+              {node.children.map((sub) => (
+                <button key={sub.name} type="button" className={styles.subcategoryChip} onClick={() => onToggle(sub.name)}>
+                  {sub.name}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  ), []);
 
   const appendTag = (name: string) => {
     const cur = tagText.split(',').map((t) => t.trim()).filter(Boolean);
@@ -291,16 +299,10 @@ export function ProblemForm({
           />
         )}
 
-        {flatCategories.length > 0 && (
+        {categoryTree && categoryTree.length > 0 && (
           <div>
             <h3 style={{ margin: '0 0 8px', fontSize: 'var(--text-md)' }}>{t('ProblemForm.Categories')}</h3>
-            <div className={styles.categoryTree}>
-              {flatCategories.map((name) => (
-                <button key={name} type="button" className={styles.categoryChip} onClick={() => appendTag(name)}>
-                  + {name}
-                </button>
-              ))}
-            </div>
+            <CategoryTreePicker tree={categoryTree} onToggle={appendTag} />
           </div>
         )}
       </aside>

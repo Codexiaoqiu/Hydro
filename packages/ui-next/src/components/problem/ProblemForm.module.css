@@ -68,26 +68,19 @@
   display: flex;
   gap: var(--space-3);
 }
-.categoryTree {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-}
+.categoryTree { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+.categoryNode { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
 .categoryChip {
-  cursor: pointer;
-  padding: var(--space-2) var(--space-3);
-  border-radius: var(--radius-pill);
-  border: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--text-soft);
-  font-size: var(--text-sm);
-  transition: background-color var(--motion-base), border-color var(--motion-base);
+  background: var(--surface, #f4f4f5); border: 1px solid var(--border, #d4d4d8);
+  border-radius: 6px; padding: 4px 10px; cursor: pointer; font: inherit; color: inherit;
 }
-.categoryChip:hover {
-  background: var(--surface-2);
-  border-color: var(--border-strong);
-  color: var(--text);
+.categoryChip:hover { background: var(--surface-hover, #e4e4e7); }
+.subcategoryList { display: flex; flex-wrap: wrap; gap: 4px; }
+.subcategoryChip {
+  background: transparent; border: 1px dashed var(--border, #d4d4d8);
+  border-radius: 999px; padding: 2px 8px; font-size: 12px; cursor: pointer; color: inherit;
 }
+.subcategoryChip:hover { border-style: solid; }
 .uploadList {
   display: flex;
   flex-direction: column;
