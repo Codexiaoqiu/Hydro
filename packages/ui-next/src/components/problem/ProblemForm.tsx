@@ -1,4 +1,4 @@
-import { type FormEvent, useCallback, useEffect, useRef, useState } from 'react';
+import { type FormEvent, useCallback, useEffect, useState } from 'react';
 import { useNavigate } from '../../context/router';
 import { HydroClientError, request } from '../../hooks/use-api';
 import { useBuildUrl } from '../../hooks/use-build-url';
@@ -98,7 +98,6 @@ export function ProblemForm({
   const [deleting, setDeleting] = useState(false);
   const [confirmDelOpen, setConfirmDelOpen] = useState(false);
   const [error, setError] = useState<HydroClientError | null>(null);
-  const titleRef = useRef<HTMLInputElement | null>(null);
   // Local mirror of `additional_file` so the sidebar's upload/delete actions
   // can update the list immediately without a round-trip to refresh the page.
   // Re-syncs when the route's pdoc prop changes (e.g. after a Save).
@@ -120,7 +119,10 @@ export function ProblemForm({
     if (!title.trim()) {
       setError(new HydroClientError({ code: 400, message: t('ProblemForm.ErrorTitleRequired') }));
       window.scrollTo({ top: 0, behavior: 'smooth' });
-      setTimeout(() => titleRef.current?.focus(), 320);
+      setTimeout(() => {
+        const el = document.querySelector<HTMLInputElement>('input[name="title"]');
+        el?.focus();
+      }, 320);
       setSubmitting(false);
       return;
     }
@@ -206,7 +208,6 @@ export function ProblemForm({
     {pageName === 'problem_edit' && <PolyhedronHint />}
     <form className={styles.form} method="POST" onSubmit={submit}>
       <div className={styles.fields}>
-      <div className={styles.fields}>
         <h1 className={styles.pageTitle}>
           {pageName === 'problem_create' ? t('ProblemForm.CreateTitle') : t('ProblemForm.EditTitle')}
         </h1>
@@ -243,7 +244,6 @@ export function ProblemForm({
           autoFocus={pageName === 'problem_create'}
           value={title}
           onChange={(e) => setTitle(e.currentTarget.value)}
-          ref={(el: HTMLInputElement | null) => { titleRef.current = el; }}
         />
 
         <Input

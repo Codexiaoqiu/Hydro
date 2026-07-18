@@ -29,9 +29,11 @@
     "test:visual:update": "playwright test --update-snapshots"
   },
   "dependencies": {
+    "@monaco-editor/react": "^4.6.0",
     "esbuild": "0.25.2",
     "is-relative-url": "^4.1.0",
     "marked": "^14.0.0",
+    "monaco-editor": "^0.52.0",
     "path-to-regexp": "^8.4.2",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",

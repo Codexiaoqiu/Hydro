@@ -3,6 +3,11 @@ import { type Theme, ThemeContext, type ThemeContextValue } from './useTheme';
 
 const STORAGE_KEY = 'hydro.theme';
 
+function applyTheme(next: Theme) {
+  document.documentElement.setAttribute('data-theme', next);
+  window.dispatchEvent(new CustomEvent('hydro:theme-change'));
+}
+
 function resolveInitial(): Theme {
   if (typeof window === 'undefined') return 'dark';
   let saved: string | null = null;
@@ -39,7 +44,7 @@ export function ThemeProvider({ children }: PropsWithChildren) {
       try { saved = localStorage.getItem(STORAGE_KEY); } catch {}
       if (saved === 'dark' || saved === 'light') return; // user has explicit choice
       const next: Theme = mql.matches ? 'light' : 'dark';
-      document.documentElement.setAttribute('data-theme', next);
+      applyTheme(next);
     };
     mql.addEventListener('change', onChange);
     return () => mql.removeEventListener('change', onChange);
@@ -49,12 +54,12 @@ export function ThemeProvider({ children }: PropsWithChildren) {
     theme,
     setTheme: (next) => {
       try { localStorage.setItem(STORAGE_KEY, next); } catch {}
-      document.documentElement.setAttribute('data-theme', next);
+      applyTheme(next);
     },
     toggle: () => {
       const next: Theme = theme === 'dark' ? 'light' : 'dark';
       try { localStorage.setItem(STORAGE_KEY, next); } catch {}
-      document.documentElement.setAttribute('data-theme', next);
+      applyTheme(next);
     },
   }), [theme]);
 

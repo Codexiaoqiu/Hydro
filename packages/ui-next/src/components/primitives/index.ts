@@ -16,6 +16,8 @@ export type { InputProps, InputType } from './Input';
 export { LangTabs } from './LangTabs';
 export { Loading } from './Loading';
 export type { LoadingProps, LoadingSize } from './Loading';
+export { MarkdownEditor } from './MarkdownEditor';
+export type { MarkdownEditorProps } from './MarkdownEditor';
 export { Select } from './Select';
 export { ToastProvider, useToast } from './Toast';
 export type { ToastVariant } from './Toast';
