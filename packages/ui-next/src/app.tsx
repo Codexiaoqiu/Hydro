@@ -1,6 +1,6 @@
 import { Suspense, useMemo, useSyncExternalStore } from 'react';
 import DefaultLayout from './components/layout';
-import { Loading } from './components/primitives';
+import { Loading, ToastProvider } from './components/primitives';
 import { usePageData } from './context/page-data';
 import { useTranslate } from './lib/i18n';
 import { defineSlot } from './registry';
@@ -56,11 +56,13 @@ const App = defineSlot('app:root', () => {
   return (
     <SlotErrorBoundary slotName={slotName} label="renderer">
       <Suspense fallback={null}>
-        <Layout>
-          <Suspense fallback={<Loading size="block" ariaLabel={t('Common.Loading')} />}>
-            <Page />
-          </Suspense>
-        </Layout>
+        <ToastProvider>
+          <Layout>
+            <Suspense fallback={<Loading size="block" ariaLabel={t('Common.Loading')} />}>
+              <Page />
+            </Suspense>
+          </Layout>
+        </ToastProvider>
       </Suspense>
     </SlotErrorBoundary>
   );

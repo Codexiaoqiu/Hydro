@@ -1,0 +1,20 @@
+.container {
+  position: fixed; bottom: 24px; right: 24px;
+  display: flex; flex-direction: column; gap: 8px;
+  z-index: 3000;
+}
+.toast {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 16px; border-radius: 8px;
+  background: var(--surface, #fff); color: var(--text, #111);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  border-left: 4px solid var(--primary, #2563eb);
+  min-width: 240px;
+}
+.info { border-left-color: var(--info, #2563eb); }
+.success { border-left-color: var(--success, #16a34a); }
+.error { border-left-color: var(--danger, #dc2626); }
+.toast button {
+  background: transparent; border: none; cursor: pointer;
+  font-size: 18px; color: inherit;
+}

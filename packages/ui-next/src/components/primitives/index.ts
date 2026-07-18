@@ -17,6 +17,8 @@ export { LangTabs } from './LangTabs';
 export { Loading } from './Loading';
 export type { LoadingProps, LoadingSize } from './Loading';
 export { Select } from './Select';
+export { ToastProvider, useToast } from './Toast';
+export type { ToastVariant } from './Toast';
 export { Switch } from './Switch';
 export type { SwitchProps } from './Switch';
 export { TagCloud } from './TagCloud';
