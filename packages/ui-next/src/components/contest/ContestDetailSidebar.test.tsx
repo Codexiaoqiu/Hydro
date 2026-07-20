@@ -171,6 +171,15 @@ describe('contestDetailSidebar', () => {
     expect(screen.getByRole('link', { name: /排行榜|Scoreboard/i })).toBeInTheDocument();
   });
 
+  it('renders Problem List link above Scoreboard when ongoing', () => {
+    render(
+      <ContestDetailSidebar tdoc={tdoc()} tsdoc={null} udict={udict()} urlForFile={(n) => `/f/${n}`} />,
+    );
+    const problemLink = screen.getByRole('link', { name: /题目列表|Problem List/i });
+    const scoreboardLink = screen.getByRole('link', { name: /排行榜|Scoreboard/i });
+    expect(problemLink.compareDocumentPosition(scoreboardLink) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
   it('renders All submissions link when canShowAllRecord (done + perm)', () => {
     const doneEnd = new Date(NOW - 60_000).toISOString();
     render(

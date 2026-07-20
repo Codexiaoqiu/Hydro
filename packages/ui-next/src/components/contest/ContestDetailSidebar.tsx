@@ -121,6 +121,11 @@ export function ContestDetailSidebar({
       <nav className={styles.section}>
         <p className={styles.title}>{t('Common.Contests')}</p>
         {flags.canShowScoreboard && (
+          <Link className={styles.action} to="contest_problemlist" params={{ tid: tdoc.docId }}>
+            {t('ContestDetail.ProblemList')}
+          </Link>
+        )}
+        {flags.canShowScoreboard && (
           <Link className={styles.action} to="contest_scoreboard" params={{ tid: tdoc.docId }}>
             {t('ContestDetail.Scoreboard')}
           </Link>
