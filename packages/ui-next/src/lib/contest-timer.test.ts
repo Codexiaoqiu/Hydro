@@ -1,6 +1,7 @@
 /* @vitest-environment happy-dom */
-import { describe, expect, it } from 'vitest';
-import { computeTimerState, type TimerOptions } from './contest-timer';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { act, renderHook } from '@testing-library/react';
+import { computeTimerState, useContestTimer, type TimerOptions } from './contest-timer';
 
 const BEGIN = 1_700_000_000_000; // 2023-11-14T22:13:20Z
 const END = BEGIN + 5 * 3600_000; // +5h
@@ -96,5 +97,65 @@ describe('computeTimerState', () => {
       // msLeft ≈ 5*3600_000 - 1000 = ~04:59:59
       expect(state.display).toMatch(/^\d{2}:\d{2}:\d{2}$/);
     });
+  });
+});
+
+describe('useContestTimer hook', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('returns initial state on first render', () => {
+    vi.setSystemTime(BEGIN - 1000);
+    const { result } = renderHook(() =>
+      useContestTimer({ beginAt: BEGIN, duration: DURATION }),
+    );
+    expect(result.current.status).toBe('pre');
+    expect(result.current.msLeft).toBe(1000);
+  });
+
+  it('updates state after tick', () => {
+    vi.setSystemTime(BEGIN);
+    const { result } = renderHook(() =>
+      useContestTimer({ beginAt: BEGIN, duration: DURATION }),
+    );
+    expect(result.current.status).toBe('running');
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
+    expect(result.current.msLeft).toBe(DURATION - 1000);
+  });
+
+  it('dispatches hydro:contest-tick when status transitions', () => {
+    vi.setSystemTime(BEGIN - 100);
+    const listener = vi.fn();
+    window.addEventListener('hydro:contest-tick', listener);
+
+    renderHook(() => useContestTimer({ beginAt: BEGIN, duration: DURATION }));
+
+    expect(listener).not.toHaveBeenCalled();
+
+    act(() => {
+      vi.setSystemTime(BEGIN + 100);
+      vi.advanceTimersByTime(1100);
+    });
+
+    expect(listener).toHaveBeenCalled();
+    window.removeEventListener('hydro:contest-tick', listener);
+  });
+
+  it('clears interval on unmount', () => {
+    vi.setSystemTime(BEGIN);
+    const { unmount } = renderHook(() =>
+      useContestTimer({ beginAt: BEGIN, duration: DURATION }),
+    );
+    const clearSpy = vi.spyOn(globalThis, 'clearInterval');
+    unmount();
+    expect(clearSpy).toHaveBeenCalled();
+    clearSpy.mockRestore();
   });
 });

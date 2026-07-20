@@ -43,3 +43,31 @@ function formatDuration(ms: number): string {
   if (h === 0) return `${pad2(m)}:${pad2(s)}`;
   return `${pad2(h)}:${pad2(m)}:${pad2(s)}`;
 }
+
+import { useEffect, useRef, useState } from 'react';
+
+export function useContestTimer(opts: TimerOptions): TimerState {
+  const [state, setState] = useState<TimerState>(() => computeTimerState(Date.now(), opts));
+  const prevStatus = useRef(state.status);
+
+  useEffect(() => {
+    const tick = () => {
+      const next = computeTimerState(Date.now(), opts);
+      setState(next);
+      if (next.status !== prevStatus.current) {
+        prevStatus.current = next.status;
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('hydro:contest-tick', { detail: next }));
+        }
+      }
+    };
+    tick();
+    const id = window.setInterval(tick, 1000);
+    return () => window.clearInterval(id);
+    // opts is treated as stable per caller convention; if caller mutates it,
+    // they should remount the component (timer is rarely live-mutated).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return state;
+}
