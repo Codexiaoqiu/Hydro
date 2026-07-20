@@ -1,15 +1,15 @@
 import { useTranslate } from '../../lib/i18n';
 import styles from './ContestFiles.module.css';
 
-export type ContestFileInfo = {
+export interface ContestFileInfo {
   name: string;
   size: number;
-};
+}
 
-export type ContestFilesProps = {
+export interface ContestFilesProps {
   files: ContestFileInfo[];
   urlForFile: (name: string) => string;
-};
+}
 
 function formatSize(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;

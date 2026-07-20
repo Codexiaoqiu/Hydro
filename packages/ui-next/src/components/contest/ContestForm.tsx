@@ -5,7 +5,11 @@ import { useBuildUrl } from '../../hooks/use-build-url';
 import { KNOWN_RULES } from '../../lib/contest-flags';
 import { useTranslate } from '../../lib/i18n';
 import { canEditSystem } from '../../lib/perms';
-import { Alert, Button, Checkbox, Input, RateLimitAlert } from '../primitives';
+import {
+  Alert, Button, Checkbox, ConfirmDialog, Input, type LanguageOption,
+  LanguageSelectAutoComplete,
+  MarkdownEditor, ProblemSelectAutoComplete, RateLimitAlert,
+} from '../primitives';
 import styles from './ContestForm.module.css';
 
 interface ContestDoc {
@@ -32,6 +36,10 @@ interface Props {
   tdoc?: ContestDoc;
   tid?: string;
   UserContext?: Record<string, unknown>;
+  /** Full language catalogue for the language picker; injected by the backend handler. */
+  languages?: LanguageOption[];
+  /** Domain id used by ProblemSelectAutoComplete to build the search URL. */
+  domainId?: string;
 }
 
 interface FormState {
@@ -40,14 +48,14 @@ interface FormState {
   beginAtDate: string;
   beginAtTime: string;
   duration: string;
-  pids: string;
+  pids: number[];
   content: string;
   rated: boolean;
   autoHide: boolean;
   allowViewCode: boolean;
   allowPrint: boolean;
   keepScoreboardHidden: boolean;
-  langs: string;
+  langs: string[];
   maintainer: string;
   lock: string;
   contestDuration: string;
@@ -73,14 +81,14 @@ function fmtTime(ms: number): string {
  * keepScoreboardHidden for oi/strictioi) toggle on/off as the user picks a rule,
  * matching the ui-default `contest_edit.page.ts` script.
  */
-export function ContestForm({ pageName, tdoc, tid, UserContext }: Props) {
+export function ContestForm({ pageName, tdoc, tid, UserContext, languages = [], domainId }: Props) {
   const navigate = useNavigate();
   const buildUrl = useBuildUrl();
   const t = useTranslate();
   const isEdit = pageName.endsWith('edit');
 
+  const [now] = useState(() => Date.now());
   const initial: FormState = useMemo(() => {
-    const now = Date.now();
     const beginAt = tdoc?.beginAt ?? now;
     const endAt = tdoc?.endAt ?? (now + 2 * 60 * 60 * 1000);
     const duration = tdoc ? Math.max(0.5, Math.round(((endAt - beginAt) / 3600000) * 10) / 10) : 2;
@@ -90,25 +98,26 @@ export function ContestForm({ pageName, tdoc, tid, UserContext }: Props) {
       beginAtDate: fmtDate(beginAt),
       beginAtTime: fmtTime(beginAt),
       duration: String(duration),
-      pids: (tdoc?.pids ?? []).join(','),
+      pids: tdoc?.pids ?? [],
       content: tdoc?.content ?? '',
       rated: tdoc?.rated ?? false,
       autoHide: tdoc?.autoHide ?? true,
       allowViewCode: tdoc?.allowViewCode ?? true,
       allowPrint: tdoc?.allowPrint ?? false,
       keepScoreboardHidden: tdoc?.keepScoreboardHidden ?? false,
-      langs: (tdoc?.langs ?? []).join(','),
+      langs: tdoc?.langs ?? [],
       maintainer: (tdoc?.maintainer ?? []).join(','),
       lock: tdoc?.lockAt ? String(Math.round((endAt - tdoc.lockAt) / 60000)) : '',
       contestDuration: tdoc && tdoc.endAt && tdoc.beginAt
         ? String(Math.round(((tdoc.endAt - tdoc.beginAt) / 3600000) * 10) / 10)
         : '',
     };
-  }, [tdoc]);
+  }, [tdoc, now]);
 
   const [form, setForm] = useState<FormState>(initial);
   const [submitting, setSubmitting] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [error, setError] = useState<HydroClientError | null>(null);
   const canEditProblems = canEditSystem(UserContext);
 
@@ -142,26 +151,32 @@ export function ContestForm({ pageName, tdoc, tid, UserContext }: Props) {
     setError(null);
     try {
       const fd = new URLSearchParams();
+      // ContestEditHandler only defines postUpdate/postDelete (no bare `post`),
+      // so the framework requires an `operation` field to dispatch.
+      fd.set('operation', 'update');
       fd.set('rule', form.rule);
       fd.set('title', form.title);
       fd.set('beginAtDate', form.beginAtDate);
       fd.set('beginAtTime', form.beginAtTime);
       fd.set('duration', form.duration);
-      fd.set('pids', form.pids);
+      // `pids`/`langs` are emitted as CSV because the server handler declares
+      // them as `Types.Content` / `Types.CommaSeperatedArray` (handler/contest.ts).
+      fd.set('pids', form.pids.join(','));
       fd.set('content', form.content);
       fd.set('rated', form.rated ? 'on' : '');
       fd.set('autoHide', form.autoHide ? 'on' : '');
       fd.set('allowViewCode', form.allowViewCode ? 'on' : '');
       fd.set('allowPrint', form.allowPrint ? 'on' : '');
       fd.set('keepScoreboardHidden', form.keepScoreboardHidden ? 'on' : '');
-      if (form.langs) fd.set('langs', form.langs);
+      if (form.langs.length) fd.set('langs', form.langs.join(','));
       if (form.maintainer) fd.set('maintainer', form.maintainer);
       if (flags.showLock && form.lock) fd.set('lock', form.lock);
       if (flags.showContestDuration && form.contestDuration) fd.set('contestDuration', form.contestDuration);
 
       const url = isEdit ? `/contest/${tid}/edit` : '/contest/create';
-      await request.post(url, fd);
-      navigate(buildUrl('contest_main'));
+      const res = await request.post<{ tid?: string }>(url, fd);
+      const newTid = res?.tid ?? tid;
+      navigate(newTid ? buildUrl('contest_detail', { tid: newTid }) : buildUrl('contest_main'));
     } catch (err) {
       if (err instanceof HydroClientError) setError(err);
     } finally {
@@ -169,9 +184,9 @@ export function ContestForm({ pageName, tdoc, tid, UserContext }: Props) {
     }
   };
 
-  const onDelete = async () => {
+  const performDelete = async () => {
     if (!tid) return;
-    if (!confirm(t('ContestForm.DeleteConfirm'))) return;
+    setShowDeleteConfirm(false);
     setDeleting(true);
     setError(null);
     try {
@@ -192,12 +207,26 @@ export function ContestForm({ pageName, tdoc, tid, UserContext }: Props) {
     setError(null);
     try {
       const fd = new URLSearchParams();
-      Object.entries(form).forEach(([k, v]) => {
-        if (typeof v === 'boolean') fd.set(k, v ? 'on' : '');
-        else if (v) fd.set(k, String(v));
-      });
-      await request.post('/contest/create', fd);
-      navigate(buildUrl('contest_main'));
+      fd.set('operation', 'update');
+      fd.set('rule', form.rule);
+      fd.set('title', form.title);
+      fd.set('beginAtDate', form.beginAtDate);
+      fd.set('beginAtTime', form.beginAtTime);
+      fd.set('duration', form.duration);
+      fd.set('pids', form.pids.join(','));
+      fd.set('content', form.content);
+      fd.set('rated', form.rated ? 'on' : '');
+      fd.set('autoHide', form.autoHide ? 'on' : '');
+      fd.set('allowViewCode', form.allowViewCode ? 'on' : '');
+      fd.set('allowPrint', form.allowPrint ? 'on' : '');
+      fd.set('keepScoreboardHidden', form.keepScoreboardHidden ? 'on' : '');
+      if (form.langs.length) fd.set('langs', form.langs.join(','));
+      if (form.maintainer) fd.set('maintainer', form.maintainer);
+      if (flags.showLock && form.lock) fd.set('lock', form.lock);
+      if (flags.showContestDuration && form.contestDuration) fd.set('contestDuration', form.contestDuration);
+
+      const res = await request.post<{ tid?: string }>('/contest/create', fd);
+      navigate(res?.tid ? buildUrl('contest_detail', { tid: res.tid }) : buildUrl('contest_main'));
     } catch (err) {
       if (err instanceof HydroClientError) setError(err);
     } finally {
@@ -220,7 +249,7 @@ export function ContestForm({ pageName, tdoc, tid, UserContext }: Props) {
           <div className={styles.row}>
             <label className={styles.field}>
               <span className={styles.label}>{t('ContestForm.Rule')}</span>
-              <select className={styles.select} value={form.rule} onChange={(e) => set('rule', e.currentTarget.value)}>
+              <select name="rule" className={styles.select} value={form.rule} onChange={(e) => set('rule', e.currentTarget.value)}>
                 {KNOWN_RULES.map((r) => (
                   <option key={r.key} value={r.key}>{r.label}</option>
                 ))}
@@ -251,7 +280,14 @@ export function ContestForm({ pageName, tdoc, tid, UserContext }: Props) {
             </label>
             <label className={styles.field}>
               <span className={styles.label}>{t('ContestForm.Duration')}</span>
-              <input type="number" min={0.5} step={0.5} value={form.duration} onChange={(e) => set('duration', e.currentTarget.value)} className={styles.input} />
+              <input
+                type="number"
+                min={0.5}
+                step={0.5}
+                value={form.duration}
+                onChange={(e) => set('duration', e.currentTarget.value)}
+                className={styles.input}
+              />
             </label>
             <label className={styles.field}>
               <span className={styles.label}>{t('ContestForm.EndAt')}</span>
@@ -259,21 +295,24 @@ export function ContestForm({ pageName, tdoc, tid, UserContext }: Props) {
             </label>
           </div>
 
-          <label className={styles.field}>
-            <span className={styles.label}>{t('ContestForm.Pids')}</span>
-            <input type="text" value={form.pids} onChange={(e) => set('pids', e.currentTarget.value)} placeholder={t('ContestForm.PidsPlaceholder')} className={styles.input} />
-          </label>
+          <ProblemSelectAutoComplete
+            label={t('ContestForm.Pids')}
+            value={form.pids}
+            onChange={(next) => set('pids', next)}
+            domainId={domainId}
+            placeholder={t('ContestForm.PidsPlaceholder')}
+            name="pids"
+          />
 
-          <label className={styles.field}>
+          <div className={styles.field}>
             <span className={styles.label}>{t('ContestForm.Description')}</span>
-            <textarea
+            <MarkdownEditor
               value={form.content}
-              onChange={(e) => set('content', e.currentTarget.value)}
-              placeholder={t('ContestForm.DescriptionPlaceholder')}
-              className={styles.textarea}
-              rows={8}
+              onChange={(next) => set('content', next)}
+              height={280}
+              aria-label={t('ContestForm.Description') ?? 'Description'}
             />
-          </label>
+          </div>
         </div>
       </section>
 
@@ -294,26 +333,69 @@ export function ContestForm({ pageName, tdoc, tid, UserContext }: Props) {
       <section className={styles.section}>
         <h2 className={styles.sectionTitle}>{t('ContestForm.SectionSettings')}</h2>
         <div className={styles.fields}>
-          <Input
+          <LanguageSelectAutoComplete
             label={t('ContestForm.Langs')}
-            name="langs"
             value={form.langs}
-            onChange={(e) => set('langs', e.currentTarget.value)}
+            onChange={(next) => set('langs', next)}
+            languages={languages}
             placeholder={t('ContestForm.LangsPlaceholder')}
+            name="langs"
           />
           <div className={styles.checkboxGrid}>
-            <Checkbox name="rated" label={t('ContestForm.Rated')} checked={form.rated} onChange={(e) => set('rated', e.currentTarget.checked)} />
-            <Checkbox name="autoHide" label={t('ContestForm.AutoHide')} checked={form.autoHide} disabled={!canEditProblems} onChange={(e) => set('autoHide', e.currentTarget.checked)} />
-            <Checkbox name="allowViewCode" label={t('ContestForm.AllowViewCode')} checked={form.allowViewCode} onChange={(e) => set('allowViewCode', e.currentTarget.checked)} />
-            <Checkbox name="allowPrint" label={t('ContestForm.AllowPrint')} checked={form.allowPrint} onChange={(e) => set('allowPrint', e.currentTarget.checked)} />
+            <Checkbox
+              name="rated"
+              label={t('ContestForm.Rated')}
+              checked={form.rated}
+              onChange={(e) => set('rated', e.currentTarget.checked)}
+            />
+            <Checkbox
+              name="autoHide"
+              label={t('ContestForm.AutoHide')}
+              checked={form.autoHide}
+              disabled={!canEditProblems}
+              onChange={(e) => set('autoHide', e.currentTarget.checked)}
+            />
+            <Checkbox
+              name="allowViewCode"
+              label={t('ContestForm.AllowViewCode')}
+              checked={form.allowViewCode}
+              onChange={(e) => set('allowViewCode', e.currentTarget.checked)}
+            />
+            <Checkbox
+              name="allowPrint"
+              label={t('ContestForm.AllowPrint')}
+              checked={form.allowPrint}
+              onChange={(e) => set('allowPrint', e.currentTarget.checked)}
+            />
             {flags.showKeepScoreboardHidden && (
-              <Checkbox name="keepScoreboardHidden" label={t('ContestForm.KeepScoreboardHidden')} checked={form.keepScoreboardHidden} onChange={(e) => set('keepScoreboardHidden', e.currentTarget.checked)} />
+              <Checkbox
+                name="keepScoreboardHidden"
+                label={t('ContestForm.KeepScoreboardHidden')}
+                checked={form.keepScoreboardHidden}
+                onChange={(e) => set('keepScoreboardHidden', e.currentTarget.checked)}
+              />
             )}
             {flags.showLock && (
-              <Input label={t('ContestForm.Lock')} name="lock" type="number" value={form.lock} onChange={(e) => set('lock', e.currentTarget.value)} placeholder={t('ContestForm.LockPlaceholder')} hint={t('ContestForm.LockHint')} />
+              <Input
+                label={t('ContestForm.Lock')}
+                name="lock"
+                type="number"
+                value={form.lock}
+                onChange={(e) => set('lock', e.currentTarget.value)}
+                placeholder={t('ContestForm.LockPlaceholder')}
+                hint={t('ContestForm.LockHint')}
+              />
             )}
             {flags.showContestDuration && (
-              <Input label={t('ContestForm.ContestDuration')} name="contestDuration" type="number" value={form.contestDuration} onChange={(e) => set('contestDuration', e.currentTarget.value)} placeholder={t('ContestForm.ContestDurationPlaceholder')} hint={t('ContestForm.ContestDurationHint')} />
+              <Input
+                label={t('ContestForm.ContestDuration')}
+                name="contestDuration"
+                type="number"
+                value={form.contestDuration}
+                onChange={(e) => set('contestDuration', e.currentTarget.value)}
+                placeholder={t('ContestForm.ContestDurationPlaceholder')}
+                hint={t('ContestForm.ContestDurationHint')}
+              />
             )}
           </div>
         </div>
@@ -334,11 +416,22 @@ export function ContestForm({ pageName, tdoc, tid, UserContext }: Props) {
           </Button>
         </div>
         {isEdit && (
-          <button type="button" className={styles.deleteBtn} disabled={submitting || deleting} onClick={onDelete}>
+          <button type="button" className={styles.deleteBtn} disabled={submitting || deleting} onClick={() => setShowDeleteConfirm(true)}>
             {deleting ? t('ContestForm.Deleting') : t('ContestForm.Delete')}
           </button>
         )}
       </div>
+
+      <ConfirmDialog
+        open={showDeleteConfirm}
+        variant="danger"
+        title={t('ContestForm.Delete')}
+        message={t('ContestForm.DeleteConfirm')}
+        confirmLabel={t('ContestForm.Delete')}
+        cancelLabel={t('ContestForm.Cancel')}
+        onConfirm={performDelete}
+        onCancel={() => setShowDeleteConfirm(false)}
+      />
     </form>
   );
 }

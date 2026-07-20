@@ -1,6 +1,7 @@
 /* @vitest-environment happy-dom */
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { ContestDetailSidebar } from './ContestDetailSidebar';
 
 const requestPost = vi.fn();
 const reloadSpy = vi.fn();
@@ -30,7 +31,7 @@ vi.mock('../../hooks/use-api', () => ({
   request: { post: (...args: unknown[]) => requestPost(...args) },
   HydroClientError: class extends Error {
     code: number;
-    constructor(init: { code?: number; message?: string }) {
+    constructor(init: { code?: number, message?: string }) {
       super(init.message ?? 'error');
       this.code = init.code ?? 0;
     }
@@ -43,8 +44,6 @@ vi.mock('../../hooks/use-api', () => ({
     setError: vi.fn(),
   }),
 }));
-
-import { ContestDetailSidebar } from './ContestDetailSidebar';
 
 const NOW = Date.now();
 const begin = new Date(NOW - 3600_000).toISOString();
@@ -104,7 +103,7 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe('ContestDetailSidebar', () => {
+describe('contestDetailSidebar', () => {
   it('shows Attend button when canAttend and triggers POST on click', async () => {
     requestPost.mockResolvedValueOnce({});
     render(

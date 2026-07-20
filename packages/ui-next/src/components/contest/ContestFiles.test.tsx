@@ -1,11 +1,11 @@
 /* @vitest-environment happy-dom */
-import { describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
 import { ContestFiles } from './ContestFiles';
 
 const urlForFile = (name: string) => `/d/contest/123/file/private/${name}`;
 
-describe('ContestFiles', () => {
+describe('contestFiles', () => {
   it('renders empty state when files is empty', () => {
     render(<ContestFiles files={[]} urlForFile={urlForFile} />);
     expect(screen.getByText(/暂无附件|No files attached/i)).toBeInTheDocument();

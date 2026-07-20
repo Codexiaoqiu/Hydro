@@ -1,13 +1,13 @@
-import { isDone, isOngoing } from './contest-status';
 import type { SerializedContestStatusDoc, SerializedTdoc } from '../sections/types';
+import { isDone, isOngoing } from './contest-status';
 
-export type UserPerms = {
+export interface UserPerms {
   _id: number;
   hasPerm: (perm: string) => boolean;
   own: (doc: { owner?: number | string }) => boolean;
-};
+}
 
-export type ContestActionFlags = {
+export interface ContestActionFlags {
   canAttend: boolean;
   canEarlyEnd: boolean;
   canSubscribe: boolean;
@@ -21,7 +21,7 @@ export type ContestActionFlags = {
   canViewCode: boolean;
   canShowDiscussion: boolean;
   canCreateDiscussion: boolean;
-};
+}
 
 const P = {
   ATTEND: 'PERM_ATTEND_CONTEST',

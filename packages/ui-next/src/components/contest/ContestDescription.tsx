@@ -1,9 +1,9 @@
 import { Article } from '../article/Article';
 
-export type ContestDescriptionProps = {
+export interface ContestDescriptionProps {
   content: string;
   docId: string;
-};
+}
 
 export function rewriteContent(raw: string, docId: string): string {
   return raw

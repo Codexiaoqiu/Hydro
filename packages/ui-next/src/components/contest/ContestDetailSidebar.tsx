@@ -1,23 +1,23 @@
 import { useState } from 'react';
+import { request } from '../../hooks/use-api';
+import { useBuildUrl } from '../../hooks/use-build-url';
+import { computeContestActions, type UserPerms } from '../../lib/contest-actions';
+import { useTranslate } from '../../lib/i18n';
+import type { SerializedContestStatusDoc, SerializedTdoc, SerializedUserDict } from '../../sections/types';
+import { Link } from '../link';
 import { Alert } from '../primitives/Alert';
 import { Button } from '../primitives/Button';
 import { ConfirmDialog } from '../primitives/ConfirmDialog';
-import { Link } from '../link';
-import { useBuildUrl } from '../../hooks/use-build-url';
 import { useToast } from '../primitives/Toast';
-import { request } from '../../hooks/use-api';
-import { useTranslate } from '../../lib/i18n';
-import { computeContestActions, type UserPerms } from '../../lib/contest-actions';
-import type { SerializedContestStatusDoc, SerializedTdoc, SerializedUserDict } from '../../sections/types';
 import styles from './ContestDetailSidebar.module.css';
 
-export type ContestDetailSidebarProps = {
-  tdoc: SerializedTdoc & { owner?: number; allowPrint?: boolean; _code?: string };
+export interface ContestDetailSidebarProps {
+  tdoc: SerializedTdoc & { owner?: number, allowPrint?: boolean, _code?: string };
   tsdoc: SerializedContestStatusDoc | null;
   udict: SerializedUserDict;
   urlForFile: (name: string) => string;
   currentUserPerms?: UserPerms;
-};
+}
 
 const DEFAULT_USER: UserPerms = {
   _id: 0,

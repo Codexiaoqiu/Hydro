@@ -1,22 +1,24 @@
-export type TimerOptions = {
+import { useEffect, useRef, useState } from 'react';
+
+export interface TimerOptions {
   beginAt: number;
   duration?: number;
   tsdocStartAt?: number;
   tsdocEndAt?: number;
-};
+}
 
-export type TimerState = {
+export interface TimerState {
   status: 'pre' | 'running' | 'ended';
   msLeft: number;
   progress: number;
   display: string;
-};
+}
 
 export function computeTimerState(now: number, opts: TimerOptions): TimerState {
   const start = opts.tsdocStartAt ?? opts.beginAt;
   const end =
-    opts.tsdocEndAt ??
-    (typeof opts.duration === 'number' ? opts.beginAt + opts.duration : Number.NEGATIVE_INFINITY);
+    opts.tsdocEndAt
+    ?? (typeof opts.duration === 'number' ? opts.beginAt + opts.duration : Number.NEGATIVE_INFINITY);
 
   if (now < start) {
     const msLeft = start - now;
@@ -43,8 +45,6 @@ function formatDuration(ms: number): string {
   if (h === 0) return `${pad2(m)}:${pad2(s)}`;
   return `${pad2(h)}:${pad2(m)}:${pad2(s)}`;
 }
-
-import { useEffect, useRef, useState } from 'react';
 
 export function useContestTimer(opts: TimerOptions): TimerState {
   const [state, setState] = useState<TimerState>(() => computeTimerState(Date.now(), opts));

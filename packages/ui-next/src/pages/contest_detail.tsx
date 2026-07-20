@@ -1,28 +1,28 @@
 import { useEffect } from 'react';
-import { Alert } from '../components/primitives/Alert';
-import { ContestDetailHeader } from '../components/contest/ContestDetailHeader';
 import { ContestDescription } from '../components/contest/ContestDescription';
+import { ContestDetailHeader } from '../components/contest/ContestDetailHeader';
+import { ContestDetailSidebar } from '../components/contest/ContestDetailSidebar';
 import { ContestFiles } from '../components/contest/ContestFiles';
 import { ContestTimer } from '../components/contest/ContestTimer';
-import { ContestDetailSidebar } from '../components/contest/ContestDetailSidebar';
+import { Alert } from '../components/primitives/Alert';
+import { usePageData } from '../context/page-data';
 import { isDone, isOngoing, renderDuration } from '../lib/contest-status';
 import { useTranslate } from '../lib/i18n';
-import { usePageData } from '../context/page-data';
 import type { SerializedContestStatusDoc, SerializedTdoc, SerializedUserDict } from '../sections/types';
 import styles from './contest_detail.module.css';
 
-export type ContestDetailPageArgs = {
-  tdoc?: SerializedTdoc & { owner?: number; allowPrint?: boolean; _code?: string; content?: string };
+export interface ContestDetailPageArgs {
+  tdoc?: SerializedTdoc & { owner?: number, allowPrint?: boolean, _code?: string, content?: string };
   tsdoc?: SerializedContestStatusDoc | null;
   udict?: SerializedUserDict;
-  files?: Array<{ name: string; size: number }>;
+  files?: Array<{ name: string, size: number }>;
   urlForFile?: (name: string) => string;
-};
+}
 
-export type ContestDetailPageProps = {
+export interface ContestDetailPageProps {
   /** Test-only injection point — production reads from usePageData() instead. */
-  _pageData?: { name: string; template: string; url: string; args?: ContestDetailPageArgs };
-};
+  _pageData?: { name: string, template: string, url: string, args?: ContestDetailPageArgs };
+}
 
 function PrerenderHints() {
   useEffect(() => {
@@ -72,7 +72,7 @@ export default function ContestDetailPage({ _pageData }: ContestDetailPageProps 
 
   // Derive UserPerms from the page's UserContext (set by server handler).
   const userCtx = (args as Record<string, unknown>).UserContext as
-    | { _id?: number; perm?: string; own?: (d: { owner?: number | string }) => boolean; hasPerm?: (p: string) => boolean }
+    | { _id?: number, perm?: string, own?: (d: { owner?: number | string }) => boolean, hasPerm?: (p: string) => boolean }
     | undefined;
   const currentUserPerms = {
     _id: userCtx?._id ?? 0,

@@ -1,6 +1,7 @@
 /* @vitest-environment happy-dom */
-import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import { describe, expect, it, vi } from 'vitest';
+import { ContestDescription } from './ContestDescription';
 
 vi.mock('@monaco-editor/react', () => ({
   Editor: (props: { value?: string }) => <textarea data-testid="monaco-mock" value={props.value} readOnly />,
@@ -13,9 +14,7 @@ vi.mock('../article/Article', () => ({
   ),
 }));
 
-import { ContestDescription } from './ContestDescription';
-
-describe('ContestDescription', () => {
+describe('contestDescription', () => {
   it('renders plain markdown content', () => {
     render(<ContestDescription content="Hello **world**" docId="60a000000000000000000001" />);
     const node = screen.getByTestId('article-mock');

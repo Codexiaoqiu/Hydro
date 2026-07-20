@@ -1,6 +1,6 @@
 /* @vitest-environment happy-dom */
 import { describe, expect, it } from 'vitest';
-import type { SerializedTdoc, SerializedContestStatusDoc } from '../sections/types';
+import type { SerializedContestStatusDoc, SerializedTdoc } from '../sections/types';
 import { computeContestActions, type UserPerms } from './contest-actions';
 
 // Use Date.now() as anchor so isOngoing/isDone (which default to Date.now())

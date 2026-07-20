@@ -1,17 +1,17 @@
+import { ruleText } from '../../lib/rule-text';
 import { Chip } from '../primitives/Chip';
 import { Eyebrow } from '../primitives/Eyebrow';
-import { ruleText } from '../../lib/rule-text';
 import styles from './ContestDetailHeader.module.css';
 
 type Status = 'upcoming' | 'ongoing' | 'done';
 
-export type ContestDetailHeaderProps = {
+export interface ContestDetailHeaderProps {
   title: string;
   rule: string;
   status: Status;
   attended: boolean;
   durationText: string;
-};
+}
 
 function statusVariant(status: Status): 'upcoming' | 'ongoing' | 'ended' {
   if (status === 'upcoming') return 'upcoming';

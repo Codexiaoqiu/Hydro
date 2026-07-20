@@ -1,12 +1,12 @@
-import { useTranslate } from '../../lib/i18n';
 import { useContestTimer } from '../../lib/contest-timer';
+import { useTranslate } from '../../lib/i18n';
 import type { SerializedContestStatusDoc, SerializedTdoc } from '../../sections/types';
 import styles from './ContestTimer.module.css';
 
-export type ContestTimerProps = {
+export interface ContestTimerProps {
   tdoc: SerializedTdoc;
   tsdoc: SerializedContestStatusDoc | null;
-};
+}
 
 function toMs(iso?: string): number | undefined {
   if (!iso) return undefined;

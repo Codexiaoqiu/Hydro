@@ -1,7 +1,7 @@
 /* @vitest-environment happy-dom */
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, renderHook } from '@testing-library/react';
-import { computeTimerState, useContestTimer, type TimerOptions } from './contest-timer';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { computeTimerState, type TimerOptions, useContestTimer } from './contest-timer';
 
 const BEGIN = 1_700_000_000_000; // 2023-11-14T22:13:20Z
 const END = BEGIN + 5 * 3600_000; // +5h

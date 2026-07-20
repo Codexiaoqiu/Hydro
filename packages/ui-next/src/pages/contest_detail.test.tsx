@@ -1,6 +1,7 @@
 /* @vitest-environment happy-dom */
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import { describe, expect, it, vi } from 'vitest';
+import ContestDetailPage from './contest_detail';
 
 vi.mock('@monaco-editor/react', () => ({
   Editor: () => null,
@@ -66,8 +67,6 @@ function buildPageData(args: any = {}) {
     args: { UserContext: userCtx, UiContext: {}, ...rest },
   } as any;
 }
-
-import ContestDetailPage from './contest_detail';
 
 describe('contest_detail page', () => {
   it('renders loading state when args is undefined', () => {

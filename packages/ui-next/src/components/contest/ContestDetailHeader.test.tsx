@@ -1,9 +1,9 @@
 /* @vitest-environment happy-dom */
-import { describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
 import { ContestDetailHeader } from './ContestDetailHeader';
 
-describe('ContestDetailHeader', () => {
+describe('contestDetailHeader', () => {
   it('renders title in h1', () => {
     render(<ContestDetailHeader title="Hello Contest" rule="acm" status="upcoming" attended={false} durationText="5.0" />);
     expect(screen.getByRole('heading', { level: 1, name: 'Hello Contest' })).toBeInTheDocument();
