@@ -1,9 +1,9 @@
 .wrap {
-  position: fixed;
-  top: 0;
+  position: sticky;
+  top: 68px;
   left: 0;
   right: 0;
-  z-index: 50;
+  z-index: 40;
   background: var(--bg-2);
   border-bottom: 1px solid var(--bg-1);
   padding: var(--space-2) var(--space-4);
