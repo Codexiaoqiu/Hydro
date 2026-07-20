@@ -78,3 +78,6 @@ export interface SectionProps {
   udict: Record<number, SerializedUser>; // owner / contributor lookup table
   domain: SerializedDomain; // { bulletin, avatar, host, _id }
 }
+
+/** Owner / contributor lookup keyed by user _id (number). */
+export type SerializedUserDict = Record<number, SerializedUser>;
