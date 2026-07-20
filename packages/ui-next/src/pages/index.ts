@@ -3,7 +3,10 @@ import '../sections';
 import { registerPage } from '../registry/page';
 
 registerPage('homepage', () => import('./homepage'));
+registerPage('contest_detail', () => import('./contest_detail'));
 registerPage('contest_main', () => import('./contest_main'));
+registerPage('contest_create', () => import('./contest_create'));
+registerPage('contest_edit', () => import('./contest_edit'));
 registerPage('problem_main', () => import('./problem_main'));
 registerPage('user_login', () => import('./user_login'), { layout: 'auth' });
 registerPage('user_register', () => import('./user_register'), { layout: 'auth' });
