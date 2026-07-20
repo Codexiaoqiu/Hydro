@@ -1,9 +1,9 @@
 /* @vitest-environment happy-dom */
 import { render, screen } from '@testing-library/react';
-import { describe, expect, test, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+import { ToastProvider } from '../components/primitives';
 import { type PageData, PageDataProvider } from '../context/page-data';
 import { RouterProvider } from '../context/router';
-import { ToastProvider } from '../components/primitives';
 import ProblemFilesPage from './problem_files';
 
 vi.mock('../hooks/use-api', () => ({
@@ -19,7 +19,7 @@ function buildPageData(args: PageData['args']): PageData {
 }
 
 describe('problem_files page', () => {
-  test('renders upload widget for a freshly created problem (no files yet)', () => {
+  it('renders upload widget for a freshly created problem (no files yet)', () => {
     render(
       <PageDataProvider initial={buildPageData({
         pdoc: { docId: 1, pid: 'P1000', title: 'Sum' },
@@ -38,7 +38,7 @@ describe('problem_files page', () => {
     expect(screen.getByRole('link', { name: /完成|Done/i })).toBeInTheDocument();
   });
 
-  test('renders existing files list', () => {
+  it('renders existing files list', () => {
     render(
       <PageDataProvider initial={buildPageData({
         pdoc: {
@@ -63,7 +63,7 @@ describe('problem_files page', () => {
     expect(screen.getByText('sample.out')).toBeInTheDocument();
   });
 
-  test('shows error when pdoc is missing', () => {
+  it('shows error when pdoc is missing', () => {
     render(
       <PageDataProvider initial={buildPageData({ UserContext: { _id: 1 } })}>
         <RouterProvider>
@@ -76,7 +76,7 @@ describe('problem_files page', () => {
     expect(screen.getByRole('alert')).toBeInTheDocument();
   });
 
-  test('disables upload for cross-domain references', () => {
+  it('disables upload for cross-domain references', () => {
     render(
       <PageDataProvider initial={buildPageData({
         pdoc: {

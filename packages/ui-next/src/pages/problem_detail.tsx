@@ -7,14 +7,14 @@ import { TagCloud } from '../components/primitives/TagCloud';
 import { ProblemHero } from '../components/problem/ProblemHero';
 import { Author } from '../components/sidebar/Author';
 import { type ContestItem, ContestList } from '../components/sidebar/ContestList';
-import { Menu, type MenuItem } from '../components/sidebar/Menu';
+import { getTidQuery, ProblemSidebar, type ProblemSidebarContext } from '../components/sidebar/ProblemSidebar';
 import { SideCard } from '../components/sidebar/SideCard';
 import { usePageData, useSetUiContext } from '../context/page-data';
 import { useBuildUrl } from '../hooks/use-build-url';
 import { useTranslate } from '../lib/i18n';
 import {
-  canEditProblem, canRejudgeProblem, canSubmitProblem, canViewAcceptedSolution,
-  canViewDiscussion, canViewProblemSolution, isLoggedIn,
+  canSubmitProblem,
+  isLoggedIn,
 } from '../lib/perms';
 import styles from './problem_detail.module.css';
 
@@ -218,248 +218,6 @@ export function readContentText(content: Pdoc['content'] | undefined, preferredL
   return pickFromMap(map);
 }
 
-interface SidebarCtx {
-  pdoc: Pdoc;
-  tdoc?: Tdoc;
-  UserContext?: Args['UserContext'];
-  buildUrl: ReturnType<typeof useBuildUrl>;
-  discussionCount: number;
-  solutionCount: number;
-  psdoc?: Psdoc;
-}
-
-function getTidQuery(tdoc?: Tdoc): Record<string, string> {
-  return tdoc && tdoc.docId != null ? { tid: String(tdoc.docId) } : {};
-}
-
-function getNormalMenu(ctx: SidebarCtx, t: (k: string, a?: Record<string, unknown>) => string): MenuItem[] {
-  const {
-    pdoc, tdoc, UserContext, buildUrl, discussionCount, solutionCount, psdoc,
-  } = ctx;
-
-  const items: MenuItem[] = [];
-  const loggedIn = isLoggedIn(UserContext);
-  const canSubmit = canSubmitProblem(UserContext);
-  const canRejudge = canRejudgeProblem(UserContext);
-  const canViewDisc = canViewDiscussion(UserContext);
-  const psdocAccepted = psdoc?.status === STATUS.STATUS_ACCEPTED;
-  const canViewSolution =
-    canViewProblemSolution(UserContext)
-    || (canViewAcceptedSolution(UserContext) && psdocAccepted);
-  const editable = canEditProblem(UserContext, pdoc as unknown as { owner?: number });
-  const showRejudge = canRejudge && !pdoc.reference;
-
-  if (canSubmit) {
-    items.push({
-      key: 'submit',
-      title: t('Problem.Submit'),
-      href: buildUrl('problem_submit', { pid: String(pdoc.docId) }, getTidQuery(tdoc)),
-    });
-  } else if (loggedIn) {
-    items.push({
-      key: 'submit',
-      title: t('Problem.NoPermissionToSubmit'),
-      href: '#',
-      onClick: () => { /* TODO: show permission hint */ },
-    });
-  } else {
-    items.push({
-      key: 'submit',
-      title: t('Problem.LoginToSubmit'),
-      href: '#',
-      onClick: () => { /* TODO: open sign-in dialog */ },
-    });
-  }
-
-  if (showRejudge) {
-    items.push({
-      key: 'rejudge',
-      title: t('Problem.Rejudge'),
-      form: true,
-      action: '',
-      postBody: { operation: 'rejudge' },
-    });
-  }
-
-  if (canViewDisc || canViewSolution) {
-    items.push({ key: 'sep-1', separator: true });
-  }
-  if (canViewDisc) {
-    items.push({
-      key: 'discussions',
-      title: `${t('Problem.Discussions')} (${discussionCount})`,
-      href: buildUrl('discussion_node', { type: 'problem', name: String(pdoc.docId) }, getTidQuery(tdoc)),
-    });
-  }
-  if (canViewSolution) {
-    items.push({
-      key: 'solutions',
-      title: `${t('Problem.Solutions')} (${solutionCount})`,
-      href: buildUrl('problem_solution', { pid: String(pdoc.docId) }, getTidQuery(tdoc)),
-    });
-  }
-  items.push({
-    key: 'files',
-    title: t('Problem.Files'),
-    href: buildUrl('problem_files', { pid: String(pdoc.docId) }, getTidQuery(tdoc)),
-  });
-  items.push({
-    key: 'statistics',
-    title: t('Problem.Statistics'),
-    href: buildUrl('problem_statistics', { pid: String(pdoc.docId) }, getTidQuery(tdoc)),
-  });
-
-  if (editable) {
-    items.push({ key: 'sep-2', separator: true });
-    items.push({
-      key: 'edit',
-      title: t('Problem.Edit'),
-      href: buildUrl('problem_edit', { pid: String(pdoc.docId) }, getTidQuery(tdoc)),
-    });
-    if (!pdoc.reference) {
-      items.push({
-        key: 'judge-config',
-        title: t('Problem.JudgeConfig'),
-        href: buildUrl('problem_config', { pid: String(pdoc.docId) }, getTidQuery(tdoc)),
-      });
-    }
-  }
-
-  void pdoc;
-  return items;
-}
-
-function getContestMenu(ctx: SidebarCtx, mode: Mode, t: (k: string, a?: Record<string, unknown>) => string): MenuItem[] {
-  const { pdoc, tdoc, UserContext, buildUrl } = ctx;
-  if (!tdoc) return getNormalMenu(ctx, t);
-  const items: MenuItem[] = [];
-
-  if (mode === 'view' || mode === 'correction') {
-    items.push({
-      key: 'open-in-problem-set',
-      title: t('Problem.OpenInProblemSet'),
-      href: buildUrl('problem_detail', { pid: String(pdoc.docId) }),
-    });
-  } else {
-    items.push({
-      key: 'view-problem',
-      title: t('Problem.ViewProblem'),
-      href: buildUrl('problem_detail', { pid: String(pdoc.docId) }, getTidQuery(tdoc)),
-    });
-  }
-
-  if (mode === 'contest' || (mode !== 'view' && mode !== 'correction')) {
-    const loggedIn = isLoggedIn(UserContext);
-    const canSubmit = canSubmitProblem(UserContext);
-    if (canSubmit) {
-      items.push({
-        key: 'submit',
-        title: t('Problem.Submit'),
-        href: buildUrl('problem_submit', { pid: String(pdoc.docId) }, getTidQuery(tdoc)),
-      });
-    } else if (loggedIn) {
-      items.push({
-        key: 'submit',
-        title: t('Problem.NoPermissionToSubmit'),
-        href: '#',
-        onClick: () => { /* TODO */ },
-      });
-    } else {
-      items.push({
-        key: 'submit',
-        title: t('Problem.LoginToSubmit'),
-        href: '#',
-        onClick: () => { /* TODO */ },
-      });
-    }
-  }
-
-  const editable = canEditProblem(UserContext, pdoc as unknown as { owner?: number });
-  if (editable) {
-    items.push({ key: 'sep-1', separator: true });
-    items.push({
-      key: 'edit',
-      title: t('Problem.Edit'),
-      href: buildUrl('problem_edit', { pid: String(pdoc.docId) }),
-    });
-    items.push({
-      key: 'files',
-      title: t('Problem.Files'),
-      href: buildUrl('problem_files', { pid: String(pdoc.docId) }),
-    });
-  }
-
-  return items;
-}
-
-function getHomeworkMenu(ctx: SidebarCtx, mode: Mode, t: (k: string, a?: Record<string, unknown>) => string): MenuItem[] {
-  const { pdoc, tdoc, UserContext, buildUrl } = ctx;
-  if (!tdoc) return getNormalMenu(ctx, t);
-  const items: MenuItem[] = [];
-
-  const showSubmitArea = mode === 'contest' || mode === 'correction' || mode === 'normal';
-
-  if (showSubmitArea) {
-    items.push({
-      key: 'view-problem',
-      title: t('Problem.ViewProblem'),
-      href: buildUrl('problem_detail', { pid: String(pdoc.docId) }, getTidQuery(tdoc)),
-    });
-    const loggedIn = isLoggedIn(UserContext);
-    const canSubmit = canSubmitProblem(UserContext);
-    if (canSubmit) {
-      items.push({
-        key: 'submit',
-        title: t('Problem.Submit'),
-        href: buildUrl('problem_submit', { pid: String(pdoc.docId) }, getTidQuery(tdoc)),
-      });
-    } else if (loggedIn) {
-      items.push({
-        key: 'submit',
-        title: t('Problem.NoPermissionToSubmit'),
-        href: '#',
-        onClick: () => { /* TODO */ },
-      });
-    } else {
-      items.push({
-        key: 'submit',
-        title: t('Problem.LoginToSubmit'),
-        href: '#',
-        onClick: () => { /* TODO */ },
-      });
-    }
-  } else {
-    items.push({
-      key: 'open-in-problem-set',
-      title: t('Problem.OpenInProblemSet'),
-      href: buildUrl('problem_detail', { pid: String(pdoc.docId) }),
-    });
-  }
-
-  const editable = canEditProblem(UserContext, pdoc as unknown as { owner?: number });
-  if (editable) {
-    items.push({ key: 'sep-1', separator: true });
-    items.push({
-      key: 'edit',
-      title: t('Problem.Edit'),
-      href: buildUrl('problem_edit', { pid: String(pdoc.docId) }),
-    });
-    items.push({
-      key: 'files',
-      title: t('Problem.Files'),
-      href: buildUrl('problem_files', { pid: String(pdoc.docId) }),
-    });
-  }
-
-  return items;
-}
-
-function pickSidebarItems(ctx: SidebarCtx, mode: Mode, t: (k: string, a?: Record<string, unknown>) => string): MenuItem[] {
-  if (!ctx.tdoc) return getNormalMenu(ctx, t);
-  if (ctx.tdoc.rule === 'homework') return getHomeworkMenu(ctx, mode, t);
-  return getContestMenu(ctx, mode, t);
-}
-
 // ===== Page ================================================================
 export default function ProblemDetailPage() {
   const { args } = usePageData() as unknown as { args: Args };
@@ -553,13 +311,9 @@ export default function ProblemDetailPage() {
   }, [pdoc, tdoc]);
 
   const canStar = !tdoc && isLoggedIn(UserContext);
-  const sidebarItems = pickSidebarItems(
-    {
-      pdoc, tdoc, UserContext, buildUrl, discussionCount, solutionCount, psdoc,
-    } as SidebarCtx,
-    mode,
-    t,
-  );
+  const sidebarContext = {
+    pdoc, tdoc, UserContext, buildUrl, discussionCount, solutionCount, psdoc,
+  } as ProblemSidebarContext;
 
   const contestItems: ContestItem[] = useMemo(() => [
     ...ctdocs.map((c) => ({ title: c.title, emoji: '🏆', date: '' })),
@@ -626,7 +380,7 @@ export default function ProblemDetailPage() {
                   <button type="button" className={styles.ctaBlockBtn} disabled>{t('Problem.Submit')}</button>
                 </div>
               )}
-              <Menu items={sidebarItems} />
+              <ProblemSidebar context={sidebarContext} mode={mode} />
             </div>
 
             {owner_udoc && (
@@ -729,7 +483,7 @@ export default function ProblemDetailPage() {
 
         <aside className={styles.sidebar}>
           <div className={styles.sidebarCard}>
-            <Menu items={sidebarItems} />
+            <ProblemSidebar context={sidebarContext} mode={mode} />
           </div>
           {(tdocs.length > 0 || ctdocs.length > 0 || htdocs.length > 0) && (
             <RelatedCard tdocs={tdocs} ctdocs={ctdocs} htdocs={htdocs} />

@@ -1,4 +1,4 @@
-# ui-default → ui-next 迁移指南
+# ui-default → ui-next 迁移指南  注意:这是一份参考流程 不是必须完全按照说明执行
 
 > 这份文档总结了从 ui-default（Webpack + Nunjucks + jQuery）迁移到 ui-next（Vite + React 19 + slot 系统）时**必须指定**的内容。每条都是踩过的坑、产线事故或重复工作。
 
@@ -119,29 +119,6 @@ useEffect(() => {
 | 文件上传 | `<ProblemAdditionalFiles pid files onChange />` |
 | Markdown 渲染（含 katex / gfm / 高亮 / 样例对） | `<Article content={...} />` 或 `<MarkdownPreview source=... />` |
 
-### 3.4 CSS Grid 滚动陷阱（**最容易翻车**）
-
-```css
-/* ❌ 不工作 — 滚动条不出现 */
-.root { display: grid; height: 360px; overflow: hidden; }
-.cell { /* 缺 min-height */ }
-.preview { height: 100%; overflow: auto; }  /* ← 永远滚不动 */
-
-/* ✅ 正确 — 三个 min-height: 0 + height: 100% + overflow: hidden 串起来 */
-.root { display: grid; height: 360px; overflow: hidden; }
-.cell { min-width: 0; min-height: 0; height: 100%; overflow: hidden; }
-.preview { height: 100%; min-height: 0; overflow: auto; }
-```
-
-**根因**：CSS Grid item 默认 `min-height: auto`，会撑到内容高度，外层 `overflow: hidden` 把内容裁掉，内层 `overflow: auto` 没机会触发。
-
-### 3.5 响应式
-
-```css
-@media (max-width: 768px) {
-  .root { grid-template-columns: 1fr; }  /* 双栏 → 单栏堆叠 */
-}
-```
 
 ---
 

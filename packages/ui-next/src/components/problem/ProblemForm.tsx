@@ -5,7 +5,7 @@ import { HydroClientError, request } from '../../hooks/use-api';
 import { useBuildUrl } from '../../hooks/use-build-url';
 import { useTranslate } from '../../lib/i18n';
 import { Alert, Button, Checkbox, ConfirmDialog, Input, LangTabs, MarkdownEditor, RateLimitAlert, useToast } from '../primitives';
-import { PolyhedronHint } from './PolyhedronHint';
+// import { PolyhedronHint } from './PolyhedronHint';
 import { type ProblemAdditionalFile, ProblemAdditionalFiles } from './ProblemAdditionalFiles';
 import styles from './ProblemForm.module.css';
 
@@ -261,7 +261,7 @@ export function ProblemForm({
 
   return (
     <>
-      {pageName === 'problem_edit' && <PolyhedronHint />}
+      {/* {pageName === 'problem_edit' && <PolyhedronHint />} */}
       <form className={styles.form} method="POST" onSubmit={submit}>
         <div className={styles.fields}>
           <h1 className={styles.pageTitle}>

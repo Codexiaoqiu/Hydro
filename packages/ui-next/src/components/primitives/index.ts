@@ -14,10 +14,18 @@ export { Eyebrow } from './Eyebrow';
 export { Input } from './Input';
 export type { InputProps, InputType } from './Input';
 export { LangTabs } from './LangTabs';
+export { LanguageSelectAutoComplete } from './LanguageSelectAutoComplete';
+export type {
+  LanguageOption, LanguageSelectAutoCompleteProps,
+} from './LanguageSelectAutoComplete';
 export { Loading } from './Loading';
 export type { LoadingProps, LoadingSize } from './Loading';
 export { MarkdownEditor } from './MarkdownEditor';
 export type { MarkdownEditorProps } from './MarkdownEditor';
+export { ProblemSelectAutoComplete } from './ProblemSelectAutoComplete';
+export type {
+  ProblemOption, ProblemSelectAutoCompleteProps,
+} from './ProblemSelectAutoComplete';
 export { Select } from './Select';
 export { Switch } from './Switch';
 export type { SwitchProps } from './Switch';

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from '../components/link';
-import { ProblemAdditionalFiles, type ProblemAdditionalFile } from '../components/problem/ProblemAdditionalFiles';
 import { Alert, Button, Card } from '../components/primitives';
+import { type ProblemAdditionalFile, ProblemAdditionalFiles } from '../components/problem/ProblemAdditionalFiles';
 import { usePageData } from '../context/page-data';
 import { useTranslate } from '../lib/i18n';
 

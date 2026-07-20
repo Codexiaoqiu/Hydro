@@ -24,6 +24,7 @@ import * as oplog from '../model/oplog';
 import problem from '../model/problem';
 import record from '../model/record';
 import ScheduleModel from '../model/schedule';
+import * as SettingModel from '../model/setting';
 import storage from '../model/storage';
 import user from '../model/user';
 import {
@@ -396,6 +397,36 @@ export class ContestEditHandler extends Handler {
             page_name: tid ? 'contest_edit' : 'contest_create',
             files: tid ? this.tdoc.files : [],
             urlForFile: (filename: string) => this.url('contest_file_download', { tid, filename, type: 'public' }),
+            domainId,
+            // Inject the available language list so the ui-next ContestForm can
+            // render a LanguageSelectAutoComplete without re-fetching domain
+            // info. Mirrors `getAvailableLangs` in
+            // `packages/ui-default/utils/index.ts` so the picker shows the same
+            // options as ui-default:
+            //   * drop sub-language prefixes (e.g. `cc` is hidden when `cc.cc17`
+            //     exists, since the parent entry only carries default options);
+            //   * if `domain.langs` is set, only keep languages explicitly
+            //     listed there;
+            //   * skip hidden languages unless they are explicitly listed;
+            //   * skip disabled languages.
+            languages: (() => {
+                const all = SettingModel.langs as Record<string, { display?: string, hidden?: boolean, disabled?: boolean }>;
+                const prefixes = new Set(
+                    Object.keys(all).filter((k) => k.includes('.')).map((k) => k.split('.')[0]),
+                );
+                const domainLangs = this.domain?.langs
+                    ? String(this.domain.langs).split(',').map((i) => i.trim()).filter(Boolean)
+                    : undefined;
+                return Object.entries(all)
+                    .filter(([key, meta]) => {
+                        if (prefixes.has(key)) return false;
+                        if (domainLangs && !domainLangs.includes(key)) return false;
+                        if (meta?.hidden && !domainLangs?.includes(key)) return false;
+                        if (meta?.disabled) return false;
+                        return true;
+                    })
+                    .map(([value, meta]) => ({ value, label: meta?.display || value }));
+            })(),
         };
     }
 

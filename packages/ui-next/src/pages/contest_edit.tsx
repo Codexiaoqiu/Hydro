@@ -1,4 +1,5 @@
 import { ContestForm } from '../components/contest/ContestForm';
+import type { LanguageOption } from '../components/primitives';
 import { usePageData } from '../context/page-data';
 
 interface Args {
@@ -21,6 +22,9 @@ interface Args {
   };
   tid?: string;
   UserContext?: Record<string, unknown>;
+  /** Available languages injected by `ContestEditHandler.get`. */
+  languages?: LanguageOption[];
+  domainId?: string;
 }
 
 export default function ContestEditPage() {
@@ -31,6 +35,8 @@ export default function ContestEditPage() {
       tdoc={args?.tdoc}
       tid={args?.tid ?? args?.tdoc?.docId}
       UserContext={args?.UserContext}
+      languages={args?.languages}
+      domainId={args?.domainId}
     />
   );
 }

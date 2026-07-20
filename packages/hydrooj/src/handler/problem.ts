@@ -474,6 +474,7 @@ export class ProblemSubmitHandler extends ProblemDetailHandler {
             ? Object.fromEntries(this.pdoc.config.langs.map((i) => [i, setting.langs[i]?.display || i]))
             : setting.SETTINGS_BY_KEY.codeLang.range;
         this.response.body.langRange = langRange;
+        this.response.body.langs = setting.langs;
         this.response.body.page_name = this.tdoc
             ? this.tdoc.rule === 'homework'
                 ? 'homework_detail_problem_submit'

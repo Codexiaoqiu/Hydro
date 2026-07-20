@@ -62,6 +62,33 @@ describe('App', () => {
         await agent.get('/api/user?args={"id":2}&projection=uname').expect({ uname: 'root' });
     });
 
+    it('ProblemSubmitHandler.get exposes language metadata for ui-next', async () => {
+        const {
+            ProblemModel, SettingModel, UserModel,
+        } = require('hydrooj');
+        await UserModel.setSuperAdmin(2);
+        await ProblemModel.add(
+            'system',
+            'P1000',
+            'A+B Problem',
+            JSON.stringify({ en: 'A+B', zh: 'A+B' }),
+            2,
+            [],
+        );
+
+        const res = await agent.get('/p/P1000/submit')
+            .set('accept', 'application/json')
+            .expect(200);
+        const body = typeof res.body === 'object' && res.body !== null
+            ? res.body
+            : JSON.parse(res.text);
+        assert(body.langRange && typeof body.langRange === 'object');
+        assert(body.langs && typeof body.langs === 'object', 'problem_submit response is missing langs');
+        assert.strictEqual(body.langs.cc?.display, SettingModel.langs.cc.display);
+        assert.strictEqual(body.langs.cc?.pretest, SettingModel.langs.cc.pretest);
+        assert.strictEqual(body.langs['cc.cc17']?.display, SettingModel.langs['cc.cc17'].display);
+    });
+
     // TODO add more tests
 
     const results: Record<string, autocannon.Result> = {};
