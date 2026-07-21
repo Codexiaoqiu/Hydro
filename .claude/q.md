@@ -1,25 +1,44 @@
-installHook.js:1 TypeError: statementLangs.map is not a function
-    at ProblemForm (ProblemForm.tsx:286:39)
-
-
-The above error occurred in the <ProblemForm> component.
-
-React will try to recreate this component tree from scratch using the error boundary you provided, SlotErrorBoundary.
-installHook.js:1 [Hydro] SlotErrorBoundary(page:problem_edit/renderer) TypeError: statementLangs.map is not a function
-    at ProblemForm (ProblemForm.tsx:286:39)
- 
-    at ProblemForm (http://localhost:8000/src/components/problem/ProblemForm.tsx:24:31)
-    at ProblemEditPage (http://localhost:8000/src/pages/problem_edit.tsx:9:19)
-    at Suspense (<anonymous>)
-    at http://localhost:8000/src/components/layout.tsx:10:48
-    at ToastProvider (http://localhost:8000/src/components/primitives/Toast.tsx:8:33)
-    at Suspense (<anonymous>)
-    at SlotErrorBoundary (http://localhost:8000/src/registry/error-boundary.tsx:4:8)
-    at http://localhost:8000/src/app.tsx:14:35
-    at SlotErrorBoundary (http://localhost:8000/src/registry/error-boundary.tsx:4:8)
-    at SlotErrorBoundary (http://localhost:8000/src/registry/error-boundary.tsx:4:8)
-    at SlotComponent (http://localhost:8000/src/registry/slot.tsx:45:19)
-    at RouterProvider (http://localhost:8000/src/context/router.tsx:30:34)
-    at PageDataProvider (http://localhost:8000/src/context/page-data.tsx:10:36)
-    at SignInDialogProvider (http://localhost:8000/src/hooks/use-sign-in-dialog.ts:25:40)
-    at ThemeProvider (http://localhost:8000/src/theme/ThemeProvider.tsx:21:33)
+{
+    "_id": 2,
+    "mail": "q2695698921@2625.com",
+    "uname": "小邱",
+    "hashType": "hydro",
+    "priv": -1,
+    "regat": "2025-11-13T03:11:54.271Z",
+    "loginat": "2026-07-17T07:03:48.642Z",
+    "perm": "BigInt::-1",
+    "role": "root",
+    "scope": "BigInt::-1",
+    "tfa": false,
+    "authn": false,
+    "group": [
+        "2"
+    ],
+    "domains": [],
+    "viewLang": "zh",
+    "timeZone": "Asia/Shanghai",
+    "codeLang": "bash",
+    "codeTemplate": "",
+    "avatar": "gravatar:q2695698921@2625.com",
+    "gender": 2,
+    "backgroundImage": "/components/profile/backgrounds/1.jpg",
+    "unreadMsg": 0,
+    "pinnedDomains": [],
+    "rounded": false,
+    "skipAnimate": false,
+    "showTimeAgo": true,
+    "fontFamily": "Open Sans",
+    "codeFontFamily": "Source Code Pro",
+    "theme": "light",
+    "preferredEditorType": "sv",
+    "showInvisibleChar": false,
+    "formatCode": true,
+    "rpInfo": {},
+    "nAccept": 3,
+    "nSubmit": 3,
+    "nLiked": 0,
+    "rp": 0,
+    "level": 0,
+    "join": true,
+    "avatarUrl": "//cn.gravatar.com/avatar/af38a767f69d23ba16e525bb1e56a3e7?d=mm&s=128"
+}

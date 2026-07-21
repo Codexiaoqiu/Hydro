@@ -6,7 +6,8 @@ import { ContestDetailSidebar } from '../components/contest/ContestDetailSidebar
 import { isDone, isOngoing, renderDuration } from '../lib/contest-status';
 import { useTranslate } from '../lib/i18n';
 import { usePageData } from '../context/page-data';
-import { Link, useBuildUrl } from '../components/link';
+import { Link } from '../components/link';
+import { useBuildUrl } from '../hooks/use-build-url';
 import type { SerializedContestStatusDoc, SerializedTdoc, SerializedUserDict } from '../sections/types';
 import styles from './contest_problemlist.module.css';
 
@@ -113,13 +114,13 @@ export default function ContestProblemListPage({ _pageData }: ContestProblemList
                   const statusLabel = statusNum != null
                     ? STATUS_SHORT_TEXTS[statusNum] ?? `status:${statusNum}`
                     : '—';
-                  const submitHref = buildUrl('problem_submit', { pid: pdoc?.docId ?? pid });
+                  const submitHref = buildUrl('problem_submit', { pid: String(pdoc?.docId ?? pid) });
                   return (
                     <tr key={pid}>
                       <td>{String.fromCharCode(65 + idx)}</td>
                       <td className={styles.titleCell}>
                         {pdoc
-                          ? <Link to="problem_detail" params={{ pid: pdoc.docId }}>{pdoc.title}</Link>
+                          ? <Link to="problem_detail" params={{ pid: String(pdoc.docId) }}>{pdoc.title}</Link>
                           : `Problem #${pid}`}
                       </td>
                       {showScore && (
@@ -131,9 +132,15 @@ export default function ContestProblemListPage({ _pageData }: ContestProblemList
                         </td>
                       )}
                       <td>
-                        <Link to="problem_submit" params={{ pid: pdoc?.docId ?? pid }} searchParams={{ tid: tdoc.docId }}>
-                          {t('ContestProblemList.HeaderSubmit')}
-                        </Link>
+                        {status === 'ongoing' && tsdoc?.attend === 1 ? (
+                          <Link to="problem_submit" params={{ pid: String(pdoc?.docId ?? pid) }} searchParams={{ tid: tdoc.docId }}>
+                            {t('ContestProblemList.HeaderSubmit')}
+                          </Link>
+                        ) : (
+                          <span className={styles.submitDisabled}>
+                            {t('ContestProblemList.SubmitDisabled')}
+                          </span>
+                        )}
                       </td>
                     </tr>
                   );
