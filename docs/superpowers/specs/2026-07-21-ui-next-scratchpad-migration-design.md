@@ -10,7 +10,7 @@
 
 - 左侧：题目内容（DOM 直接迁移到 React 子树）；
 - 右侧：垂直分布的工具栏 + Monaco 编辑器 + 可选的预测试面板 + 可选的提交记录面板；
-- 全局快捷键：`Alt+E` 进入、`Alt+Q` 退出、`F9` 跑预测试、`F10` 提交、`Alt+P` 切换预测试面板、`Alt+R` 切换记录面板；
+- 全局快捷键：`Alt+Q` 退出、`F9` 跑预测试、`F10` 提交、`Alt+P` 切换预测试面板、`Alt+R` 切换记录面板；进入模式无快捷键，仅通过侧边栏菜单点击；
 - 后端契约：`POST <postSubmitUrl>` 携带 `pretest:true` 与 `input:[...]` 触发预测试；`GET /record-conn?pretest=1&...` WebSocket 流式返回预测试输出；`GET <getSubmissionsUrl>` 拉取最近提交。
 
 `ui-next` 当前只实现了一个 placeholder Card（`components/problem/Scratchpad.tsx`），文案"Scratchpad 正在准备中"，侧边栏没有"进入在线编程模式"入口，编辑器内核也只是 textarea 回退。
@@ -58,7 +58,7 @@ problem_detail.tsx (已有)
 - 行为：
   - 挂载时建立 `ScratchpadContext.Provider`，初始化 `useScratchpadState`
   - 通过 CSS Grid 划分左右两栏（`grid-template-columns: minmax(320px, 1fr) minmax(420px, 1.2fr)`）
-  - 监听键盘 `Alt+Q` → 调用 `onExit()`
+  - 监听键盘 `Alt+Q` → 如果 `confirm("未提交代码将被丢弃")` 通过则调用 `onExit()`
   - 卸载时关闭 WebSocket、清理 IndexedDB 写入定时器
 
 ### 5.2 ScratchpadProblemPane
@@ -72,7 +72,7 @@ problem_detail.tsx (已有)
 ### 5.4 ScratchpadToolbar
 - 按钮：Run Pretest (F9)、Submit (F10)、Exit (Alt+Q)、语言下拉、Toggle Pretest (Alt+P)、Toggle Records (Alt+R)
 - 语言下拉复用 `ProblemLanguageSelect` 组件
-- 提交流程：调用共享 `postSubmit({lang, code})`，返回 `{rid, url}` 后 `window.location.href = url`
+- 提交流程：调用 `POST <postSubmitUrl>` body `{ lang, code }`，返回 `{ rid, url }` 后 `window.location.href = url`
 
 ### 5.5 PretestPanel
 - 订阅 `usePretestSession` 的 WebSocket 状态
@@ -133,7 +133,7 @@ interface ScratchpadState {
 - 浏览器后退 = 退出
 
 ### 7.2 后端契约（沿用）
-- 预测试：`POST <postSubmitUrl>` body `{ lang, code, input:[input], pretest: true }` → `{ rid }`
+- 预测试：`POST <postSubmitUrl>` body `{ lang, code, input:[input], pretest:true }` → `{ rid }`
 - 预测试输出：WebSocket `/record-conn?pretest=1&uidOrName=<uid>&pid=<pid>[&tid=<tid>]`，消息 `{type, payload}` 流式推送
 - 提交：`POST <postSubmitUrl>` body `{ lang, code }` → `{ rid, url }`，前端跳转 `url`
 - 记录：`GET <getSubmissionsUrl>` → 最近 5 条 `{ _id, status, lang, time }`
