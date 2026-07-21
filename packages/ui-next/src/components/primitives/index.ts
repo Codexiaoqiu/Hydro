@@ -34,3 +34,5 @@ export type { SwitchProps } from './Switch';
 export { TagCloud } from './TagCloud';
 export { ToastProvider, useToast } from './Toast';
 export type { ToastVariant } from './Toast';
+export { UserSelectAutoComplete } from './UserSelectAutoComplete';
+export type { UserSummary } from './UserSelectAutoComplete';
