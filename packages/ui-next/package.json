@@ -55,6 +55,7 @@
     "@vitejs/plugin-react": "^6.0.3",
     "@vitest/ui": "^4.1.10",
     "happy-dom": "^20.10.6",
+    "idb-keyval": "^6.3.0",
     "koa2-connect": "^1.0.2",
     "vite": "^8.1.0",
     "vitest": "^4.1.10"
