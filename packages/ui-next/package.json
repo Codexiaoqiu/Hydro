@@ -30,8 +30,11 @@
   },
   "dependencies": {
     "@monaco-editor/react": "^4.6.0",
+    "ajv": "^8.20.0",
+    "ajv-formats": "^3.0.1",
     "esbuild": "0.25.2",
     "is-relative-url": "^4.1.0",
+    "js-yaml": "^4.3.0",
     "marked": "^14.0.0",
     "monaco-editor": "^0.52.0",
     "path-to-regexp": "^8.4.2",
