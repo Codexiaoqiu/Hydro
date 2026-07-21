@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useTranslate } from '../../lib/i18n';
+import { Select } from '../primitives/Select';
 import {
   buildMainLangsAndPreferences,
   getAvailableLangsForProblem,
@@ -36,6 +37,15 @@ export default function ProblemLanguageSelect({
   const subLangs = getSubLangs(available, main);
   const fullKey = sub ? `${main}.${sub}` : main;
 
+  const mainOptions = useMemo(
+    () => Object.entries(mainLangs).map(([value, label]) => ({ value, label })),
+    [mainLangs],
+  );
+  const subOptions = useMemo(
+    () => Object.entries(subLangs).map(([value, label]) => ({ value, label })),
+    [subLangs],
+  );
+
   const changeMain = (nextMain: string) => {
     const nextSubs = getSubLangs(available, nextMain);
     setMain(nextMain);
@@ -46,20 +56,22 @@ export default function ProblemLanguageSelect({
     <div>
       <label>
         <span>{t('ProblemSubmit.Language')}</span>
-        <select value={main} onChange={(event) => changeMain(event.currentTarget.value)}>
-          {Object.entries(mainLangs).map(([value, label]) => (
-            <option key={value} value={value}>{label}</option>
-          ))}
-        </select>
+        <Select
+          value={main}
+          options={mainOptions}
+          onChange={changeMain}
+          ariaLabel={t('ProblemSubmit.Language')}
+        />
       </label>
-      {Object.keys(subLangs).length > 0 && (
+      {subOptions.length > 0 && (
         <label>
           <span>{t('ProblemSubmit.LanguageVersion')}</span>
-          <select value={sub} onChange={(event) => setSub(event.currentTarget.value)}>
-            {Object.entries(subLangs).map(([value, label]) => (
-              <option key={value} value={value}>{label}</option>
-            ))}
-          </select>
+          <Select
+            value={sub}
+            options={subOptions}
+            onChange={setSub}
+            ariaLabel={t('ProblemSubmit.LanguageVersion')}
+          />
         </label>
       )}
       <input type="hidden" name={name} value={fullKey} />

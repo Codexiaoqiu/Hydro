@@ -1,5 +1,6 @@
 /* @vitest-environment happy-dom */
-import { fireEvent, render, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import ProblemLanguageSelect from './ProblemLanguageSelect';
 
@@ -20,25 +21,29 @@ describe('problemLanguageSelect', () => {
     expect(document.querySelector<HTMLInputElement>('input[name="lang"]')?.value).toBe('cc.cc17o2');
   });
 
-  it('updates the hidden field when the main language changes', () => {
+  it('updates the hidden field when the main language changes', async () => {
+    const user = userEvent.setup();
     render(<ProblemLanguageSelect
       langRange={{ 'cc.cc17': 'C++17', 'cc.cc17o2': 'C++17 (O2)', py: 'Python' }}
       langs={langs}
       codeLang="py"
     />);
-    const mainSelect = screen.getAllByRole('combobox')[0];
-    fireEvent.change(mainSelect, { target: { value: 'cc' } });
+    const trigger = screen.getAllByRole('button')[0];
+    await user.click(trigger);
+    await user.click(screen.getByRole('option', { name: 'C++' }));
     expect(document.querySelector<HTMLInputElement>('input[name="lang"]')?.value).toBe('cc.cc17');
   });
 
-  it('updates the hidden field when the sub language changes', () => {
+  it('updates the hidden field when the sub language changes', async () => {
+    const user = userEvent.setup();
     render(<ProblemLanguageSelect
       langRange={{ 'cc.cc17': 'C++17', 'cc.cc17o2': 'C++17 (O2)' }}
       langs={langs}
       codeLang="cc.cc17"
     />);
-    const selects = screen.getAllByRole('combobox');
-    fireEvent.change(selects[selects.length - 1], { target: { value: 'cc17o2' } });
+    const triggers = screen.getAllByRole('button');
+    await user.click(triggers[triggers.length - 1]);
+    await user.click(screen.getByRole('option', { name: 'C++17 (O2)' }));
     expect(document.querySelector<HTMLInputElement>('input[name="lang"]')?.value).toBe('cc.cc17o2');
   });
 });

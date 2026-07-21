@@ -3,12 +3,23 @@ import {
   fireEvent, render, screen,
 } from '@testing-library/react';
 import type { ReactNode } from 'react';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { type PageData, PageDataProvider, useSetPageData } from '../context/page-data';
 import { RouterProvider } from '../context/router';
 import { routeMapStore } from '../globals';
 import { ThemeProvider } from '../theme/ThemeProvider';
 import ProblemSubmitPage from './problem_submit';
+
+vi.mock('@monaco-editor/react', () => ({
+  Editor: (props: { value?: string, onChange?: (v: string | undefined) => void }) => (
+    <textarea
+      data-testid="monaco-stub"
+      value={props.value ?? ''}
+      onChange={(e) => props.onChange?.(e.currentTarget.value)}
+    />
+  ),
+  loader: { config: vi.fn() },
+}));
 
 const defaultArgs = {
   pdoc: {
@@ -71,7 +82,8 @@ describe('problem_submit page', () => {
     });
   });
 
-  it('renders language options from the server language map', () => {
+  it('renders language options from the server language map', async () => {
+    const user = (await import('@testing-library/user-event')).default.setup();
     renderPage({
       pdoc: {
         docId: 1,
@@ -91,8 +103,10 @@ describe('problem_submit page', () => {
       UiContext: {},
     });
 
-    expect(screen.getByRole('option', { name: 'C++' })).toHaveValue('cpp');
-    expect(screen.getByRole('option', { name: 'Python 3' })).toHaveValue('python');
+    const trigger = screen.getByRole('button', { name: '语言' });
+    await user.click(trigger);
+    expect(screen.getByRole('option', { name: 'C++' })).toHaveTextContent('C++');
+    expect(screen.getByRole('option', { name: 'Python 3' })).toHaveTextContent('Python 3');
   });
 
   it('renders a native multipart POST form without overriding the current URL', () => {
@@ -105,7 +119,8 @@ describe('problem_submit page', () => {
 
   it('renders legacy code and file field names without pretest fields', () => {
     renderPage();
-    expect(document.querySelector('textarea[name="code"]')).toBeTruthy();
+    // code is now a hidden input synced from CodeEditor onChange
+    expect(document.querySelector('input[type="hidden"][name="code"]')).toBeTruthy();
     expect(document.querySelector('input[type="file"][name="file"]')).toBeTruthy();
     expect(document.querySelector('[name="pretest"], [name="input"]')).toBeNull();
   });
@@ -138,7 +153,7 @@ describe('problem_submit page', () => {
     expect(screen.getByRole('complementary')).toBeInTheDocument();
   });
 
-  it('resets native form fields when pdoc changes in the same page slot', () => {
+  it('resets the code editor and hidden input when pdoc changes in the same page slot', () => {
     function NavigateToSecondProblem({ next }: { next: PageData }) {
       const setPageData = useSetPageData();
       return (
@@ -163,9 +178,19 @@ describe('problem_submit page', () => {
       </>
     ));
 
-    const code = document.querySelector<HTMLTextAreaElement>('textarea[name="code"]')!;
-    code.value = 'old code';
+    // Simulate typing code into the Monaco stub textarea (CodeEditor uses
+    // Monaco internally; the stub renders a textarea so we can change its
+    // value the same way a user would). The hidden input is kept in sync
+    // by the CodeEditor's onChange -> setCode handler.
+    const editor = screen.getByTestId('monaco-stub') as HTMLTextAreaElement;
+    fireEvent.change(editor, { target: { value: 'old code' } });
+    expect(document.querySelector<HTMLInputElement>('input[type="hidden"][name="code"]')?.value).toBe('old code');
+
     fireEvent.click(screen.getByRole('button', { name: 'next problem' }));
-    expect(document.querySelector<HTMLTextAreaElement>('textarea[name="code"]')?.value).toBe('');
+
+    // <form key={formKey}> remount causes CodeEditor (and its stub textarea)
+    // to be torn down and re-mounted, clearing the controlled value.
+    expect((screen.getByTestId('monaco-stub') as HTMLTextAreaElement).value).toBe('');
+    expect(document.querySelector<HTMLInputElement>('input[type="hidden"][name="code"]')?.value).toBe('');
   });
 });
