@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from '../link';
 import { useTranslate } from '../../lib/i18n';
-import { statusText } from './status';
+import { STATUS_TEXTS } from '@hydrooj/common';
 
 export interface RecordRow {
   _id: string;
@@ -40,7 +40,7 @@ export function RecordsPanel({ submissionsUrl }: { submissionsUrl: string }) {
       {records.map((r) => (
         <li key={r._id}>
           <Link to="record_detail" params={{ rid: r._id }} style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'center' }}>
-            <span aria-label={statusText(r.status)} data-status={r.status} style={{ width: 8, height: 8, borderRadius: 4, background: 'var(--accent)' }} />
+            <span aria-label={STATUS_TEXTS[r.status] ?? `Status ${r.status}`} data-status={r.status} style={{ width: 8, height: 8, borderRadius: 4, background: 'var(--accent)' }} />
             <span style={{ flex: 1, fontFamily: 'var(--font-mono)' }}>{r._id}</span>
             <span style={{ color: 'var(--text-mute)' }}>{r.lang}</span>
           </Link>
