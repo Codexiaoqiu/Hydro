@@ -1,4 +1,6 @@
-import { type ChangeEvent, useCallback } from 'react';
+import type { ChangeEvent } from 'react';
+import { useCallback } from 'react';
+import Editor from '@monaco-editor/react';
 
 // TODO: 接入真正的 Monaco / CodeMirror
 //
@@ -41,6 +43,12 @@ export interface MonacoEditorProps {
   name?: string;
   /** Forwarded to the underlying `<textarea>` so labels can `htmlFor` it. */
   id?: string;
+  /**
+   * When true, render real Monaco via @monaco-editor/react. Default false
+   * (textarea fallback) — only the scratchpad passes useMonaco to opt into
+   * the heavier editor; problem_submit keeps the lightweight textarea.
+   */
+  useMonaco?: boolean;
 }
 
 export function MonacoEditor({
@@ -54,6 +62,7 @@ export function MonacoEditor({
   'aria-label': ariaLabel,
   name,
   id,
+  useMonaco = false,
 }: MonacoEditorProps) {
   const handleChange = useCallback(
     (e: ChangeEvent<HTMLTextAreaElement>) => {
@@ -61,6 +70,21 @@ export function MonacoEditor({
     },
     [onChange],
   );
+
+  if (useMonaco) {
+    return (
+      <Editor
+        value={value}
+        language={language || 'plaintext'}
+        theme="vs"
+        onChange={(v) => onChange?.(v ?? '')}
+        options={{ readOnly, fontFamily: 'var(--font-mono)', minimap: { enabled: false } }}
+        height="100%"
+        className={className}
+        loading={<div style={{ padding: 'var(--space-4)', color: 'var(--text-mute)' }}>Loading editor…</div>}
+      />
+    );
+  }
 
   const cls = [
     language ? `language-${language}` : '',
