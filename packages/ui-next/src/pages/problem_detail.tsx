@@ -1,5 +1,5 @@
 import { STATUS } from '@hydrooj/common';
-import { useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { Article } from '../components/article/Article';
 import { Link } from '../components/link';
 import { Alert, Chip, Eyebrow } from '../components/primitives';
@@ -9,6 +9,8 @@ import { Author } from '../components/sidebar/Author';
 import { type ContestItem, ContestList } from '../components/sidebar/ContestList';
 import { getTidQuery, ProblemSidebar, type ProblemSidebarContext } from '../components/sidebar/ProblemSidebar';
 import { SideCard } from '../components/sidebar/SideCard';
+import { ScratchpadPanel } from '../components/scratchpad/ScratchpadPanel';
+import type { ScratchpadPanelProps } from '../components/scratchpad/ScratchpadPanel';
 import { usePageData, useSetUiContext } from '../context/page-data';
 import { useBuildUrl } from '../hooks/use-build-url';
 import { useTranslate } from '../lib/i18n';
@@ -263,6 +265,19 @@ export default function ProblemDetailPage() {
     });
   }, [pdoc, tdoc, tsdoc, UserContext, buildUrl, setUiContext]);
 
+  const searchParams = typeof window !== 'undefined'
+    ? new URLSearchParams(window.location.search)
+    : new URLSearchParams();
+  const isScratchpad = searchParams.get('mode') === 'scratchpad';
+
+  const handleExitScratchpad = useCallback(() => {
+    if (typeof window === 'undefined') return;
+    const url = new URL(window.location.href);
+    url.searchParams.delete('mode');
+    window.history.pushState({}, '', url.toString());
+    window.dispatchEvent(new PopStateEvent('popstate'));
+  }, []);
+
   const preferredLang = useMemo(() => {
     const userLang = (UserContext as unknown as { viewLang?: string })?.viewLang;
     const contentLangs: string[] =
@@ -311,6 +326,26 @@ export default function ProblemDetailPage() {
   }, [pdoc, tdoc]);
 
   const canStar = !tdoc && isLoggedIn(UserContext);
+
+  if (isScratchpad && canSubmit) {
+    return (
+      <ScratchpadPanel
+        pdoc={pdoc}
+        tdoc={tdoc}
+        UserContext={UserContext as unknown as ScratchpadPanelProps['UserContext']}
+        pretestConnUrl={`record-conn?pretest=1&uidOrName=${UserContext?._id ?? ''}&pid=${pdoc.docId}${tdoc ? `&tid=${tdoc.docId}` : ''}`}
+        postSubmitUrl={buildUrl('problem_submit', { pid: String(pdoc.docId) }, getTidQuery(tdoc))}
+        getSubmissionsUrl={buildUrl('record_main', {}, { pid: String(pdoc.docId), fullStatus: 'true', ...getTidQuery(tdoc) })}
+        contentText={contentText}
+        contentLangs={contentLangs}
+        preferredLang={preferredLang}
+        mode={mode}
+        problemId={pdoc.docId}
+        onExit={handleExitScratchpad}
+      />
+    );
+  }
+
   const sidebarContext = {
     pdoc, tdoc, UserContext, buildUrl, discussionCount, solutionCount, psdoc,
   } as ProblemSidebarContext;
