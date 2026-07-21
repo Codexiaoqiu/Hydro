@@ -35,6 +35,19 @@ describe('ScratchpadProblemPane', () => {
     expect(screen.getByText('Given an array...')).toBeInTheDocument();
   });
 
+  it('renders Article content for real problems with config object', () => {
+    wrap(
+      <ScratchpadProblemPane
+        pdoc={{ docId: 1, title: 'T', config: { type: 'default', langs: ['cpp'] } }}
+        contentText="real content"
+        contentLangs={['en']}
+        preferredLang="en"
+        mode="normal"
+      />,
+    );
+    expect(screen.getByText('real content')).toBeInTheDocument();
+  });
+
   it('renders language tabs when multiple langs', () => {
     wrap(
       <ScratchpadProblemPane

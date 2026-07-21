@@ -22,7 +22,6 @@ export interface ScratchpadProblemPaneProps {
 
 export function ScratchpadProblemPane({ pdoc, contentText, contentLangs, preferredLang, mode }: ScratchpadProblemPaneProps) {
   const t = useTranslate();
-  const cfg = typeof pdoc.config === 'object' ? pdoc.config : null;
   const noData = !pdoc.data || (Array.isArray(pdoc.data) && pdoc.data.length === 0);
   const configError = typeof pdoc.config === 'string';
 
@@ -65,7 +64,7 @@ export function ScratchpadProblemPane({ pdoc, contentText, contentLangs, preferr
       {!contentText && !configError && (
         <Alert variant="info" title={t('Problem.StatementPending')} message={t('Problem.StatementPendingMessage')} />
       )}
-      {cfg === null ? <Article content={contentText} /> : null}
+      {contentText && !configError && <Article content={contentText} />}
     </aside>
   );
 }
