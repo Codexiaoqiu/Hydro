@@ -11,6 +11,7 @@ export type { ConfirmDialogProps } from './ConfirmDialog';
 export { Dropdown } from './Dropdown';
 export type { DropdownProps } from './Dropdown';
 export { Eyebrow } from './Eyebrow';
+export { HexColorPicker } from './HexColorPicker';
 export { Input } from './Input';
 export type { InputProps, InputType } from './Input';
 export { LangTabs } from './LangTabs';
