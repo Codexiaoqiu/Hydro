@@ -325,6 +325,7 @@ export default function ProblemDetailPage() {
     return `#${pdoc.pid ?? pdoc.docId}`;
   }, [pdoc, tdoc]);
 
+  const canSubmit = canSubmitProblem(UserContext);
   const canStar = !tdoc && isLoggedIn(UserContext);
 
   if (isScratchpad && canSubmit) {
@@ -357,7 +358,6 @@ export default function ProblemDetailPage() {
   ], [ctdocs, tdocs, htdocs]);
 
   const loggedIn = isLoggedIn(UserContext);
-  const canSubmit = canSubmitProblem(UserContext);
 
   // === Normal mode: new hero + content + sidebar layout ===
   if (mode === 'normal') {
