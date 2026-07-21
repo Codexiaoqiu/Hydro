@@ -1,0 +1,131 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  padding: var(--space-6) var(--space-8);
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: var(--space-6);
+}
+
+@media (max-width: 960px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.banner {
+  padding: var(--space-3) var(--space-4);
+  background: var(--bg-1);
+  border-left: 3px solid var(--blue);
+  border-radius: var(--radius-sm);
+  color: var(--text-soft);
+  font-size: var(--text-sm);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--bg-1);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.table th,
+.table td {
+  padding: var(--space-3) var(--space-4);
+  text-align: left;
+  border-bottom: 1px solid var(--bg-2);
+  font-size: var(--text-sm);
+}
+
+.table th {
+  background: var(--bg-2);
+  color: var(--text-soft);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: var(--text-xs);
+}
+
+.titleCell a {
+  color: var(--blue);
+  text-decoration: none;
+}
+
+.titleCell a:hover {
+  text-decoration: underline;
+}
+
+.statusAccept {
+  color: var(--green);
+  font-weight: 600;
+}
+
+.statusOther {
+  color: var(--text-soft);
+}
+
+.scoreCell {
+  font-family: var(--font-mono);
+  text-align: right;
+}
+
+.correctionTag {
+  display: inline-block;
+  padding: 0 var(--space-2);
+  background: var(--violet);
+  color: var(--bg-0);
+  font-size: var(--text-xs);
+  border-radius: var(--radius-sm);
+}
+
+.clarify {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.clarifyTitle {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+}
+
+.clarifyItem {
+  padding: var(--space-3) var(--space-4);
+  background: var(--bg-1);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--bg-2);
+}
+
+.clarifyMeta {
+  font-size: var(--text-xs);
+  color: var(--text-soft);
+}
+
+.clarifyBody {
+  margin-top: var(--space-2);
+  color: var(--text);
+  font-size: var(--text-sm);
+}
+
+.empty {
+  color: var(--text-mute);
+  font-size: var(--text-sm);
+  text-align: center;
+  padding: var(--space-6);
+}

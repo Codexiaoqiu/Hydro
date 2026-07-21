@@ -5,6 +5,7 @@ import { registerPage } from '../registry/page';
 registerPage('homepage', () => import('./homepage'));
 registerPage('contest_detail', () => import('./contest_detail'));
 registerPage('contest_main', () => import('./contest_main'));
+registerPage('contest_problemlist', () => import('./contest_problemlist'));
 registerPage('contest_create', () => import('./contest_create'));
 registerPage('contest_edit', () => import('./contest_edit'));
 registerPage('problem_main', () => import('./problem_main'));
