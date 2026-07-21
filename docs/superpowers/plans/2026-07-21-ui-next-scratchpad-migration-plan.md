@@ -1233,7 +1233,7 @@ git commit -m "feat(ui-next): add RecordsPanel component"
 - Create: `packages/ui-next/src/components/scratchpad/ScratchpadToolbar.test.tsx`
 
 **Interfaces:**
-- Produces: `<ScratchpadToolbar postSubmitUrl pretestConnUrl getSubmissionsUrl problemId pdoc tdoc UserContext onExit />` — Run Pretest (F9), Submit (F10), Exit (Alt+Q), language select, panel toggles.
+- Produces: `<ScratchpadToolbar postSubmitUrl pretestConnUrl getSubmissionsUrl problemId pdoc tdoc UserContext onExit setRid />` — Run Pretest (F9), Submit (F10), Exit (Alt+Q), language select, panel toggles. The `setRid` callback is invoked after a successful pretest submission so that the parent (`ScratchpadEditorPane`) can open the WebSocket connection.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -1254,6 +1254,7 @@ const baseArgs = {
   tdoc: undefined,
   UserContext: { _id: 1 },
   onExit: vi.fn(),
+  setRid: vi.fn(),
 };
 
 function wrap(ui: React.ReactNode) {
@@ -1287,9 +1288,9 @@ Expected: FAIL with module not found.
 Create `packages/ui-next/src/components/scratchpad/ScratchpadToolbar.tsx`:
 
 ```tsx
-import { useState } from 'react';
 import { useScratchpad } from './ScratchpadContext';
 import { useTranslate } from '../../lib/i18n';
+import type { Dispatch, SetStateAction } from 'react';
 
 interface PdocMinimal {
   config?: { type?: string; langs?: string[] } | string;
@@ -1304,6 +1305,11 @@ export interface ScratchpadToolbarProps {
   tdoc?: { docId?: string };
   UserContext: { _id?: number };
   onExit: () => void;
+  /**
+   * Called with the new rid returned by the pretest POST so the parent
+   * (`ScratchpadEditorPane`) can open the WebSocket session.
+   */
+  setRid: Dispatch<SetStateAction<string | null>>;
 }
 
 export function ScratchpadToolbar({
@@ -1312,10 +1318,10 @@ export function ScratchpadToolbar({
   getSubmissionsUrl: _getSubmissionsUrl,
   pdoc,
   onExit,
+  setRid,
 }: ScratchpadToolbarProps) {
   const { state, dispatch } = useScratchpad();
   const t = useTranslate();
-  const [_rid, setRid] = useState<string | null>(null);
 
   const langs = (typeof pdoc.config === 'object' && pdoc.config?.langs) || ['cpp'];
   const canPretest = typeof pdoc.config === 'object' && pdoc.config?.type === 'default';
@@ -1329,7 +1335,7 @@ export function ScratchpadToolbar({
         body: JSON.stringify({ lang: state.lang, code: state.code, input: [state.pretest.input], pretest: true }),
       });
       const data = await res.json();
-      setRid(data.rid);
+      setRid(data.rid ?? null);
     } catch (e) {
       dispatch({ type: 'PRETEST_ERROR', payload: String((e as Error).message) });
     }
@@ -1691,7 +1697,7 @@ git commit -m "feat(ui-next): add ScratchpadProblemPane (read-only left column)"
 - Create: `packages/ui-next/src/components/scratchpad/Scratchpad.module.css`
 
 **Interfaces:**
-- Produces: `<ScratchpadEditorPane pdoc pretestConnUrl postSubmitUrl getSubmissionsUrl problemId tdoc UserContext onExit rid />` — vertical stack: toolbar + Monaco editor + bottom panels.
+- Produces: `<ScratchpadEditorPane pdoc pretestConnUrl postSubmitUrl getSubmissionsUrl problemId tdoc UserContext onExit rid setRid />` — vertical stack: toolbar + Monaco editor + bottom panels. Receives `rid` from the parent and forwards `setRid` to the toolbar so a successful pretest POST can flow back up to the WebSocket session.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -1719,6 +1725,7 @@ describe('ScratchpadEditorPane', () => {
         UserContext={{ _id: 1 }}
         onExit={() => {}}
         rid={null}
+        setRid={() => {}}
       />,
     );
     expect(screen.getByRole('toolbar')).toBeInTheDocument();
@@ -1735,6 +1742,7 @@ describe('ScratchpadEditorPane', () => {
         UserContext={{ _id: 1 }}
         onExit={() => {}}
         rid={null}
+        setRid={() => {}}
       />,
     );
     expect(screen.getByLabelText(/input/i)).toBeInTheDocument();
@@ -1774,6 +1782,7 @@ export interface ScratchpadEditorPaneProps {
   UserContext: { _id?: number };
   onExit: () => void;
   rid: string | null;
+  setRid: (rid: string | null) => void;
 }
 
 export function ScratchpadEditorPane({
@@ -1786,6 +1795,7 @@ export function ScratchpadEditorPane({
   UserContext,
   onExit,
   rid,
+  setRid,
 }: ScratchpadEditorPaneProps) {
   const { state, dispatch } = useScratchpad();
 
@@ -1802,6 +1812,7 @@ export function ScratchpadEditorPane({
         tdoc={tdoc}
         UserContext={UserContext}
         onExit={onExit}
+        setRid={setRid}
       />
       <div className={styles.editorSurface}>
         <MonacoEditor
@@ -2017,6 +2028,7 @@ export function ScratchpadPanel(props: ScratchpadPanelProps) {
           UserContext={props.UserContext}
           onExit={handleExit}
           rid={rid}
+          setRid={setRid}
         />
       </div>
     </ScratchpadProvider>
@@ -2349,3 +2361,4 @@ git commit -m "chore(ui-next): remove deprecated Scratchpad placeholder"
 4. **Gaps fixed during self-review**
    - Task 13 originally had `import` after a function (syntax error) — Step 3 fixes this with a clean rewrite (all imports at top).
    - RecordsPanel test in Task 8 originally imported `within` and had a stray `trigger` button — Step 1 of Task 8 was corrected to a clean two-test variant.
+   - **Pre-flight fix (post-review):** The original plan had a data-flow gap — Task 9's `ScratchpadToolbar` kept the new `rid` in local state (`_rid`) but never propagated it to the parent `ScratchpadPanel`. As a result, `ScratchpadEditorPane`'s WebSocket session (`usePretestSession({ rid })`) would never open after a successful pretest. Fixed by adding `setRid: (rid: string | null) => void` to `ScratchpadToolbarProps` and `ScratchpadEditorPaneProps`, removing Toolbar's local `useState`, and forwarding `setRid` from `ScratchpadPanel`.
