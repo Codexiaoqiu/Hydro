@@ -42,6 +42,28 @@ describe('scratchpadReducer', () => {
     expect(s.pretest.error).toBeUndefined();
   });
 
+  it('CLEAR_OUTPUT clears output and error without touching running', () => {
+    const prev = {
+      ...initialScratchpadState('cpp', ''),
+      pretest: { running: false, input: '1\n', output: ['old line'], error: 'some error' },
+    };
+    const s = scratchpadReducer(prev, { type: 'CLEAR_OUTPUT' });
+    expect(s.pretest.running).toBe(false); // running unchanged
+    expect(s.pretest.output).toEqual([]);
+    expect(s.pretest.error).toBeUndefined();
+  });
+
+  it('CLEAR_OUTPUT leaves running=true when pretest is in flight', () => {
+    const prev = {
+      ...initialScratchpadState('cpp', ''),
+      pretest: { running: true, input: '1\n', output: ['partial'], error: undefined },
+    };
+    const s = scratchpadReducer(prev, { type: 'CLEAR_OUTPUT' });
+    expect(s.pretest.running).toBe(true); // still in flight
+    expect(s.pretest.output).toEqual([]);
+    expect(s.pretest.error).toBeUndefined();
+  });
+
   it('PUSH_PRETEST_LINE appends one line', () => {
     const prev = { ...initialScratchpadState('cpp', ''), pretest: { running: true, input: '', output: ['a'], error: undefined } };
     const s = scratchpadReducer(prev, { type: 'PUSH_PRETEST_LINE', payload: 'b' });

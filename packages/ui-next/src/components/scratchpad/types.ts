@@ -30,6 +30,7 @@ export type ScratchpadAction =
   | { type: 'SET_LANG'; payload: string }
   | { type: 'SET_INPUT'; payload: string }
   | { type: 'START_PRETEST' }
+  | { type: 'CLEAR_OUTPUT' }
   | { type: 'PUSH_PRETEST_LINE'; payload: string }
   | { type: 'END_PRETEST' }
   | { type: 'PRETEST_ERROR'; payload: string }

@@ -45,7 +45,7 @@ export function PretestPanel() {
             </button>
             <button
               type="button"
-              onClick={() => dispatch({ type: 'START_PRETEST' })}
+              onClick={() => dispatch({ type: 'CLEAR_OUTPUT' })}
               aria-label={t('Scratchpad.ClearOutput')}
               style={btnStyle}
             >

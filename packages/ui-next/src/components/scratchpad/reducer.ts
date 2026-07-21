@@ -26,6 +26,11 @@ export function scratchpadReducer(state: ScratchpadState, action: ScratchpadActi
         ...state,
         pretest: { running: true, input: state.pretest.input, output: [], error: undefined },
       };
+    case 'CLEAR_OUTPUT':
+      return {
+        ...state,
+        pretest: { ...state.pretest, output: [], error: undefined },
+      };
     case 'PUSH_PRETEST_LINE':
       return {
         ...state,
