@@ -49,4 +49,12 @@ describe('ScratchpadToolbar', () => {
     fireEvent.click(screen.getByRole('button', { name: /exit/i }));
     expect(onExit).toHaveBeenCalledOnce();
   });
+
+  it('renders language select with options matching langs', () => {
+    wrap(<ScratchpadToolbar {...baseArgs} />);
+    const select = screen.getByRole('combobox');
+    expect(select).toBeInTheDocument();
+    const options = Array.from(select.querySelectorAll('option')).map((o) => o.value);
+    expect(options).toEqual(['cpp', 'py']);
+  });
 });

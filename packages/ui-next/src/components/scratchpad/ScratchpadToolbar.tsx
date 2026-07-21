@@ -87,14 +87,15 @@ export function ScratchpadToolbar({
       <button type="button" data-hotkey="alt+r" onClick={() => dispatch({ type: 'TOGGLE_PANEL', payload: 'records' })} style={btnStyle}>
         {t('Scratchpad.Records')} (Alt+R)
       </button>
+      <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-soft)' }}>Language:</span>
       <select
         aria-label="Language"
         value={state.lang}
         onChange={(e) => dispatch({ type: 'SET_LANG', payload: e.target.value })}
-        style={{ padding: '4px 8px', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', background: 'var(--surface)', color: 'var(--text)' }}
+        style={{ padding: '4px 8px', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', background: 'var(--surface)', color: 'var(--text)', minWidth: '120px' }}
       >
         {langs.map((l) => (
-          <option key={l} value={l}>{l}</option>
+          <option key={l} value={l}>{l.toUpperCase()}</option>
         ))}
       </select>
     </div>
