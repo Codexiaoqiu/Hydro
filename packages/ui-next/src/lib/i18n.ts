@@ -421,6 +421,15 @@ export const zhCN: Catalog = {
   'ContestDetail.TimerStarts': '距离开始',
   'ContestDetail.Unsubscribe': '取消订阅',
 
+  'ContestMgmt.Attendees': '参赛者',
+  'ContestMgmt.Balloon': '气球状态',
+  'ContestMgmt.Clarifications': '答疑',
+  'ContestMgmt.Contest': '比赛',
+  'ContestMgmt.Edit': '编辑比赛',
+  'ContestMgmt.Export': '导出',
+  'ContestMgmt.Manage': '管理',
+  'ContestMgmt.SidebarAria': '管理菜单',
+
   'ContestMain.Crumbs': '比赛 / Contests',
   'ContestMain.Title': '所有比赛',
   'ContestMain.SearchPlaceholder': '搜索比赛...',
@@ -930,6 +939,15 @@ export const en: Catalog = {
   'ContestDetail.TimerEnds': 'Ends in',
   'ContestDetail.TimerStarts': 'Starts in',
   'ContestDetail.Unsubscribe': 'Unsubscribe',
+
+  'ContestMgmt.Attendees': 'Attendees',
+  'ContestMgmt.Balloon': 'Balloon',
+  'ContestMgmt.Clarifications': 'Clarifications',
+  'ContestMgmt.Contest': 'Contest',
+  'ContestMgmt.Edit': 'Edit',
+  'ContestMgmt.Export': 'Export',
+  'ContestMgmt.Manage': 'Manage',
+  'ContestMgmt.SidebarAria': 'Management',
 
   'ContestMain.Crumbs': 'Contests',
   'ContestMain.Title': 'All contests',

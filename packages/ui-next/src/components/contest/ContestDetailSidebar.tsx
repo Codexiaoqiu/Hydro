@@ -188,6 +188,19 @@ export function ContestDetailSidebar({
               {t('ContestDetail.Manage')}
             </Link>
           )}
+          {flags.canManage && (
+            <>
+              <Link className={styles.action} to="contest_user" params={{ tid: String(tdoc.docId) }}>
+                {t('ContestMgmt.Attendees')}
+              </Link>
+              <Link className={styles.action} to="contest_balloon" params={{ tid: String(tdoc.docId) }}>
+                {t('ContestMgmt.Balloon')}
+              </Link>
+              <Link className={styles.action} to="contest_clarification" params={{ tid: String(tdoc.docId) }}>
+                {t('ContestMgmt.Clarifications')}
+              </Link>
+            </>
+          )}
         </nav>
       )}
     </aside>
