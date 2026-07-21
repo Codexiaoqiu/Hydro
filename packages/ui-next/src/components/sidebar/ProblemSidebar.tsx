@@ -149,6 +149,14 @@ export function getNormalMenu(ctx: ProblemSidebarContext, t: (k: string, a?: Rec
     title: t('Problem.Statistics'),
     href: buildUrl('problem_statistics', { pid: String(pdoc.docId) }, getTidQuery(tdoc)),
   });
+  items.push({
+    key: 'scratchpad',
+    title: t('Problem.OpenScratchpad') ?? '进入在线编程模式',
+    href: buildUrl('problem_detail',
+      { pid: String(pdoc.docId) },
+      { ...getTidQuery(tdoc), mode: 'scratchpad' },
+    ),
+  });
 
   if (editable) {
     items.push({ key: 'sep-2', separator: true });
