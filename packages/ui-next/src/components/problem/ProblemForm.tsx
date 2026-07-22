@@ -180,9 +180,9 @@ export function ProblemForm({
       fd.set('tag', tagText);
       if (difficulty !== '') fd.set('difficulty', String(difficulty));
       const url = action ?? (pageName === 'problem_create' ? '/problem/create' : window.location.pathname);
-      await request.post(url, fd);
+      const res = await request.post<{ _id: number; pid?: string }>(url, fd);
       const redirectTo = pageName === 'problem_create'
-        ? buildUrl('problem_files', { pid: pid || String(pdoc?.docId ?? '') })
+        ? buildUrl('problem_files', { pid: res.pid ?? String(res._id) })
         : buildUrl('problem_detail', { pid: pid || String(pdoc?.docId ?? '') });
       navigate(redirectTo);
     } catch (err) {
