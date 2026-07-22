@@ -439,6 +439,9 @@ export const zhCN: Catalog = {
   'ContestMgmt.Manage': '管理',
   'ContestMgmt.SidebarAria': '管理菜单',
 
+  'ContestBalloon.SetColor': '设置颜色',
+  'ContestBalloon.Title': '气球状态',
+
   'ContestMain.Crumbs': '比赛 / Contests',
   'ContestMain.Title': '所有比赛',
   'ContestMain.SearchPlaceholder': '搜索比赛...',
@@ -966,6 +969,9 @@ export const en: Catalog = {
   'ContestMgmt.Export': 'Export',
   'ContestMgmt.Manage': 'Manage',
   'ContestMgmt.SidebarAria': 'Management',
+
+  'ContestBalloon.SetColor': 'Set Color',
+  'ContestBalloon.Title': 'Balloon Status',
 
   'ContestMain.Crumbs': 'Contests',
   'ContestMain.Title': 'All contests',
