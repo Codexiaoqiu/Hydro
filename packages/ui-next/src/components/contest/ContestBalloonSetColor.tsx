@@ -42,7 +42,12 @@ export function ContestBalloonSetColor({ open, onClose, onSaved, initial = '#fbb
       </>
     }>
       <div className={styles.body}>
-        <HexColorPicker value={color} onChange={setColor} disabled={busy} />
+        {/* HexColorPicker does not expose a `disabled` prop; overlay the busy
+            state by intercepting the swatch with a pointer-events guard when
+            a save is in flight. */}
+        <div style={{ pointerEvents: busy ? 'none' : 'auto', opacity: busy ? 0.6 : 1 }}>
+          <HexColorPicker value={color} onChange={setColor} />
+        </div>
       </div>
     </Modal>
   );

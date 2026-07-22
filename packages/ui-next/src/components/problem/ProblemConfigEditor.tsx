@@ -1,11 +1,15 @@
+import type { ReactNode } from 'react';
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { parseProblemConfigYaml } from '../../lib/yaml-config';
 import styles from './ProblemConfigEditor.module.css';
 
-const MonacoWrapper = lazy(async () => {
-  const monaco = await import('@monaco-editor/react');
-  return { default: monaco.default };
-});
+// Lazy wrapper that accepts children: by exporting a wrapper component
+// instead of the bare Monaco `Editor`, we can let the parent compose the
+// inner implementation via children. React.lazy() requires a module with
+// `default` export, so the host lives in its own file.
+const MonacoWrapper = lazy(() =>
+  import('./MonacoEditorHost').then((m) => ({ default: m.MonacoEditorHost })),
+);
 
 export interface ProblemConfigEditorProps {
   value: string;

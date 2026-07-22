@@ -1,8 +1,9 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
+import type { ProblemConfigYaml } from '../../lib/yaml-config';
 import { ProblemConfigBasicForm } from './ProblemConfigBasicForm';
 
-const cfg = { type: 'default', subLimit: 0, count: 10 };
+const cfg = { type: 'default', subLimit: 0, count: 10 } as unknown as ProblemConfigYaml;
 
 describe('ProblemConfigBasicForm', () => {
   it('renders current values', () => {

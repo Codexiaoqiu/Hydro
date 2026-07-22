@@ -1,3 +1,4 @@
+import type { SubtaskConfig, TestCaseConfig } from '@hydrooj/common';
 import { Button } from '../primitives/Button';
 import type { ProblemConfigYaml } from '../../lib/yaml-config';
 import styles from './ProblemConfigTree.module.css';
@@ -9,12 +10,20 @@ export interface ProblemConfigTreeProps {
   onAutoDetect: () => void;
 }
 
-export function ProblemConfigTree({ config, testdata, onChange, onAutoDetect }: ProblemConfigTreeProps) {
-  const subtasks = config.subtasks ?? [];
+// The UI exposes subtask time/memory limits as integer ms / MB, while the
+// canonical SubtaskConfig carries them as strings ("1s", "256MB"). Treat the
+// UI fields as opaque extensions for now.
+type SubtaskUI = SubtaskConfig & {
+  time_limit?: number;
+  memory_limit?: number;
+};
 
-  const updateSubtask = (idx: number, patch: Partial<(typeof subtasks)[number]>) => {
+export function ProblemConfigTree({ config, testdata, onChange, onAutoDetect }: ProblemConfigTreeProps) {
+  const subtasks = (config.subtasks ?? []) as SubtaskUI[];
+
+  const updateSubtask = (idx: number, patch: Partial<SubtaskUI>) => {
     const next = subtasks.map((s, i) => (i === idx ? { ...s, ...patch } : s));
-    onChange({ ...config, subtasks: next });
+    onChange({ ...config, subtasks: next as unknown as SubtaskConfig[] });
   };
 
   return (
@@ -39,7 +48,7 @@ export function ProblemConfigTree({ config, testdata, onChange, onAutoDetect }: 
               </div>
               {s.cases && s.cases.length > 0 && (
                 <ul className={styles.cases}>
-                  {s.cases.map((c, j) => (
+                  {s.cases.map((c: TestCaseConfig, j) => (
                     <li key={j} className={styles.case}>{c.input} → {c.output}</li>
                   ))}
                 </ul>

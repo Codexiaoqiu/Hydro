@@ -1,8 +1,17 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
+import type { ProblemConfigYaml } from '../../lib/yaml-config';
 import { ProblemConfigTree } from './ProblemConfigTree';
 
-const cfg = { type: 'default', subtasks: [{ score: 100, time_limit: 1000, memory_limit: 256, cases: [{ input: '1.in', output: '1.out' }] }] };
+const cfg = {
+  type: 'default',
+  subtasks: [{
+    score: 100,
+    time_limit: 1000,
+    memory_limit: 256,
+    cases: [{ input: '1.in', output: '1.out' }],
+  }],
+} as unknown as ProblemConfigYaml;
 
 describe('ProblemConfigTree', () => {
   it('renders each subtask as a row', () => {

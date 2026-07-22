@@ -1,39 +1,72 @@
+import { ProblemType, type ProblemConfigFile } from '@hydrooj/common';
 import Ajv, { type ErrorObject } from 'ajv';
 import addFormats from 'ajv-formats';
 import * as yaml from 'js-yaml';
 
-// ProblemConfig is not exported from @hydrooj/common; use inline fallback
-export type ProblemConfigYaml = Record<string, unknown> & {
-  type?: string;
-  subtasks?: Array<{
-    score?: number;
-    time_limit?: number;
-    memory_limit?: number;
-    if?: string | string[];
-    cases?: unknown[];
-  }>;
-};
+// Re-export the canonical `type` field so consumers can read it as a plain
+// string (the upstream enum still narrows correctly when used directly).
+export type ProblemConfigYaml = ProblemConfigFile & { type?: string };
+
+// AJV schema mirrors the canonical shape from @hydrooj/common. Unknown fields
+// (forward-compat) are allowed via `additionalProperties: true`.
+const PROBLEM_TYPE_VALUES = [
+  ProblemType.Default,
+  ProblemType.SubmitAnswer,
+  ProblemType.Interactive,
+  ProblemType.Communication,
+  ProblemType.Objective,
+] as const;
 
 const SCHEMA = {
   type: 'object',
   additionalProperties: true,
   properties: {
-    type: { type: 'string', enum: ['default', 'interactive', 'objective', 'submit_answer', 'communication'] },
-    subLimit: { type: 'integer', minimum: 0 },
-    count: { type: 'integer', minimum: 1 },
+    type: { type: 'string', enum: PROBLEM_TYPE_VALUES as unknown as string[] },
+    subType: { type: 'string' },
+    target: { type: 'string' },
+    score: { type: 'number' },
+    time: { type: 'string' },
+    memory: { type: 'string' },
+    filename: { type: 'string' },
+    checker_type: { type: 'string' },
+    num_processes: { type: 'integer', minimum: 0 },
+    user_extra_files: { type: 'array', items: { type: 'string' } },
+    judge_extra_files: { type: 'array', items: { type: 'string' } },
+    detail: { type: ['string', 'boolean'] },
+    answers: { type: 'object' },
+    redirect: { type: 'string' },
+    cases: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          input: { type: 'string' },
+          output: { type: 'string' },
+          time: { type: 'string' },
+          memory: { type: 'string' },
+          score: { type: 'number' },
+        },
+      },
+    },
     subtasks: {
       type: 'array',
       items: {
         type: 'object',
         properties: {
+          time: { type: 'string' },
+          memory: { type: 'string' },
           score: { type: 'number' },
-          time_limit: { type: 'integer', minimum: 0 },
-          memory_limit: { type: 'integer', minimum: 0 },
-          if: { type: ['string', 'array'] },
+          if: { type: 'array' },
+          id: { type: 'integer' },
+          type: { type: 'string' },
           cases: { type: 'array' },
         },
       },
     },
+    langs: { type: 'array', items: { type: 'string' } },
+    multi_pass: { type: 'integer', minimum: 0 },
+    time_limit_rate: { type: 'object' },
+    memory_limit_rate: { type: 'object' },
   },
 } as const;
 

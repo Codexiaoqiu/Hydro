@@ -15,9 +15,17 @@ const TYPES = [
   { value: 'communication', label: 'Communication' },
 ];
 
+// `count` and `subLimit` are UI-specific fields that the YAML schema does not
+// declare but the basic form still edits (they were carried over from the
+// earlier hand-rolled type). They are passed through opaquely.
+type BasicFormExtensions = { count?: number; subLimit?: number };
+
 export function ProblemConfigBasicForm({ config, onChange }: ProblemConfigBasicFormProps) {
+  const cfg = config as ProblemConfigYaml & BasicFormExtensions;
   const set = <K extends keyof ProblemConfigYaml>(k: K, v: ProblemConfigYaml[K]) =>
     onChange({ ...config, [k]: v });
+  const setExt = (patch: BasicFormExtensions) =>
+    onChange({ ...config, ...patch } as ProblemConfigYaml);
 
   return (
     <div className={styles.grid}>
@@ -35,15 +43,15 @@ export function ProblemConfigBasicForm({ config, onChange }: ProblemConfigBasicF
         label="Count (cases per subtask)"
         type="number"
         min={1}
-        value={config.count ?? 10}
-        onChange={(e) => set('count', Number(e.currentTarget.value))}
+        value={cfg.count ?? 10}
+        onChange={(e) => setExt({ count: Number(e.currentTarget.value) })}
       />
       <Input
         label="Sub-Limit (ms)"
         type="number"
         min={0}
-        value={config.subLimit ?? 0}
-        onChange={(e) => set('subLimit', Number(e.currentTarget.value))}
+        value={cfg.subLimit ?? 0}
+        onChange={(e) => setExt({ subLimit: Number(e.currentTarget.value) })}
       />
     </div>
   );
