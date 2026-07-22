@@ -1,0 +1,8 @@
+.list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: var(--space-3); }
+.item { background: var(--bg-1); border: 1px solid var(--border); border-radius: var(--radius-md); padding: var(--space-3); }
+.header { display: flex; gap: var(--space-3); align-items: center; margin-bottom: var(--space-2); }
+.subject { padding: 1px var(--space-2); background: var(--tint-cyan-12); color: var(--cyan); border-radius: var(--radius-pill); font-size: var(--text-xs); }
+.author { color: var(--text-mute); font-size: var(--text-sm); }
+.empty { color: var(--text-mute); padding: var(--space-4); text-align: center; }
+.replies { list-style: none; padding-left: var(--space-5); margin: var(--space-2) 0 0; border-left: 2px solid var(--border); display: flex; flex-direction: column; gap: var(--space-2); }
+.reply { font-size: var(--text-sm); }
