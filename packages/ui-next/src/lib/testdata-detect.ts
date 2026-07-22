@@ -82,8 +82,19 @@ function clientSideDetect(files: string[]): DetectedSubtask[] {
     }
     if (!ext) continue;
 
-    // Determine output extension
-    const outExt = outputExts.find((e) => e.toLowerCase() === lower.slice(-e.length).toLowerCase());
+    // Skip output files — their input pair will be added when the input file is processed
+    if (!isInput) continue;
+
+    // Determine the matching output extension for this input file's extension
+    let outExt = '';
+    for (const e of inputExts) {
+      if (lower.endsWith(e)) {
+        // Find the corresponding output extension at the same index in outputExts (or first match)
+        const idx = inputExts.indexOf(e);
+        outExt = outputExts[idx] ?? outputExts[0];
+        break;
+      }
+    }
     if (!outExt) continue;
 
     const outFile = base + outExt;
