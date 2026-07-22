@@ -43,4 +43,14 @@ describe('ContestClarificationPage', () => {
     expect(screen.getByRole('button', { name: /broadcast|广播/i })).toBeInTheDocument();
     expect(screen.getByText(/no clarifications/i)).toBeInTheDocument();
   });
+
+  it('exposes a back link to the contest detail page', () => {
+    vi.mocked(usePageData).mockReturnValue({
+      args: { tdoc: { docId: 7, pids: [1] }, tcdocs: [], pdict: {}, udict: {} },
+    });
+    render(<ContestClarificationPage />);
+    const back = screen.getByTestId('contest-back-link');
+    expect(back).toBeInTheDocument();
+    expect(back.getAttribute('href')).toBe('/contest_detail/7');
+  });
 });

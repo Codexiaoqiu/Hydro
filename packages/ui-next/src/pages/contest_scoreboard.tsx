@@ -2,6 +2,7 @@ import { getScoreColor } from '@hydrooj/common';
 import {
   useCallback, useEffect, useMemo, useRef, useState,
 } from 'react';
+import { ContestBackLink } from '../components/contest/ContestBackLink';
 import { Link } from '../components/link';
 import { Select } from '../components/primitives/Select';
 import { useBuildUrl } from '../hooks/use-build-url';
@@ -238,12 +239,7 @@ export default function ContestScoreboardPage({ _pageData }: ContestScoreboardPa
     <div className={styles.page} data-page="contest_scoreboard">
       <div className={styles.header}>
         <div className={styles.titleBlock}>
-          <Link to="contest_detail" params={{ tid: tdoc.docId }} className={styles.backLink}>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-              <path d="m15 18-6-6 6-6" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-            <span>{t('ContestScoreboard.BackToContest')}</span>
-          </Link>
+          <ContestBackLink tdoc={tdoc} />
           <h1 className={styles.title}>{tdoc.title}</h1>
         </div>
         <div className={styles.tools}>

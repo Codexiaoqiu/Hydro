@@ -63,4 +63,15 @@ describe('ContestBalloonPage', () => {
     await waitFor(() => expect(screen.getByText('A')).toBeInTheDocument());
     expect(screen.getByRole('button', { name: /set color|设置颜色/i })).toBeInTheDocument();
   });
+
+  it('exposes a back link to the contest detail page', async () => {
+    render(
+      <ToastProvider>
+        <ContestBalloonPage />
+      </ToastProvider>,
+    );
+    await waitFor(() => expect(screen.getByTestId('contest-back-link')).toBeInTheDocument());
+    const back = screen.getByTestId('contest-back-link');
+    expect(back.getAttribute('href')).toBe('/contest_detail/7');
+  });
 });

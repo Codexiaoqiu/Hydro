@@ -17,8 +17,11 @@ interface ContestDoc {
   title?: string;
   content?: string;
   rule?: string;
-  beginAt?: number;
-  endAt?: number;
+  // After JSON serialization (`packages/ui-next/index.ts` JSON.stringifies
+  // the handler body), MongoDB Date fields arrive as ISO strings. Accept
+  // both shapes so callers that pre-coerce to ms numbers also work.
+  beginAt?: string | number;
+  endAt?: string | number;
   pids?: number[];
   rated?: boolean;
   autoHide?: boolean;
@@ -28,7 +31,7 @@ interface ContestDoc {
   langs?: string[];
   assign?: string[];
   maintainer?: number[];
-  lockAt?: number;
+  lockAt?: string | number;
 }
 
 interface Props {
@@ -72,6 +75,24 @@ function fmtTime(ms: number): string {
 }
 
 /**
+ * Coerce an ISO string or ms timestamp to a millisecond number.
+ *
+ * The renderer (`packages/ui-next/index.ts`) embeds handler args via
+ * `JSON.stringify`, which turns MongoDB `Date` fields into ISO strings on
+ * the wire. Without this coercion, subtracting two ISO strings (`a - b`)
+ * yields `NaN` and every downstream duration/endAt calculation breaks.
+ *
+ * Mirrors the local helper in `ContestTimer.tsx`, but also accepts a
+ * numeric input so callers that pre-coerce (e.g. future SSR paths) still
+ * work without extra wrapping.
+ */
+function toMs(iso?: string | number): number | undefined {
+  if (iso == null || iso === '') return undefined;
+  const t = new Date(iso).getTime();
+  return Number.isFinite(t) ? t : undefined;
+}
+
+/**
  * Three-section form mirroring `templates/contest_edit.html`:
  *   1. Basic Info        (rule, title, begin/duration/end, pids, description)
  *   2. Permission Control (maintainer)
@@ -89,14 +110,14 @@ export function ContestForm({ pageName, tdoc, tid, UserContext, languages = [], 
 
   const [now] = useState(() => Date.now());
   const initial: FormState = useMemo(() => {
-    const beginAt = tdoc?.beginAt ?? now;
-    const endAt = tdoc?.endAt ?? (now + 2 * 60 * 60 * 1000);
-    const duration = tdoc ? Math.max(0.5, Math.round(((endAt - beginAt) / 3600000) * 10) / 10) : 2;
+    const beginAtMs = toMs(tdoc?.beginAt) ?? now;
+    const endAtMs = toMs(tdoc?.endAt) ?? (now + 2 * 60 * 60 * 1000);
+    const duration = tdoc ? Math.max(0.5, Math.round(((endAtMs - beginAtMs) / 3600000) * 10) / 10) : 2;
     return {
       rule: tdoc?.rule ?? 'acm',
       title: tdoc?.title ?? '',
-      beginAtDate: fmtDate(beginAt),
-      beginAtTime: fmtTime(beginAt),
+      beginAtDate: fmtDate(beginAtMs),
+      beginAtTime: fmtTime(beginAtMs),
       duration: String(duration),
       pids: tdoc?.pids ?? [],
       content: tdoc?.content ?? '',
@@ -107,9 +128,11 @@ export function ContestForm({ pageName, tdoc, tid, UserContext, languages = [], 
       keepScoreboardHidden: tdoc?.keepScoreboardHidden ?? false,
       langs: tdoc?.langs ?? [],
       maintainer: (tdoc?.maintainer ?? []).join(','),
-      lock: tdoc?.lockAt ? String(Math.round((endAt - tdoc.lockAt) / 60000)) : '',
+      lock: tdoc?.lockAt
+        ? String(Math.round((endAtMs - toMs(tdoc.lockAt)!) / 60000))
+        : '',
       contestDuration: tdoc && tdoc.endAt && tdoc.beginAt
-        ? String(Math.round(((tdoc.endAt - tdoc.beginAt) / 3600000) * 10) / 10)
+        ? String(Math.round(((toMs(tdoc.endAt)! - toMs(tdoc.beginAt)!) / 3600000) * 10) / 10)
         : '',
     };
   }, [tdoc, now]);

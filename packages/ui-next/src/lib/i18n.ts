@@ -488,6 +488,8 @@ export const zhCN: Catalog = {
   'ContestScoreboard.Unstar': '取消收藏',
   'ContestScoreboard.NoRows': '当前筛选下无用户',
   'ContestScoreboard.RowSummary': '显示 {visible} / {total} 位用户',
+  'Contest.BackToContest': '返回比赛',
+
   'ContestScoreboard.BackToContest': '返回比赛',
 
   'ContestUser.Action': '操作',
@@ -1100,6 +1102,8 @@ export const en: Catalog = {
   'ContestScoreboard.Unstar': 'Unstar',
   'ContestScoreboard.NoRows': 'No users match this filter',
   'ContestScoreboard.RowSummary': 'Showing {visible} of {total} users',
+  'Contest.BackToContest': 'Back to contest',
+
   'ContestScoreboard.BackToContest': 'Back to contest',
 
   'ContestUser.Action': 'Action',

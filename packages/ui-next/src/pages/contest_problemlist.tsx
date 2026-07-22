@@ -1,5 +1,6 @@
 import { STATUS, STATUS_SHORT_TEXTS } from '@hydrooj/common';
 import { Alert } from '../components/primitives/Alert';
+import { ContestBackLink } from '../components/contest/ContestBackLink';
 import { ContestDetailHeader } from '../components/contest/ContestDetailHeader';
 import { ContestTimer } from '../components/contest/ContestTimer';
 import { ContestDetailSidebar } from '../components/contest/ContestDetailSidebar';
@@ -87,6 +88,7 @@ export default function ContestProblemListPage({ _pageData }: ContestProblemList
       <ContestTimer tdoc={tdoc} tsdoc={tsdoc} />
       <div className={styles.layout}>
         <main className={styles.main}>
+          <ContestBackLink tdoc={tdoc} block />
           {tsdoc?.attend === 1 && isOngoing(tdoc) && (
             <div className={styles.banner}>{t('ContestProblemList.AttendedBanner')}</div>
           )}

@@ -42,4 +42,18 @@ describe('ContestUserPage', () => {
     expect(screen.getByRole('button', { name: /add|添加/i })).toBeInTheDocument();
     expect(screen.getByText(/no attendees/i)).toBeInTheDocument();
   });
+
+  it('exposes a back link to the contest detail page', () => {
+    mockPageData.mockReturnValue({
+      args: { tdoc: { docId: 7, beginAt: '2026-01-01', endAt: '2026-12-31' }, tsdocs: [], udict: {} },
+    });
+    render(
+      <ToastProvider>
+        <ContestUserPage />
+      </ToastProvider>,
+    );
+    const back = screen.getByTestId('contest-back-link');
+    expect(back).toBeInTheDocument();
+    expect(back.getAttribute('href')).toBe('/contest_detail/7');
+  });
 });

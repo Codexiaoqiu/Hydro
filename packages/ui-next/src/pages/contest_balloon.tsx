@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Button } from '../components/primitives/Button';
+import { ContestBackLink } from '../components/contest/ContestBackLink';
 import { ContestManagementSidebar } from '../components/contest/ContestManagementSidebar';
 import { ContestBalloonSetColor } from '../components/contest/ContestBalloonSetColor';
 import { ContestBalloonTable, type BalloonRow } from '../components/contest/ContestBalloonTable';
@@ -39,6 +40,7 @@ export default function ContestBalloonPage() {
     <div className={styles.page} data-page="contest_balloon">
       <div className={styles.layout}>
         <main className={styles.main}>
+          <ContestBackLink tdoc={tdoc} />
           <header className={styles.header}>
             <h1 className={styles.title}>{t('ContestBalloon.Title')}</h1>
             <Button variant="ghost" onClick={() => setShowSetColor(true)}>

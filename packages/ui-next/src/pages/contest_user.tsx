@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Button } from '../components/primitives/Button';
+import { ContestBackLink } from '../components/contest/ContestBackLink';
 import { ContestManagementSidebar } from '../components/contest/ContestManagementSidebar';
 import { ContestUserAddDialog } from '../components/contest/ContestUserAddDialog';
 import { ContestUserTable } from '../components/contest/ContestUserTable';
@@ -27,6 +28,7 @@ export default function ContestUserPage() {
     <div className={styles.page} data-page="contest_user">
       <div className={styles.layout}>
         <main className={styles.main}>
+          <ContestBackLink tdoc={tdoc} />
           <header className={styles.header}>
             <h1 className={styles.title}>{t('ContestUser.Title')}</h1>
             <Button variant="primary" onClick={() => setShowAdd(true)}>

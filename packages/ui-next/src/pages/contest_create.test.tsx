@@ -21,6 +21,15 @@ vi.mock('../hooks/use-api', () => ({
   },
 }));
 
+vi.mock('../components/link', () => ({
+  Link: ({ children, to, params, ...rest }: any) => (
+    <a {...rest} data-testid={`link-${to}`} href={`/${to}/${params?.tid ?? ''}`}>
+      {children}
+    </a>
+  ),
+  useBuildUrl: () => (_name: string, _params?: Record<string, string>) => '#',
+}));
+
 function buildPageData(args: PageData['args']): PageData {
   return { name: 'contest_create', template: '', url: '/contest/create', args };
 }
@@ -85,5 +94,12 @@ describe('contest_create page', () => {
     // oi -> KeepScoreboardHidden visible, Lock hidden.
     expect(screen.getByText(/赛后继续保持封榜|Keep scoreboard hidden/i)).toBeInTheDocument();
     expect(screen.queryByText(/封榜 \(分钟\)|Lock \(minutes\)/i)).not.toBeInTheDocument();
+  });
+
+  it('exposes a back link to the contest main page', () => {
+    renderPage();
+    const back = screen.getByTestId('link-contest_main');
+    expect(back).toBeInTheDocument();
+    expect(back.getAttribute('href')).toBe('/contest_main/');
   });
 });

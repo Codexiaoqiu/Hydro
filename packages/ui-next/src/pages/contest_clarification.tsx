@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Button } from '../components/primitives/Button';
+import { ContestBackLink } from '../components/contest/ContestBackLink';
 import { ContestClarificationList } from '../components/contest/ContestClarificationList';
 import { ContestClarificationForm } from '../components/contest/ContestClarificationForm';
 import { ContestManagementSidebar } from '../components/contest/ContestManagementSidebar';
@@ -27,6 +28,7 @@ export default function ContestClarificationPage() {
     <div className={styles.page} data-page="contest_clarification">
       <div className={styles.layout}>
         <main className={styles.main}>
+          <ContestBackLink tdoc={tdoc} />
           <header className={styles.header}>
             <h1 className={styles.title}>{t('ContestClarification.Title')}</h1>
             <Button variant="primary" onClick={() => setBroadcastOpen(true)}>

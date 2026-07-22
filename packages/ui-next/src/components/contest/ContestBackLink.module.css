@@ -1,0 +1,43 @@
+.link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--text-soft);
+  font-size: var(--text-xs);
+  text-decoration: none;
+  width: fit-content;
+}
+
+.link svg {
+  width: 14px;
+  height: 14px;
+}
+
+.link:hover {
+  color: var(--blue);
+  text-decoration: none;
+}
+
+.blockLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--text-soft);
+  font-size: var(--text-sm);
+  text-decoration: none;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--bg-1);
+  border: 1px solid var(--bg-2);
+  width: fit-content;
+}
+
+.blockLink svg {
+  width: 16px;
+  height: 16px;
+}
+
+.blockLink:hover {
+  color: var(--blue);
+  text-decoration: none;
+}

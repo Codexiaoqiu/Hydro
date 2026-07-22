@@ -203,4 +203,35 @@ describe('contest_problemlist page', () => {
     expect(screen.getByText(/What is the time limit/)).toBeInTheDocument();
     expect(screen.getByText(/2 seconds/)).toBeInTheDocument();
   });
+
+  it('exposes a back link to the contest detail page', () => {
+    const tdoc = {
+      _id: '60a000000000000000000001',
+      docId: '60a000000000000000000001',
+      title: 'C',
+      rule: 'acm',
+      beginAt: beginIso,
+      endAt: endIso,
+      duration: 5,
+      owner: 1,
+      pids: [],
+    };
+    render(
+      <ContestProblemListPage
+        _pageData={buildPageData({
+          tdoc,
+          tsdoc: { attend: 1, subscribe: 0, startAt: beginIso },
+          pdict: {},
+          psdict: {},
+          udict: {},
+          tcdocs: [],
+          showScore: false,
+          canViewRecord: true,
+        })}
+      />,
+    );
+    const back = screen.getByTestId('contest-back-link');
+    expect(back).toBeInTheDocument();
+    expect(back.getAttribute('href')).toBe('/contest_detail/60a000000000000000000001');
+  });
 });

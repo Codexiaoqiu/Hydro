@@ -1,6 +1,7 @@
 import {
   useCallback, useEffect, useRef, useState,
 } from 'react';
+import { ContestBackLink } from '../components/contest/ContestBackLink';
 import { Link } from '../components/link';
 import { useToast } from '../components/primitives/Toast';
 import { request } from '../hooks/use-api';
@@ -49,6 +50,7 @@ export default function ContestManagePage({ _pageData }: ContestManagePageProps 
     <div className={styles.page} data-page="contest_manage">
       <div className={styles.layout}>
         <main className={styles.main}>
+          <ContestBackLink tdoc={tdoc} />
           <section className={styles.section}>
             <h2 className={styles.sectionTitle}>{t('ContestManage.ScoreSection')}</h2>
             <div className={styles.sectionBody}>
