@@ -364,6 +364,12 @@ export const zhCN: Catalog = {
   'RecordMain.HeaderScore': '分数',
   'RecordMain.HeaderTime': '时间',
 
+  'ContestBalloon.SetColor': '设置颜色',
+  'ContestBalloon.Title': '气球状态',
+
+  'ContestClarification.Broadcast': '广播',
+  'ContestClarification.Title': '赛时答疑',
+
   'ContestDetail.AllSubmissions': '所有提交',
   'ContestDetail.Attend': '报名参赛',
   'ContestDetail.Code': '导出代码',
@@ -409,6 +415,10 @@ export const zhCN: Catalog = {
   'ContestScoreboard.NoRows': '当前筛选下无用户',
   'ContestScoreboard.RowSummary': '显示 {visible} / {total} 位用户',
   'ContestScoreboard.BackToContest': '返回比赛',
+
+  'ContestUser.Add': '添加',
+  'ContestUser.Title': '参赛者管理',
+
   'ContestManage.ScoreSection': '题目分值',
   'ContestManage.NoProblems': '比赛暂未包含题目',
   'ContestManage.SetScoreTitle': '设置比赛题目分数',
@@ -438,12 +448,6 @@ export const zhCN: Catalog = {
   'ContestMgmt.Export': '导出',
   'ContestMgmt.Manage': '管理',
   'ContestMgmt.SidebarAria': '管理菜单',
-
-  'ContestUser.Add': '添加',
-  'ContestUser.Title': '参赛者管理',
-
-  'ContestBalloon.SetColor': '设置颜色',
-  'ContestBalloon.Title': '气球状态',
 
   'ContestMain.Crumbs': '比赛 / Contests',
   'ContestMain.Title': '所有比赛',
@@ -518,8 +522,6 @@ export const zhCN: Catalog = {
   Polyhedron_Intro: '为获得更好的题目版本管理与校验,我们建议使用 Polyhedron 来准备题目。',
   Polyhedron_Feature: 'Polyhedron 支持管理题目版本历史、测试解答、检查时间限制、合成比赛题面、协作等功能。',
   Polyhedron_Import: '在 Polyhedron 中创建的题目可以直接导入任何基于 Hydro 的在线评测系统。',
-  'ContestClarification.Broadcast': '广播',
-  'ContestClarification.Title': '赛时答疑',
   'Common.OpenPolyhedron': '打开 Polyhedron',
   'Common.Dismiss': '知道了',
   'Common.DontShowAgain': '不再显示',
@@ -900,6 +902,12 @@ export const en: Catalog = {
   'RecordMain.HeaderScore': 'Score',
   'RecordMain.HeaderTime': 'Time',
 
+  'ContestBalloon.SetColor': 'Set Color',
+  'ContestBalloon.Title': 'Balloon Status',
+
+  'ContestClarification.Broadcast': 'Broadcast',
+  'ContestClarification.Title': 'Clarifications',
+
   'ContestDetail.AllSubmissions': 'All submissions',
   'ContestDetail.Attend': 'Attend Contest',
   'ContestDetail.Code': 'Export Code',
@@ -945,6 +953,10 @@ export const en: Catalog = {
   'ContestScoreboard.NoRows': 'No users match this filter',
   'ContestScoreboard.RowSummary': 'Showing {visible} of {total} users',
   'ContestScoreboard.BackToContest': 'Back to contest',
+
+  'ContestUser.Add': 'Add',
+  'ContestUser.Title': 'Attendees',
+
   'ContestManage.ScoreSection': 'Problem scores',
   'ContestManage.NoProblems': 'Contest has no problems yet',
   'ContestManage.SetScoreTitle': 'Set score for contest problem',
@@ -973,15 +985,7 @@ export const en: Catalog = {
   'ContestMgmt.Edit': 'Edit',
   'ContestMgmt.Export': 'Export',
   'ContestMgmt.Manage': 'Manage',
-  'ContestClarification.Broadcast': 'Broadcast',
-  'ContestClarification.Title': 'Clarifications',
   'ContestMgmt.SidebarAria': 'Management',
-
-  'ContestUser.Add': 'Add',
-  'ContestUser.Title': 'Attendees',
-
-  'ContestBalloon.SetColor': 'Set Color',
-  'ContestBalloon.Title': 'Balloon Status',
 
   'ContestMain.Crumbs': 'Contests',
   'ContestMain.Title': 'All contests',
