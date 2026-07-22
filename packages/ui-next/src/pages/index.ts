@@ -25,6 +25,7 @@ registerPage('problem_import', () => import('./problem_import'));
 registerPage('problem_detail', () => import('./problem_detail'));
 registerPage('problem_submit', () => import('./problem_submit'));
 registerPage('problem_files', () => import('./problem_files'));
+registerPage('problem_config', () => import('./problem_config'));
 registerPage('problem_hack', () => import('./problem_hack'));
 registerPage('record_detail', () => import('./record_detail'));
 registerPage('record_main', () => import('./record_main'));

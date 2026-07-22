@@ -251,6 +251,14 @@ export const zhCN: Catalog = {
   'ProblemForm.ErrorPidInvalid': '题号格式不正确。仅允许字母、数字和可选前缀(如 P1000-)。',
   'ProblemForm.ErrorDifficultyRange': '难度必须是 1 到 10 之间的整数。',
 
+  'ProblemConfig.AutoDetected': '已自动检测 {count} 个子任务',
+  'ProblemConfig.InvalidYaml': '配置无效,请检查 YAML',
+  'ProblemConfig.Saved': '配置已保存',
+  'ProblemConfig.Tab.basic': '基础',
+  'ProblemConfig.Tab.editor': '编辑器',
+  'ProblemConfig.Tab.subtasks': '子任务',
+  'ProblemConfig.Title': '题目配置',
+
   'Auth.SignIn': '登录',
   'Auth.Username': '用户名',
   'Auth.Password': '密码',
@@ -769,6 +777,14 @@ export const en: Catalog = {
   'ProblemForm.ErrorTitleRequired': 'Title is required.',
   'ProblemForm.ErrorPidInvalid': 'PID format invalid. Use letters, digits, and optional prefix like "P1000-".',
   'ProblemForm.ErrorDifficultyRange': 'Difficulty must be an integer between 1 and 10.',
+
+  'ProblemConfig.AutoDetected': 'Detected {count} subtasks',
+  'ProblemConfig.InvalidYaml': 'Invalid config — please fix YAML',
+  'ProblemConfig.Saved': 'Config saved',
+  'ProblemConfig.Tab.basic': 'Basic',
+  'ProblemConfig.Tab.editor': 'Editor',
+  'ProblemConfig.Tab.subtasks': 'Subtasks',
+  'ProblemConfig.Title': 'Problem Config',
 
   'Auth.SignIn': 'Sign in',
   'Auth.Username': 'Username',
