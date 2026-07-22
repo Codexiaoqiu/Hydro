@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from '../components/link';
 import { Alert, Button, Card } from '../components/primitives';
+import { ProblemTestdata } from '../components/problem/ProblemTestdata';
 import { type ProblemAdditionalFile, ProblemAdditionalFiles } from '../components/problem/ProblemAdditionalFiles';
 import { usePageData } from '../context/page-data';
 import { useTranslate } from '../lib/i18n';
@@ -11,12 +12,14 @@ interface Args {
    *   - `pdoc.additional_file`  — current additional-file list (sorted)
    *   - `pdoc.reference`        — when this problem is a cross-domain reference
    *   - `pdoc.docId / .pid`     — needed to address the upload endpoint
+   *   - `pdoc.testdata`         — current testdata file list
    */
   pdoc?: {
     docId: number;
     pid?: string;
     title?: string;
     additional_file?: ProblemAdditionalFile[];
+    testdata?: Array<{ name: string; size: number }>;
     reference?: { domainId: string, pid: string | number };
   };
 }
@@ -43,6 +46,7 @@ export default function ProblemFilesPage() {
 
   const isReference = !!pdoc.reference;
   const pid = pdoc.pid ?? String(pdoc.docId);
+  const testdata: Array<{ name: string; size: number }> = (pdoc as any).testdata ?? [];
 
   return (
     <main style={{
@@ -61,6 +65,12 @@ export default function ProblemFilesPage() {
 
       {isReference && (
         <Alert variant="info" message={t('ProblemFiles.ReferenceNotice')} />
+      )}
+
+      {!isReference && (
+        <Card variant="default" header={<h2 style={{ margin: 0, fontSize: 'var(--text-lg)' }}>{t('ProblemFiles.TestdataSection')}</h2>}>
+          <ProblemTestdata pid={pid} files={testdata} disabled={isReference} onChange={() => window.location.reload()} />
+        </Card>
       )}
 
       <Card variant="default" header={<h2 style={{ margin: 0, fontSize: 'var(--text-lg)' }}>{t('ProblemFiles.AdditionalSection')}</h2>}>

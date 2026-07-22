@@ -109,6 +109,7 @@ export const zhCN: Catalog = {
   'ProblemFiles.Title': '附加文件',
   'ProblemFiles.Empty': '此题暂无附加文件。',
   'ProblemFiles.Manage': '管理文件',
+  'ProblemFiles.TestdataSection': '测试数据',
 
   'ProblemReference.CopyNotice': '这是另一道题目的副本。',
   'ProblemReference.CopyNoticeDetail': '此副本的编辑和统计不会同步到原始题目。',
@@ -633,6 +634,7 @@ export const en: Catalog = {
   'ProblemFiles.NotFound': 'Problem not found.',
   'ProblemFiles.ReferenceNotice': 'This problem is a cross-domain reference; additional files can only be edited from the source domain.',
   'ProblemFiles.Done': 'Done',
+  'ProblemFiles.TestdataSection': 'Testdata',
 
   'ProblemReference.CopyNotice': 'This is a copy of another problem.',
   'ProblemReference.CopyNoticeDetail': 'Edits and statistics on this copy will not be reflected in the original.',
