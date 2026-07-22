@@ -47,7 +47,7 @@ export function ProblemFiles({ pdoc }: ProblemFilesProps) {
               const downloadHref = buildUrl(
                 'problem_file_download',
                 { pid: String(pdoc.docId), filename: f.name },
-                { type: 'additional' },
+                { type: 'additional_file' },
               );
               return (
                 <li key={f.name} className={styles.item}>
