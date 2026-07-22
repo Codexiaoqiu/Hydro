@@ -1,0 +1,6 @@
+.textarea {
+  width: 100%; padding: var(--space-3); font-family: var(--font-mono);
+  font-size: var(--text-sm); color: var(--text); background: var(--bg-2);
+  border: 1px solid var(--border); border-radius: var(--radius-md); resize: vertical;
+}
+.textarea:focus { outline: 2px solid var(--cyan); outline-offset: 1px; }
