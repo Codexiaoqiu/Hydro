@@ -1,0 +1,2 @@
+.body { display: flex; flex-direction: column; gap: var(--space-3); }
+.label { font-size: var(--text-sm); color: var(--text-soft); }
