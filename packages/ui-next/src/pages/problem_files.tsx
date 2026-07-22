@@ -5,6 +5,7 @@ import { ProblemTestdata } from '../components/problem/ProblemTestdata';
 import { type ProblemAdditionalFile, ProblemAdditionalFiles } from '../components/problem/ProblemAdditionalFiles';
 import { usePageData } from '../context/page-data';
 import { useTranslate } from '../lib/i18n';
+import styles from './problem_files.module.css';
 
 interface Args {
   /**
@@ -38,7 +39,7 @@ export default function ProblemFilesPage() {
 
   if (!pdoc) {
     return (
-      <main style={{ maxWidth: 720, margin: '0 auto', padding: 'var(--space-6)' }}>
+      <main className={styles.notFound}>
         <Alert variant="error" message={t('ProblemFiles.NotFound')} />
       </main>
     );
@@ -49,16 +50,13 @@ export default function ProblemFilesPage() {
   const testdata: Array<{ name: string; size: number }> = (pdoc as any).testdata ?? [];
 
   return (
-    <main style={{
-      maxWidth: 960, margin: '0 auto', padding: 'var(--space-6)',
-      display: 'flex', flexDirection: 'column', gap: 'var(--space-5)',
-    }}>
-      <header style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+    <main className={styles.page}>
+      <header className={styles.header}>
         <Link to="problem_edit" params={{ pid }}>{t('ProblemFiles.BackToEdit')}</Link>
-        <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-2xl)', margin: 0 }}>
+        <h1 className={styles.headerTitle}>
           {pdoc.title ?? t('ProblemFiles.Title')}
         </h1>
-        <p style={{ margin: 0, color: 'var(--text-mute)', fontSize: 'var(--text-sm)' }}>
+        <p className={styles.headerSubtitle}>
           {t('ProblemFiles.Subtitle')}
         </p>
       </header>
@@ -68,12 +66,12 @@ export default function ProblemFilesPage() {
       )}
 
       {!isReference && (
-        <Card variant="default" header={<h2 style={{ margin: 0, fontSize: 'var(--text-lg)' }}>{t('ProblemFiles.TestdataSection')}</h2>}>
+        <Card variant="default" header={<h2 className={styles.sectionTitle}>{t('ProblemFiles.TestdataSection')}</h2>}>
           <ProblemTestdata pid={pid} files={testdata} disabled={isReference} onChange={() => window.location.reload()} />
         </Card>
       )}
 
-      <Card variant="default" header={<h2 style={{ margin: 0, fontSize: 'var(--text-lg)' }}>{t('ProblemFiles.AdditionalSection')}</h2>}>
+      <Card variant="default" header={<h2 className={styles.sectionTitle}>{t('ProblemFiles.AdditionalSection')}</h2>}>
         <ProblemAdditionalFiles
           pid={pid}
           files={files}
@@ -82,7 +80,7 @@ export default function ProblemFilesPage() {
         />
       </Card>
 
-      <footer style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--space-3)' }}>
+      <footer className={styles.footer}>
         <Link to="problem_detail" params={{ pid }}>
           <Button variant="primary" type="button">{t('ProblemFiles.Done')}</Button>
         </Link>

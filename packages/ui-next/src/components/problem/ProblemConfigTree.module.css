@@ -1,7 +1,8 @@
 .root { display: flex; flex-direction: column; gap: var(--space-3); }
 .header { display: flex; justify-content: space-between; align-items: center; }
 .title { margin: 0; font-family: var(--font-display); font-size: var(--text-base); }
-.empty { color: var(--text-mute); font-size: var(--text-sm); }
+/* Empty state needs vertical breathing room so the message doesn't sit on the card's border. */
+.empty { color: var(--text-mute); font-size: var(--text-sm); padding: var(--space-4) 0; }
 .list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: var(--space-3); }
 .row {
   background: var(--bg-1); border: 1px solid var(--border); border-radius: var(--radius-md);

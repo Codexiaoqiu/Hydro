@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { Button } from '../primitives/Button';
+import { useTranslate } from '../../lib/i18n';
 import { request } from '../../hooks/use-api';
 import { useToast } from '../primitives/Toast';
 import { formatDateTime } from '../../lib/datetime';
@@ -30,6 +31,7 @@ function personalEndAt(row: ContestUserRow, tdoc: ContestUserTableProps['tdoc'])
 
 export function ContestUserTable({ rows, udict, tdoc, onChange }: ContestUserTableProps) {
   const toast = useToast();
+  const t = useTranslate();
   const now = useMemo(() => Date.now(), []);
   const op = async (body: Record<string, unknown>) => {
     const fd = new URLSearchParams();
@@ -49,9 +51,20 @@ export function ContestUserTable({ rows, udict, tdoc, onChange }: ContestUserTab
         <col className={styles.colTime} /><col className={styles.colTime} />
         <col className={styles.colRank} /><col className={styles.colAction} />
       </colgroup>
-      <thead><tr><th>Uid</th><th>User</th><th>Start</th><th>End</th><th>Rank</th><th>Action</th></tr></thead>
+      <thead>
+        <tr>
+          <th>{t('ContestUser.Uid')}</th>
+          <th>{t('ContestUser.User')}</th>
+          <th>{t('ContestUser.Start')}</th>
+          <th>{t('ContestUser.End')}</th>
+          <th>{t('ContestUser.Rank')}</th>
+          <th>{t('ContestUser.Action')}</th>
+        </tr>
+      </thead>
       <tbody>
-        {rows.length === 0 && <tr><td colSpan={6} className={styles.empty}>No attendees</td></tr>}
+        {rows.length === 0 && (
+          <tr><td colSpan={6} className={styles.empty}>{t('ContestUser.Empty')}</td></tr>
+        )}
         {rows.map((r) => {
           const udoc = udict[String(r.uid)];
           const end = personalEndAt(r, tdoc);
@@ -64,13 +77,13 @@ export function ContestUserTable({ rows, udict, tdoc, onChange }: ContestUserTab
               <td>{r.endAt ? formatDateTime(r.endAt) : (r.startAt && tdoc.duration ? formatDateTime(new Date(new Date(r.startAt).getTime() + tdoc.duration * 3600_000).toISOString()) : '—')}</td>
               <td>
                 <Button variant="ghost" onClick={() => op({ operation: 'rank', uid: r.uid })}>
-                  {r.unrank ? 'UnRank' : 'Rank'}
+                  {r.unrank ? t('ContestUser.UnRank') : t('ContestUser.Rank')}
                 </Button>
               </td>
               <td>
                 {resumable && (
                   <Button variant="ghost" onClick={() => op({ operation: 'resume', uid: r.uid })}>
-                    Resume
+                    {t('ContestUser.Resume')}
                   </Button>
                 )}
               </td>

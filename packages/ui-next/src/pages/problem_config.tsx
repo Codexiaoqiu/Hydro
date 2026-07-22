@@ -29,6 +29,10 @@ export default function ProblemConfigPage() {
   const [saving, setSaving] = useState(false);
 
   const validation = useMemo(() => validateProblemConfigYaml(parsed), [parsed]);
+  const validationOk = validation.ok;
+  const rawErrors: ReadonlyArray<{ instancePath?: string; message?: string }> = validationOk
+    ? []
+    : (validation as Extract<typeof validation, { ok: false }>).errors ?? [];
 
   const onYamlChange = useCallback((next: string, nextParsed: ProblemConfigYaml) => {
     setYamlText(next);
@@ -77,10 +81,17 @@ export default function ProblemConfigPage() {
           {saving ? t('Common.Loading') : t('Common.Save')}
         </Button>
       </header>
-      {!validation.ok && (
-        <div className={styles.error} role="alert">
-          {validation.errors.map((e) => `${e.instancePath || '/'} ${e.message}`).join('; ')}
-        </div>
+      {rawErrors.length > 0 && (
+        <ul className={styles.errorList} role="alert">
+          {rawErrors.map((e, i) => (
+            <li key={i} className={styles.errorItem}>
+              {t('ProblemConfig.ValidationErrorItem', {
+                path: e.instancePath || '/',
+                message: e.message ?? '',
+              })}
+            </li>
+          ))}
+        </ul>
       )}
       <nav className={styles.tabs} role="tablist">
         {(['editor', 'basic', 'subtasks'] as Tab[]).map((k) => (

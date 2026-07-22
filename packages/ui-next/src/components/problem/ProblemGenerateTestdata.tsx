@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Button } from '../primitives/Button';
 import { Input } from '../primitives/Input';
 import { Modal } from '../primitives/Modal';
+import { useTranslate } from '../../lib/i18n';
 import { request } from '../../hooks/use-api';
 import { useToast } from '../primitives/Toast';
 import styles from './ProblemGenerateTestdata.module.css';
@@ -19,6 +20,7 @@ export function ProblemGenerateTestdata({ pid, testdata, onGenerated }: ProblemG
   const [recordUrl, setRecordUrl] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const toast = useToast();
+  const t = useTranslate();
 
   useEffect(() => {
     if (!open) return;
@@ -27,12 +29,12 @@ export function ProblemGenerateTestdata({ pid, testdata, onGenerated }: ProblemG
         setOpen(false);
         setRecordUrl(null);
         onGenerated();
-        toast.success('Testdata generated');
+        toast.success(t('ProblemGenerateTestdata.Generated'));
       }
     };
     window.addEventListener('message', onMessage);
     return () => window.removeEventListener('message', onMessage);
-  }, [open, onGenerated, toast]);
+  }, [open, onGenerated, toast, t]);
 
   const start = async () => {
     setBusy(true);
@@ -54,15 +56,15 @@ export function ProblemGenerateTestdata({ pid, testdata, onGenerated }: ProblemG
   return (
     <>
       <Button variant="ghost" onClick={() => setOpen(true)} disabled={testdata.length === 0}>
-        Generate Testdata
+        {t('ProblemGenerateTestdata.Title')}
       </Button>
-      <Modal open={open} onClose={() => setOpen(false)} title="Generate Testdata" width={640}>
+      <Modal open={open} onClose={() => setOpen(false)} title={t('ProblemGenerateTestdata.ModalTitle')} width={640}>
         {!recordUrl ? (
           <div className={styles.form}>
-            <Input label="Generator source" value={gen} onChange={(e) => setGen(e.currentTarget.value)} hint="One of the existing files in testdata" />
-            <Input label="Standard output source" value={std} onChange={(e) => setStd(e.currentTarget.value)} />
+            <Input label={t('ProblemGenerateTestdata.GeneratorLabel')} value={gen} onChange={(e) => setGen(e.currentTarget.value)} hint={t('ProblemGenerateTestdata.Hint')} />
+            <Input label={t('ProblemGenerateTestdata.StdLabel')} value={std} onChange={(e) => setStd(e.currentTarget.value)} />
             <Button variant="primary" onClick={start} disabled={!gen || !std || busy}>
-              {busy ? 'Starting…' : 'Start'}
+              {busy ? t('ProblemGenerateTestdata.Starting') : t('ProblemGenerateTestdata.Start')}
             </Button>
           </div>
         ) : (

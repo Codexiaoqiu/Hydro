@@ -4,6 +4,13 @@
   border-radius: var(--radius-xl);
   transition: background-color var(--motion-slow), border-color var(--motion-slow), box-shadow var(--motion-slow);
 }
+/*
+ * Default `.card` keeps the body flush with the rendered borders — the header
+ * already provides its own `padding: var(--space-4) var(--space-6)`, but the
+ * children slot has no breathing room. Add a uniform body padding so empty
+ * states / form fields don't sit on the card's edge.
+ */
+.card > :not(.header) { padding: var(--space-4) var(--space-5); }
 .side { padding: var(--space-5) var(--space-5); }
 .stat { padding: var(--space-5) var(--space-6); position: relative; overflow: hidden; }
 .header { display: flex; align-items: center; justify-content: space-between; padding: var(--space-4) var(--space-6); border-bottom: 1px solid var(--border); }

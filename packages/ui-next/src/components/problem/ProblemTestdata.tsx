@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 import { Button } from '../primitives/Button';
+import { useTranslate } from '../../lib/i18n';
 import { request } from '../../hooks/use-api';
 import { useToast } from '../primitives/Toast';
 import { ProblemCreateTestdata } from './ProblemCreateTestdata';
@@ -18,6 +19,7 @@ export function ProblemTestdata({ pid, files, disabled, onChange }: ProblemTestd
   const [busy, setBusy] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const toast = useToast();
+  const t = useTranslate();
 
   const upload = async (file: File) => {
     const fd = new FormData();
@@ -66,28 +68,28 @@ export function ProblemTestdata({ pid, files, disabled, onChange }: ProblemTestd
       // Download first link; ui-next simplifies ui-default's StreamSaver approach
       const first = Object.values(resp.links)[0];
       if (first) window.location.href = first;
-      else toast.error('No links returned');
+      else toast.error(t('ProblemTestdata.NoLinks'));
     } finally { setBusy(false); }
   };
 
   return (
     <div className={styles.root}>
       <header className={styles.header}>
-        <h3 className={styles.title}>Testdata ({files.length})</h3>
+        <h3 className={styles.title}>{t('ProblemTestdata.Title', { count: files.length })}</h3>
         <div className={styles.tools}>
           <label className={styles.upload}>
-            {busy ? 'Uploading…' : 'Upload'}
+            {busy ? t('ProblemTestdata.Uploading') : t('ProblemTestdata.Upload')}
             <input ref={inputRef} type="file" multiple disabled={disabled || busy} onChange={onUpload} />
           </label>
           <ProblemCreateTestdata pid={pid} onCreated={(name) => onChange([...files, { name, size: 0 }])} />
           <ProblemGenerateTestdata pid={pid} testdata={files.map((f) => f.name)} onGenerated={() => window.location.reload()} />
           {files.length > 0 && (
-            <Button variant="ghost" onClick={downloadZip} disabled={busy}>Download ZIP</Button>
+            <Button variant="ghost" onClick={downloadZip} disabled={busy}>{t('ProblemTestdata.DownloadZip')}</Button>
           )}
         </div>
       </header>
       {files.length === 0 ? (
-        <p className={styles.empty}>No testdata yet.</p>
+        <p className={styles.empty}>{t('ProblemTestdata.Empty')}</p>
       ) : (
         <ul className={styles.list}>
           {files.map((f) => (

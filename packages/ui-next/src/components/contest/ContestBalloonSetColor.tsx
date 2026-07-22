@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { HexColorPicker } from '../primitives/HexColorPicker';
 import { Modal } from '../primitives/Modal';
 import { Button } from '../primitives/Button';
+import { useTranslate } from '../../lib/i18n';
 import { request } from '../../hooks/use-api';
 import { useToast } from '../primitives/Toast';
 import * as yaml from 'js-yaml';
@@ -18,6 +19,7 @@ export function ContestBalloonSetColor({ open, onClose, onSaved, initial = '#fbb
   const [color, setColor] = useState(initial);
   const [busy, setBusy] = useState(false);
   const toast = useToast();
+  const t = useTranslate();
 
   const save = async () => {
     setBusy(true);
@@ -26,7 +28,7 @@ export function ContestBalloonSetColor({ open, onClose, onSaved, initial = '#fbb
       fd.set('operation', 'set_color');
       fd.set('color', yaml.dump({ default: color }));
       await request.post(window.location.pathname, fd);
-      toast.success('Color saved');
+      toast.success(t('ContestBalloon.ColorSaved'));
       onSaved();
       onClose();
     } catch (e) {
@@ -35,10 +37,12 @@ export function ContestBalloonSetColor({ open, onClose, onSaved, initial = '#fbb
   };
 
   return (
-    <Modal open={open} onClose={onClose} title="Set Balloon Color" footer={
+    <Modal open={open} onClose={onClose} title={t('ContestBalloon.ModalTitle')} footer={
       <>
-        <Button variant="ghost" onClick={onClose} disabled={busy}>Cancel</Button>
-        <Button variant="primary" onClick={save} disabled={busy}>{busy ? 'Saving…' : 'Save'}</Button>
+        <Button variant="ghost" onClick={onClose} disabled={busy}>{t('ContestBalloon.Cancel')}</Button>
+        <Button variant="primary" onClick={save} disabled={busy}>
+          {busy ? t('ContestBalloon.Saving') : t('ContestBalloon.Save')}
+        </Button>
       </>
     }>
       <div className={styles.body}>

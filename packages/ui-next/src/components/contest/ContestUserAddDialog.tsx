@@ -3,6 +3,7 @@ import { Button } from '../primitives/Button';
 import { Checkbox } from '../primitives/Checkbox';
 import { Modal } from '../primitives/Modal';
 import { UserSelectAutoComplete } from '../primitives/UserSelectAutoComplete';
+import { useTranslate } from '../../lib/i18n';
 import { request } from '../../hooks/use-api';
 import { useToast } from '../primitives/Toast';
 import styles from './ContestUserAddDialog.module.css';
@@ -19,6 +20,7 @@ export function ContestUserAddDialog({ open, onClose, onAdded, domainId }: Conte
   const [unrank, setUnrank] = useState(false);
   const [busy, setBusy] = useState(false);
   const toast = useToast();
+  const t = useTranslate();
 
   const add = async () => {
     if (uids.length === 0) return;
@@ -29,7 +31,7 @@ export function ContestUserAddDialog({ open, onClose, onAdded, domainId }: Conte
       fd.set('uids', uids.join(','));
       if (unrank) fd.set('unrank', 'on');
       await request.post(window.location.pathname, fd);
-      toast.success(`Added ${uids.length} user(s)`);
+      toast.success(t('ContestUser.Added', { count: uids.length }));
       setUids([]);
       onAdded();
       onClose();
@@ -39,16 +41,22 @@ export function ContestUserAddDialog({ open, onClose, onAdded, domainId }: Conte
   };
 
   return (
-    <Modal open={open} onClose={onClose} title="Add Attendees" footer={
+    <Modal open={open} onClose={onClose} title={t('ContestUser.AddAttendees')} footer={
       <>
-        <Button variant="ghost" onClick={onClose} disabled={busy}>Cancel</Button>
-        <Button variant="primary" onClick={add} disabled={uids.length === 0 || busy}>{busy ? 'Adding…' : 'Add'}</Button>
+        <Button variant="ghost" onClick={onClose} disabled={busy}>{t('ContestUser.Cancel')}</Button>
+        <Button variant="primary" onClick={add} disabled={uids.length === 0 || busy}>
+          {busy ? t('ContestUser.Adding') : t('ContestUser.Add')}
+        </Button>
       </>
     }>
       <div className={styles.body}>
-        <label className={styles.label}>Users</label>
+        <label className={styles.label}>{t('ContestUser.Users')}</label>
         <UserSelectAutoComplete value={uids} onChange={setUids} domainId={domainId} />
-        <Checkbox label="Add as unranked" checked={unrank} onChange={(e) => setUnrank(e.currentTarget.checked)} />
+        <Checkbox
+          label={t('ContestUser.AddAsUnranked')}
+          checked={unrank}
+          onChange={(e) => setUnrank(e.currentTarget.checked)}
+        />
       </div>
     </Modal>
   );
