@@ -1,0 +1,6 @@
+.table { width: 100%; border-collapse: collapse; font-size: var(--text-sm); }
+.table th { text-align: left; color: var(--text-mute); font-weight: 600; padding: var(--space-2) var(--space-3); border-bottom: 1px solid var(--border); }
+.table td { padding: var(--space-2) var(--space-3); border-bottom: 1px solid var(--border); color: var(--text); }
+.colUid { width: 80px; } .colUser { width: 30%; } .colTime { width: 20%; } .colRank { width: 100px; } .colAction { width: 140px; }
+.mono { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--text-mute); }
+.empty { text-align: center; color: var(--text-mute); padding: var(--space-6); }
