@@ -1,0 +1,5 @@
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); }
+.field { display: flex; flex-direction: column; gap: var(--space-1); }
+.label { font-size: var(--text-sm); color: var(--fg); }
+.select { width: 100%; padding: var(--space-2) var(--space-3); border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg-secondary); color: var(--fg); font-size: var(--text-sm); cursor: pointer; }
+.select:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
