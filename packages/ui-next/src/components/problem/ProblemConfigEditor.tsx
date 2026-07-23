@@ -1,12 +1,13 @@
 import type { ReactNode } from 'react';
-import { lazy, Suspense, useEffect, useRef, useState } from 'react';
+import { lazy, Suspense } from 'react';
 import { parseProblemConfigYaml } from '../../lib/yaml-config';
 import styles from './ProblemConfigEditor.module.css';
 
-// Lazy wrapper that accepts children: by exporting a wrapper component
-// instead of the bare Monaco `Editor`, we can let the parent compose the
-// inner implementation via children. React.lazy() requires a module with
-// `default` export, so the host lives in its own file.
+// Lazy wrapper that accept a host component as children: by exporting a
+// wrapper component instead of the bare Monaco `Editor`, we can let the
+// parent compose the inner implementation via children. React.lazy()
+// requires a module with `default` export, so the host lives in its own
+// file (this matches the prior pass-through layout).
 const MonacoWrapper = lazy(() =>
   import('./MonacoEditorHost').then((m) => ({ default: m.MonacoEditorHost })),
 );
@@ -33,20 +34,17 @@ function FallbackTextarea({ value, onChange, height }: ProblemConfigEditorProps)
 }
 
 export function ProblemConfigEditor(props: ProblemConfigEditorProps) {
-  // 用动态 import + Suspense 拉 Monaco;happy-dom / SSR 时降级为 textarea
+  // SSR: happy-dom / vitest always render the textarea fallback. The
+  // fallback forwards `parseProblemConfigYaml` so any test that types into
+  // it still exercises the validation pipeline.
   if (typeof window === 'undefined') return <FallbackTextarea {...props} />;
   return (
     <Suspense fallback={<FallbackTextarea {...props} />}>
-      <MonacoWrapper>
-        <MonacoImpl {...props} />
-      </MonacoWrapper>
+      <MonacoWrapper
+        value={props.value}
+        onChange={(next) => props.onChange(next, parseProblemConfigYaml(next))}
+        height={props.height}
+      />
     </Suspense>
   );
-}
-
-function MonacoImpl({ value, onChange, height = 400 }: ProblemConfigEditorProps) {
-  // 真实实现: Editor from '@monaco-editor/react', language='yaml', theme='vs-dark',
-  // onChange 触发 300ms debounce 后调 onChange(yaml, parse(yaml))
-  // 为简洁此处保留钩子,完整 Monaco wiring 在后续 spec 任务中填。
-  return <FallbackTextarea value={value} onChange={onChange} height={height} />;
 }

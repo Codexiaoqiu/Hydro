@@ -1,3 +1,4 @@
+import { STATUS } from '@hydrooj/common';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from '../components/link';
 import { Alert, Button } from '../components/primitives';
@@ -78,6 +79,13 @@ export default function RecordDetailPage() {
         if (typeof data.status === 'number') {
           setLiveStatus(data.status);
           liveStatusRef.current = data.status;
+          // Tell the parent window we have an accepted result. ui-next's
+          // ProblemGenerateTestdata modal embeds this page in an iframe and
+          // listens for a `{status: STATUS.STATUS_ACCEPTED}` postMessage to
+          // close itself once the generation record finishes AC.
+          if (data.status === STATUS.STATUS_ACCEPTED) {
+            try { window.parent?.postMessage({ status: STATUS.STATUS_ACCEPTED }, '*'); } catch { /* parent gone */ }
+          }
           // Terminal status — no more updates expected, close the stream.
           if (STATUS_KEYS[data.status]) es.close();
         }

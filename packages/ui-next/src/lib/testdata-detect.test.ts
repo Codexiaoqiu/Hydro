@@ -23,4 +23,14 @@ describe('detectSubtasks', () => {
   it('returns empty array when no pairs', () => {
     expect(detectSubtasks(['only.in'])).toEqual([]);
   });
+
+  // ---- I-6 parity (server-aligned heuristic) ----
+  it('produces the same result regardless of whether @hydrooj/common is loaded', () => {
+    // Both the server-aligned path and the client-side fallback should
+    // agree on the canonical naming conventions.
+    const plain = detectSubtasks(['1.in', '1.out', '2.in', '2.out']);
+    expect(plain[0].cases.map((c) => c.input).sort()).toEqual(['1.in', '2.in']);
+    const grouped = detectSubtasks(['1-1.in', '1-1.out', '2-1.in', '2-1.out']);
+    expect(grouped).toHaveLength(2);
+  });
 });

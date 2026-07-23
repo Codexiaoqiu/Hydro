@@ -12,9 +12,14 @@ export interface ModalProps {
   width?: number;
   /** When true, clicking the backdrop does not call onClose. */
   persistent?: boolean;
+  /** Accessible label for the close button. Defaults to "Close". Pass a localized string when the host page has a translation. */
+  closeLabel?: string;
 }
 
-export function Modal({ open, onClose, title, footer, children, width = 480, persistent = false }: ModalProps) {
+export function Modal({
+  open, onClose, title, footer, children,
+  width = 480, persistent = false, closeLabel = 'Close',
+}: ModalProps) {
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
@@ -49,7 +54,7 @@ export function Modal({ open, onClose, title, footer, children, width = 480, per
           <button
             type="button"
             className={styles.close}
-            aria-label="Close"
+            aria-label={closeLabel}
             onClick={onClose}
           >×</button>
         </header>

@@ -7,12 +7,15 @@ import styles from './ProblemCreateTestdata.module.css';
 export interface ProblemCreateTestdataProps {
   pid: string;
   onCreated: (name: string) => void;
+  /** Disabled when the problem is a cross-domain reference. */
+  disabled?: boolean;
 }
 
-export function ProblemCreateTestdata({ pid, onCreated }: ProblemCreateTestdataProps) {
+export function ProblemCreateTestdata({ pid, onCreated, disabled }: ProblemCreateTestdataProps) {
   const [busy, setBusy] = useState(false);
   const t = useTranslate();
   const create = async () => {
+    if (disabled) return;
     const name = window.prompt(t('ProblemCreateTestdata.FilenamePrompt'));
     if (!name) return;
     setBusy(true);
@@ -28,7 +31,7 @@ export function ProblemCreateTestdata({ pid, onCreated }: ProblemCreateTestdataP
   }
   ;
   return (
-    <Button variant="ghost" onClick={create} disabled={busy}>
+    <Button variant="ghost" onClick={create} disabled={disabled || busy}>
       {busy ? t('ProblemCreateTestdata.Creating') : `+ ${t('ProblemCreateTestdata.Create')}`}
     </Button>
   );

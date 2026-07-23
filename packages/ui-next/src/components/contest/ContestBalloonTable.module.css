@@ -1,12 +1,18 @@
 .table { width: 100%; border-collapse: collapse; font-size: var(--text-sm); }
 .table th { text-align: left; color: var(--text-mute); font-weight: 600; padding: var(--space-2) var(--space-3); border-bottom: 1px solid var(--border); }
 .table td { padding: var(--space-2) var(--space-3); border-bottom: 1px solid var(--border); color: var(--text); }
-.colStatus { width: 80px; } .colBid { width: 80px; } .colProblem { width: 40%; } .colUser { width: 20%; } .colAwards { width: 80px; } .colAction { width: 100px; }
+.colPid { width: 56px; }
+.colTitle { width: 36%; }
+.colColor { width: 110px; }
+.colSubmitter { width: 20%; }
+.colFirst { width: 64px; }
+.colSent { width: 22%; }
+.colAction { width: 100px; }
 .mono { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--text-mute); }
 .empty { text-align: center; color: var(--text-mute); padding: var(--space-6); }
-.dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; }
-.dot.pending { background: var(--amber); }
-.dot.done { background: var(--green); }
 .swatch { display: inline-block; width: 14px; height: 14px; border-radius: var(--radius-sm); margin-right: var(--space-2); vertical-align: middle; border: 1px solid var(--border); }
 .first { padding: 1px var(--space-2); background: var(--tint-amber-12); color: var(--amber); border-radius: var(--radius-pill); font-size: var(--text-xs); }
-.done { color: var(--green); font-size: var(--text-xs); }
+.sent { color: var(--green); font-size: var(--text-xs); }
+.pidTag { display: inline-block; min-width: 28px; text-align: center; font-family: var(--font-mono); font-size: var(--text-xs); padding: 2px var(--space-2); border-radius: var(--radius-pill); background: var(--tint-amber-12); color: var(--amber); }
+.colorCell { display: inline-flex; align-items: center; gap: var(--space-2); }
+.colorName { color: var(--text-mute); font-size: var(--text-xs); }

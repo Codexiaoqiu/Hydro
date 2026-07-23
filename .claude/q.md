@@ -1,217 +1,69 @@
-{
-    "rules": {
-        "acm": "XCPC",
-        "oi": "OI",
-        "ioi": "IOI",
-        "ledo": "Ledo",
-        "strictioi": "IOI(Strict)"
-    },
-    "tdoc": {
-        "_id": "6916ce868baf48be1624b9a7",
-        "content": "text",
-        "owner": 2,
-        "domainId": "system",
-        "docType": 30,
-        "docId": "6916ce868baf48be1624b9a7",
-        "assign": [],
-        "duration": null,
-        "title": "text",
-        "rule": "acm",
-        "beginAt": "2026-07-21T08:30:00.000Z",
-        "endAt": "2026-07-22T08:30:00.000Z",
-        "pids": [
-            5,
-            3,
-            1
-        ],
-        "attend": 2,
-        "rated": true,
-        "allowPrint": false,
-        "allowViewCode": true,
-        "autoHide": true,
-        "langs": [
-            "cc.cc17",
-            "cc",
-            "py.py3",
-            "py"
-        ],
-        "lockAt": null,
-        "maintainer": [
-            2
-        ],
-        "keepScoreboardHidden": false
-    },
-    "duration": 24,
-    "pids": "5,3,1",
-    "beginAt": "2026-07-21T08:30:00.000Z",
-    "page_name": "contest_edit",
-    "domainId": "system",
-    "languages": [
-        {
-            "value": "bash",
-            "label": "Bash"
-        },
-        {
-            "value": "c",
-            "label": "C"
-        },
-        {
-            "value": "cc.cc98",
-            "label": "C++98"
-        },
-        {
-            "value": "cc.cc98o2",
-            "label": "C++98(O2)"
-        },
-        {
-            "value": "cc.cc11",
-            "label": "C++11"
-        },
-        {
-            "value": "cc.cc11o2",
-            "label": "C++11(O2)"
-        },
-        {
-            "value": "cc.cc14",
-            "label": "C++14"
-        },
-        {
-            "value": "cc.cc14o2",
-            "label": "C++14(O2)"
-        },
-        {
-            "value": "cc.cc17",
-            "label": "C++17"
-        },
-        {
-            "value": "cc.cc17o2",
-            "label": "C++17(O2)"
-        },
-        {
-            "value": "cc.cc20",
-            "label": "C++20"
-        },
-        {
-            "value": "cc.cc20o2",
-            "label": "C++20(O2)"
-        },
-        {
-            "value": "pas",
-            "label": "Pascal"
-        },
-        {
-            "value": "java",
-            "label": "Java"
-        },
-        {
-            "value": "kt.jvm",
-            "label": "Kotlin/JVM"
-        },
-        {
-            "value": "py.py3",
-            "label": "Python 3"
-        },
-        {
-            "value": "py.pypy3",
-            "label": "PyPy3"
-        },
-        {
-            "value": "php",
-            "label": "PHP"
-        },
-        {
-            "value": "rs",
-            "label": "Rust"
-        },
-        {
-            "value": "hs",
-            "label": "Haskell"
-        },
-        {
-            "value": "js",
-            "label": "NodeJS"
-        },
-        {
-            "value": "go",
-            "label": "Golang"
-        },
-        {
-            "value": "rb",
-            "label": "Ruby"
-        },
-        {
-            "value": "cs",
-            "label": "C#"
-        },
-        {
-            "value": "r",
-            "label": "R"
-        }
-    ],
-    "UiContext": {
-        "cdn_prefix": "/",
-        "cdn_dynamic": false,
-        "url_prefix": "/",
-        "ws_prefix": "/",
-        "hydroacFeatures": [],
-        "blspHost": "wss://ws.hydrooj.com",
-        "constantVersion": "d5f9bc31",
-        "domainId": "system",
-        "domainVersion": 1784709000237,
-        "SWConfig": {
-            "preload": "",
-            "hosts": [
-                "http://localhost:8000",
-                "https://localhost:8000",
-                "/",
-                "/"
-            ],
-            "assets": [],
-            "domains": []
-        }
-    },
-    "UserContext": {
-        "_id": 2,
-        "mail": "q2695698921@2625.com",
-        "uname": "小邱",
-        "hashType": "hydro",
-        "priv": -1,
-        "regat": "2025-11-13T03:11:54.271Z",
-        "loginat": "2026-07-17T07:03:48.642Z",
-        "perm": "BigInt::-1",
-        "role": "root",
-        "scope": "BigInt::-1",
-        "tfa": false,
-        "authn": false,
-        "group": [
-            "2"
-        ],
-        "domains": [],
-        "viewLang": "zh",
-        "timeZone": "Asia/Shanghai",
-        "codeLang": "bash",
-        "codeTemplate": "",
-        "avatar": "gravatar:q2695698921@2625.com",
-        "gender": 2,
-        "backgroundImage": "/components/profile/backgrounds/1.jpg",
-        "unreadMsg": 0,
-        "pinnedDomains": [],
-        "rounded": false,
-        "skipAnimate": false,
-        "showTimeAgo": true,
-        "fontFamily": "Open Sans",
-        "codeFontFamily": "Source Code Pro",
-        "theme": "light",
-        "preferredEditorType": "sv",
-        "showInvisibleChar": false,
-        "formatCode": true,
-        "rpInfo": {},
-        "nAccept": 3,
-        "nSubmit": 3,
-        "nLiked": 0,
-        "rp": 0,
-        "level": 0,
-        "join": true,
-        "avatarUrl": "//cn.gravatar.com/avatar/af38a767f69d23ba16e525bb1e56a3e7?d=mm&s=128"
-    }
-}
+继续执行 ui-next 原未迁移页面完整对等迁移。
+
+请先读取：
+@.superpowers/sdd/progress.md
+@docs/superpowers/specs/2026-07-22-ui-next-unmigrated-pages-parity-design.md
+@.superpowers/sdd/task-8-brief.md
+@.superpowers/sdd/task-8-report.md
+@.superpowers/sdd/task-8-review-package.md
+
+
+继续执行 ui-next 原未迁移页面完整对等迁移。
+
+请先读取：
+@.superpowers/sdd/progress.md
+@docs/superpowers/specs/2026-07-22-ui-next-unmigrated-pages-parity-design.md
+@.superpowers/sdd/task-8-brief.md
+@.superpowers/sdd/task-8-report.md
+@.superpowers/sdd/task-8-review-package.md
+
+Task 1–7 已完成并通过任务级审查。
+Task 8 已实现并有 40/40 目标测试通过，但任务级审查尚未执行。
+请从 Task 8 的规格符合性和代码质量审查开始。
+
+继续使用 Subagent-Driven Development：
+每个任务由独立实现代理完成，随后进行任务级审查；
+发现 Critical/Important 必须修复并复审。
+
+当前直接在 master 工作，保留现有全部未提交改动。
+不要 commit、不要 push。
+不要覆盖用户或 linter 对以下文件的有意修改：
+.claude/reviews/ui-next-migration-gap-2026-07-21.md
+packages/ui-next/src/lib/i18n.ts
+.superpowers/sdd/task-7.patch
+
+Task 8 通过后继续 Task 9–12。
+
+其中最关键的单个文件是：
+
+@.superpowers/sdd/progress.md
+
+但只引入该文件不会包含 Task 8 的具体审查要求，因此最好至少再加：
+
+@.superpowers/sdd/task-8-brief.md
+@.superpowers/sdd/task-8-report.md
+@.superpowers/sdd/task-8-review-package.md
+---
+
+# SDD Recovery Round 完成（2026-07-24）
+
+- Task 8 Re-review: PASSED（40/40 GREEN；4 Important fixes 验证通过）
+- Task 12 Fix (contest_clarification 2C+4M): PASSED（接受 2 项 scope-creep）
+- Task 10 Fix (problem_files testdata 3C+4H): PASSED（接受 98 行 lib/i18n.ts additive；H-4 部分）
+- Task 9 Fix (problem_config 5C+7I): PASSED（+19 新增测试；12 ProblemConfig 通过；review subagent 被中途停止）
+
+测试基线：720/8/712 → 739/8/731（+19 新增；预存在 8 失败不变）
+
+约束遵守：
+- ✅ 不 commit、不 push（工作树 dirty）
+- ⚠️ lib/i18n.ts：98 行 additive（仅 Task 10），无删除、字母序
+- ✅ 无新 window.location.reload 引入
+- ✅ 未触 ui-default、后端 handler
+
+文件落地：
+- Spec: docs/superpowers/specs/2026-07-24-sdd-recovery-tasks-8-9-10-12-design.md
+- Plan: docs/superpowers/plans/2026-07-24-sdd-recovery-plan.md
+- 报告附录八: .claude/reviews/ui-next-migration-gap-2026-07-21.md
+- SDD 文档: .superpowers/sdd/task-{8-re-review,12-fix-{brief,report,re-review},10-fix-{brief,report,re-review},9-fix-{brief,report,re-review}}.md
+
+下一步：等待用户指示（final whole-branch review / commit / 下一轮 SDD）

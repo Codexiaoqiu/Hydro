@@ -4,8 +4,9 @@ import { ProblemConfigEditor } from './ProblemConfigEditor';
 
 describe('ProblemConfigEditor', () => {
   it('renders a textarea fallback when Monaco is not loaded', () => {
+    // happy-dom: there is no real layout engine and Monaco's lazy chunk
+    // sometimes refuses to render; the fallback is always shown for SSR.
     render(<ProblemConfigEditor value="type: default" onChange={() => {}} />);
-    // Monaco 在 happy-dom 下不会初始化,组件应降级为 textarea
     const textarea = screen.getByRole('textbox');
     expect(textarea).toBeInTheDocument();
     expect((textarea as HTMLTextAreaElement).value).toBe('type: default');

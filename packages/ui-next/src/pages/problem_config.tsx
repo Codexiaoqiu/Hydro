@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import { Button } from '../components/primitives/Button';
+import { ConfirmDialog } from '../components/primitives/ConfirmDialog';
 import { useToast } from '../components/primitives/Toast';
 import { ProblemConfigBasicForm } from '../components/problem/ProblemConfigBasicForm';
 import { ProblemConfigEditor } from '../components/problem/ProblemConfigEditor';
@@ -8,7 +9,10 @@ import { usePageData } from '../context/page-data';
 import { request } from '../hooks/use-api';
 import { useTranslate } from '../lib/i18n';
 import { detectSubtasks } from '../lib/testdata-detect';
-import { dumpProblemConfigYaml, parseProblemConfigYaml, validateProblemConfigYaml, type ProblemConfigYaml } from '../lib/yaml-config';
+import {
+  dumpProblemConfigYaml, migrateCasesToSubtasks, parseProblemConfigYaml,
+  validateProblemConfigYaml, type ProblemConfigYaml,
+} from '../lib/yaml-config';
 import styles from './problem_config.module.css';
 
 interface Args {
@@ -24,9 +28,17 @@ export default function ProblemConfigPage() {
   const t = useTranslate();
   const toast = useToast();
   const [tab, setTab] = useState<Tab>('editor');
-  const [yamlText, setYamlText] = useState(args?.config ?? '');
-  const [parsed, setParsed] = useState<ProblemConfigYaml>(() => parseProblemConfigYaml(args?.config ?? ''));
+  const initialConfig = useMemo(() => {
+    const parsed = parseProblemConfigYaml(args?.config ?? '');
+    // Migrate legacy `cases` + `score` configs into a single 'sum' subtask,
+    // mirroring ui-default's `pages/problem_config.page.tsx` reducer so the
+    // editor and subtask tree don't silently drop data.
+    return migrateCasesToSubtasks(parsed);
+  }, [args?.config]);
+  const [yamlText, setYamlText] = useState(() => dumpProblemConfigYaml(initialConfig));
+  const [parsed, setParsed] = useState<ProblemConfigYaml>(initialConfig);
   const [saving, setSaving] = useState(false);
+  const [confirmInvalid, setConfirmInvalid] = useState(false);
 
   const validation = useMemo(() => validateProblemConfigYaml(parsed), [parsed]);
   const validationOk = validation.ok;
@@ -43,33 +55,47 @@ export default function ProblemConfigPage() {
     const files = args?.testdata ?? [];
     const subtasks = detectSubtasks(files);
     const next: ProblemConfigYaml = { ...parsed, subtasks: subtasks.map((s) => ({
-      score: s.score, cases: s.cases, time_limit: 1000, memory_limit: 256,
+      type: 'sum' as const,
+      score: s.score,
+      cases: s.cases,
+      id: s.id,
     })) };
     setParsed(next);
     setYamlText(dumpProblemConfigYaml(next));
     toast.success(t('ProblemConfig.AutoDetected', { count: subtasks.length }));
   }, [args?.testdata, parsed, toast, t]);
 
-  const save = useCallback(async () => {
-    if (!validation.ok) { toast.error(t('ProblemConfig.InvalidYaml')); return; }
+  const save = useCallback(async (force = false) => {
     if (!args?.pdoc) return;
+    if (!validation.ok && !force) {
+      // I-3: when validation fails the user can still confirm to save anyway.
+      // The ConfirmDialog intercepts and re-invokes save(true) on confirm.
+      setConfirmInvalid(true);
+      return;
+    }
     setSaving(true);
     try {
+      // Run the saved config through the same filtering/dump pipeline so the
+      // server-side file matches what the editor would produce locally.
+      const cleanYaml = dumpProblemConfigYaml(parsed);
       const fd = new FormData();
-      fd.append('file', new Blob([yamlText], { type: 'text/yaml' }), 'config.yaml');
+      fd.append('file', new Blob([cleanYaml], { type: 'text/yaml' }), 'config.yaml');
       fd.append('filename', 'config.yaml');
       fd.append('type', 'testdata');
       fd.append('operation', 'upload_file');
       const pid = args.pdoc.pid ?? String(args.pdoc.docId);
       await request.postFile(`/p/${encodeURIComponent(pid)}/files`, fd);
       toast.success(t('ProblemConfig.Saved'));
+      // Reload to pick up server-side canonical state (parity with
+      // ui-default's `window.location.reload()` after save).
+      if (typeof window !== 'undefined') window.location.reload();
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
       toast.error(msg);
     } finally {
       setSaving(false);
     }
-  }, [validation, args?.pdoc, yamlText, toast, t]);
+  }, [validation, args?.pdoc, parsed, toast, t]);
 
   if (!args?.pdoc) return <p style={{ padding: 'var(--space-6)' }}>{t('Common.Loading')}</p>;
 
@@ -77,7 +103,7 @@ export default function ProblemConfigPage() {
     <div className={styles.page} data-page="problem_config">
       <header className={styles.header}>
         <h1 className={styles.title}>{t('ProblemConfig.Title')}</h1>
-        <Button variant="primary" onClick={save} disabled={saving || !validation.ok}>
+        <Button variant="primary" onClick={() => save()} disabled={saving}>
           {saving ? t('Common.Loading') : t('Common.Save')}
         </Button>
       </header>
@@ -112,6 +138,17 @@ export default function ProblemConfigPage() {
           />
         )}
       </main>
+
+      <ConfirmDialog
+        open={confirmInvalid}
+        title="Config has validation errors"
+        message="The YAML does not match the schema. Save anyway?"
+        confirmLabel="Save anyway"
+        cancelLabel="Cancel"
+        variant="danger"
+        onConfirm={() => { setConfirmInvalid(false); void save(true); }}
+        onCancel={() => setConfirmInvalid(false)}
+      />
     </div>
   );
 }

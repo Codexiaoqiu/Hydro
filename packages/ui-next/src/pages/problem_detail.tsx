@@ -18,6 +18,7 @@ import {
   canSubmitProblem,
   isLoggedIn,
 } from '../lib/perms';
+import { toWebSocketUrl } from '../lib/ws-url';
 import styles from './problem_detail.module.css';
 
 // ===== Types (unchanged from existing) =====================================
@@ -229,6 +230,7 @@ export default function ProblemDetailPage() {
     discussionCount = 0, solutionCount = 0,
     mode = 'normal', UserContext,
   } = args;
+  const injectedUiContext = (args as { UiContext?: { ws_prefix?: string } }).UiContext;
   const buildUrl = useBuildUrl();
   const setUiContext = useSetUiContext();
   const t = useTranslate();
@@ -241,6 +243,13 @@ export default function ProblemDetailPage() {
       canViewRecord?: boolean;
     };
     const canViewRecord = !!(userCtx?.canViewRecord) || !tdoc;
+    // The native `WebSocket` constructor rejects relative URLs; the server
+    // emits a relative `record-conn?pretest=1&...` plus a `ws_prefix` path
+    // (e.g. `/`). Join them into an absolute ws:// / wss:// URL so the scratchpad
+    // can establish the pretest stream. The helper short-circuits during SSR.
+    const pretestRelative = `record-conn?pretest=1&uidOrName=${UserContext?._id ?? ''}&pid=${pdoc.docId}${tdoc ? `&tid=${tdoc.docId}` : ''}`;
+    const wsPrefix = injectedUiContext?.ws_prefix;
+    const pretestConnUrl = toWebSocketUrl(pretestRelative, { wsPrefix }) ?? pretestRelative;
     setUiContext({
       problemId: pdoc.pid ?? pdoc.docId,
       problemNumId: pdoc.docId,
@@ -261,7 +270,7 @@ export default function ProblemDetailPage() {
         { rid: '{rid}' },
         getTidQuery(tdoc),
       ),
-      pretestConnUrl: `record-conn?pretest=1&uidOrName=${UserContext?._id ?? ''}&pid=${pdoc.docId}${tdoc ? `&tid=${tdoc.docId}` : ''}`,
+      pretestConnUrl,
     });
   }, [pdoc, tdoc, tsdoc, UserContext, buildUrl, setUiContext]);
 
@@ -329,12 +338,16 @@ export default function ProblemDetailPage() {
   const canStar = !tdoc && isLoggedIn(UserContext);
 
   if (isScratchpad && canSubmit) {
+    // Mirror the same ws:// / wss:// promotion as the UiContext path so the
+    // scratchpad `<ScratchpadPanel>` can open the pretest stream directly.
+    const pretestRelativeDirect = `record-conn?pretest=1&uidOrName=${UserContext?._id ?? ''}&pid=${pdoc.docId}${tdoc ? `&tid=${tdoc.docId}` : ''}`;
+    const pretestConnUrlDirect = toWebSocketUrl(pretestRelativeDirect, { wsPrefix: injectedUiContext?.ws_prefix }) ?? pretestRelativeDirect;
     return (
       <ScratchpadPanel
         pdoc={pdoc}
         tdoc={tdoc}
         UserContext={UserContext as unknown as ScratchpadPanelProps['UserContext']}
-        pretestConnUrl={`record-conn?pretest=1&uidOrName=${UserContext?._id ?? ''}&pid=${pdoc.docId}${tdoc ? `&tid=${tdoc.docId}` : ''}`}
+        pretestConnUrl={pretestConnUrlDirect}
         postSubmitUrl={buildUrl('problem_submit', { pid: String(pdoc.docId) }, getTidQuery(tdoc))}
         getSubmissionsUrl={buildUrl('record_main', {}, { pid: String(pdoc.docId), fullStatus: 'true', ...getTidQuery(tdoc) })}
         contentText={contentText}

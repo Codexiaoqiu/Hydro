@@ -1,0 +1,20 @@
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3, 12px);
+  padding: var(--space-3, 12px) var(--space-4, 16px);
+  border: 1px solid var(--border, #ccc);
+  border-radius: var(--radius-md, 8px);
+  background: var(--surface, #fff);
+}
+.count {
+  font-size: var(--text-sm, 13px);
+  color: var(--text-soft, #666);
+  font-variant-numeric: tabular-nums;
+}
+.actions {
+  display: flex;
+  gap: var(--space-2, 8px);
+  flex-wrap: wrap;
+}

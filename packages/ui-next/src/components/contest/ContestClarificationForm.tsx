@@ -7,11 +7,11 @@ import { useToast } from '../primitives/Toast';
 import styles from './ContestClarificationForm.module.css';
 
 export interface ContestClarificationFormProps {
-  mode: 'reply' | 'broadcast';
+  mode: 'reply' | 'broadcast' | 'ask';
   tdoc: { docId: number; pids: number[]; title?: string };
   /** Required when mode === 'reply'. */
   did?: string;
-  onSubmitted: () => void;
+  onSubmitted: (payload?: { did?: string; subject?: number; content?: string }) => void;
 }
 
 export function ContestClarificationForm({ mode, tdoc, did, onSubmitted }: ContestClarificationFormProps) {
@@ -34,30 +34,40 @@ export function ContestClarificationForm({ mode, tdoc, did, onSubmitted }: Conte
       fd.set('operation', 'clarification');
       fd.set('content', content);
       if (mode === 'reply' && did) fd.set('did', did);
-      if (mode === 'broadcast') fd.set('subject', subject);
+      // Both `broadcast` (jury) and `ask` (contestant) post a new thread:
+      // no `did`, but a `subject` selector.
+      if (mode === 'broadcast' || mode === 'ask') fd.set('subject', subject);
       await request.post(window.location.pathname, fd);
       toast.success(t('ContestClarification.Submitted'));
       setContent('');
-      onSubmitted();
+      const payload = (mode === 'broadcast' || mode === 'ask')
+        ? { subject: Number(subject), content }
+        : { did, content };
+      onSubmitted(payload);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : String(e));
     } finally { setBusy(false); }
   };
 
+  const titleKey = mode === 'reply'
+    ? 'ContestClarification.Reply'
+    : mode === 'ask'
+      ? 'ContestClarification.Ask'
+      : 'ContestClarification.Broadcast';
+
   return (
     <form className={styles.root} onSubmit={(e) => { e.preventDefault(); submit(); }}>
-      <h3 className={styles.title}>
-        {mode === 'reply' ? t('ContestClarification.Reply') : t('ContestClarification.Broadcast')}
-      </h3>
-      {mode === 'broadcast' && (
+      <h3 className={styles.title}>{t(titleKey)}</h3>
+      {(mode === 'broadcast' || mode === 'ask') && (
         <div className={styles.field}>
           <label htmlFor="clar-subject" className={styles.label}>{t('ContestClarification.Subject')}</label>
           <select
             id="clar-subject"
+            data-testid="clar-subject-select"
             className={styles.select}
             value={subject}
             onChange={(e) => setSubject(e.target.value)}
-            aria-label={t('ContestClarification.Subject')}
+            aria-label={t('ContestClarification.SubjectLabel')}
           >
             {SUBJECT_KEYS.map((k) => (
               <option key={k} value={k}>{t(SUBJECT_LABEL_KEYS[k])}</option>

@@ -27,20 +27,28 @@ export default function ProblemHackPage() {
     setError(null);
     try {
       const url = `/p/${encodeURIComponent(String(pdoc?.docId ?? ''))}/hack/${encodeURIComponent(rdoc?._id ?? '')}${tid ? `?tid=${encodeURIComponent(tid)}` : ''}`;
+      // `ProblemHackHandler.post` (packages/hydrooj/src/handler/problem.ts:606)
+      // returns `{ rid }` — the *new* hack record's id, NOT the source rdoc's id.
+      // Redirecting to the source rdoc would land the user on the original AC
+      // record instead of the freshly-submitted hack, hiding the result.
+      let newRid: string | undefined;
       if (file) {
         const fd = new FormData();
         if (input) fd.set('input', input);
         if (autoOrganize) fd.set('autoOrganizeInput', 'on');
         fd.set('file', file);
-        await request.postFile(url, fd);
+        newRid = (await request.postFile<{ rid?: string }>(url, fd))?.rid;
       } else {
         const fd = new URLSearchParams();
         if (input) fd.set('input', input);
         if (autoOrganize) fd.set('autoOrganizeInput', 'on');
-        await request.post(url, fd);
+        newRid = (await request.post<{ rid?: string }>(url, fd))?.rid;
       }
-      if (rdoc?._id && typeof window !== 'undefined') {
-        window.location.href = `/record/${encodeURIComponent(rdoc._id)}`;
+      // Prefer the new hack record id; only fall back to the source rdoc if
+      // the server didn't return one (defensive — never expected in practice).
+      const targetRid = newRid || rdoc?._id;
+      if (targetRid && typeof window !== 'undefined') {
+        window.location.href = `/record/${encodeURIComponent(targetRid)}`;
       }
     } catch (err) {
       if (err instanceof HydroClientError) setError(err);

@@ -25,4 +25,14 @@ describe('Modal', () => {
     fireEvent.click(screen.getByTestId('modal-backdrop'));
     expect(onClose).toHaveBeenCalledTimes(1);
   });
+
+  it('localizes the close button via the closeLabel prop', () => {
+    render(<Modal open onClose={() => {}} title="x" closeLabel="关闭">body</Modal>);
+    expect(screen.getByRole('button', { name: '关闭' })).toBeInTheDocument();
+  });
+
+  it('defaults the close button label to "Close"', () => {
+    render(<Modal open onClose={() => {}} title="x">body</Modal>);
+    expect(screen.getByRole('button', { name: 'Close' })).toBeInTheDocument();
+  });
 });

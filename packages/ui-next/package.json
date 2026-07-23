@@ -33,6 +33,7 @@
     "ajv": "^8.20.0",
     "ajv-formats": "^3.0.1",
     "esbuild": "0.25.2",
+    "fflate": "^0.8.2",
     "is-relative-url": "^4.1.0",
     "js-yaml": "^4.3.0",
     "marked": "^14.0.0",

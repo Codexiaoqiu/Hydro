@@ -1,41 +1,79 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from '../components/link';
 import { Alert, Button, Card } from '../components/primitives';
-import { ProblemTestdata } from '../components/problem/ProblemTestdata';
+import { useToast } from '../components/primitives/Toast';
+import { ProblemTestdata, type ProblemTestdataFile } from '../components/problem/ProblemTestdata';
 import { type ProblemAdditionalFile, ProblemAdditionalFiles } from '../components/problem/ProblemAdditionalFiles';
 import { usePageData } from '../context/page-data';
+import { request } from '../hooks/use-api';
 import { useTranslate } from '../lib/i18n';
+import { canEditProblem } from '../lib/perms';
 import styles from './problem_files.module.css';
 
 interface Args {
   /**
-   * Server injects from `ProblemFilesHandler.get` (handler/problem.ts:662):
-   *   - `pdoc.additional_file`  — current additional-file list (sorted)
-   *   - `pdoc.reference`        — when this problem is a cross-domain reference
-   *   - `pdoc.docId / .pid`     — needed to address the upload endpoint
-   *   - `pdoc.testdata`         — current testdata file list
+   * `ProblemFilesHandler.get` (handler/problem.ts:668) injects the file lists
+   * as **top-level** response fields, not nested under `pdoc`:
+   *   - `testdata`        — sorted testdata file list (`pdoc.data`)
+   *   - `additional_file` — sorted additional-file list
+   *   - `reference`       — set when this problem is a cross-domain reference
+   * `pdoc` still carries `docId` / `pid` / `title` for addressing + display.
+   * `owner` / `maintainer` (when present) drive the PERM_EDIT_PROBLEM_SELF
+   * half of `canEditProblem`; the global PERM_EDIT_PROBLEM bit wins otherwise.
    */
   pdoc?: {
     docId: number;
     pid?: string;
     title?: string;
-    additional_file?: ProblemAdditionalFile[];
-    testdata?: Array<{ name: string; size: number }>;
-    reference?: { domainId: string, pid: string | number };
+    owner?: number;
+    maintainer?: number[];
   };
+  testdata?: ProblemTestdataFile[];
+  additional_file?: ProblemAdditionalFile[];
+  reference?: { domainId: string, pid: string | number };
+  UserContext?: Record<string, unknown>;
 }
 
 export default function ProblemFilesPage() {
-  const { args } = usePageData() as unknown as { args: Args };
+  const page = usePageData();
+  const args = page.args as unknown as Args;
   const t = useTranslate();
+  const toast = useToast();
   const pdoc = args?.pdoc;
 
-  // Local mirror so uploads / deletes update the list immediately without a
-  // full page round-trip. Re-syncs whenever the server-provided list changes
-  // (e.g. after a navigation back from edit).
-  const [files, setFiles] = useState<ProblemAdditionalFile[]>(
-    pdoc?.additional_file ?? [],
-  );
+  // Local mirrors so uploads / deletes / renames update the lists immediately.
+  // After every mutation we re-request the page as JSON (`recalibrate`) so the
+  // client converges on the server's authoritative, sorted list instead of a
+  // full-page reload.
+  const [testdata, setTestdata] = useState<ProblemTestdataFile[]>(args?.testdata ?? []);
+  const [files, setFiles] = useState<ProblemAdditionalFile[]>(args?.additional_file ?? []);
+
+  // I1 (review): in-flight recalibrate responses can race each other when
+  // mutations land faster than the JSON refresh resolves. We tag each call
+  // with an incrementing token and only apply the body whose token is still
+  // the latest — stale responses are silently dropped.
+  const tokenRef = useRef(0);
+
+  const recalibrate = useCallback(async () => {
+    const token = ++tokenRef.current;
+    try {
+      const body = await request.get<{ testdata?: ProblemTestdataFile[]; additional_file?: ProblemAdditionalFile[] }>(page.url);
+      if (token !== tokenRef.current) return; // a newer mutation has superseded us
+      if (Array.isArray(body?.testdata)) setTestdata(body.testdata);
+      if (Array.isArray(body?.additional_file)) setFiles(body.additional_file);
+    } catch (err) {
+      if (token !== tokenRef.current) return; // superseded — caller owns the state
+      // I2 (review): never swallow recalibrate failures. Optimistic state is
+      // kept (the local mutation has already been applied); surface a toast so
+      // the user knows the canonical list may be stale and can retry.
+      const msg = err instanceof Error ? err.message : String(err);
+      toast.error(t('ProblemFiles.RecalibrateFailed', { message: msg }));
+    }
+  }, [page.url, toast, t]);
+
+  // Abort in-flight refreshes on unmount (token monotonicity also guards
+  // against stale updates, but this prevents wasted network on teardown).
+  useEffect(() => () => { tokenRef.current++; }, []);
 
   if (!pdoc) {
     return (
@@ -45,9 +83,20 @@ export default function ProblemFilesPage() {
     );
   }
 
-  const isReference = !!pdoc.reference;
+  const isReference = !!args.reference;
+  // Mirror ui-default's perm gate: PERM_EDIT_PROBLEM (or SELF-ownership) is
+  // required to mutate the testdata / additional files; references are always
+  // read-only because the foreign domain owns them. canEditProblem already
+  // honours scope from the UserContext, so anonymous visitors on a non-public
+  // problem get `false`.
+  const canEdit = !isReference && canEditProblem(
+    args.UserContext as never,
+    pdoc as { owner?: number, maintainer?: number[] },
+  );
   const pid = pdoc.pid ?? String(pdoc.docId);
-  const testdata: Array<{ name: string; size: number }> = (pdoc as any).testdata ?? [];
+
+  const onTestdataChange = (next: ProblemTestdataFile[]) => { setTestdata(next); recalibrate(); };
+  const onAdditionalChange = (next: ProblemAdditionalFile[]) => { setFiles(next); recalibrate(); };
 
   return (
     <main className={styles.page}>
@@ -65,18 +114,16 @@ export default function ProblemFilesPage() {
         <Alert variant="info" message={t('ProblemFiles.ReferenceNotice')} />
       )}
 
-      {!isReference && (
-        <Card variant="default" header={<h2 className={styles.sectionTitle}>{t('ProblemFiles.TestdataSection')}</h2>}>
-          <ProblemTestdata pid={pid} files={testdata} disabled={isReference} onChange={() => window.location.reload()} />
-        </Card>
-      )}
+      <Card variant="default" header={<h2 className={styles.sectionTitle}>{t('ProblemFiles.TestdataSection')}</h2>}>
+        <ProblemTestdata pid={pid} files={testdata} disabled={!canEdit} onChange={onTestdataChange} />
+      </Card>
 
       <Card variant="default" header={<h2 className={styles.sectionTitle}>{t('ProblemFiles.AdditionalSection')}</h2>}>
         <ProblemAdditionalFiles
           pid={pid}
           files={files}
-          disabled={isReference}
-          onChange={setFiles}
+          disabled={!canEdit}
+          onChange={onAdditionalChange}
         />
       </Card>
 

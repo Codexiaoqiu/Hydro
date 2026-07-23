@@ -2,7 +2,10 @@ import type { SerializedTdoc } from '../sections/types';
 
 const DAY_MS = 86_400_000;
 
-export function isOngoing(t: SerializedTdoc, now = Date.now()): boolean {
+export function isOngoing(
+  t: Pick<SerializedTdoc, 'beginAt' | 'endAt'>,
+  now = Date.now(),
+): boolean {
   const begin = new Date(t.beginAt).getTime();
   const end = new Date(t.endAt).getTime();
   return begin <= now && now < end;

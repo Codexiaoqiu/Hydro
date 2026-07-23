@@ -7,6 +7,7 @@ import { Link } from '../components/link';
 import { Select } from '../components/primitives/Select';
 import { useBuildUrl } from '../hooks/use-build-url';
 import { usePageData } from '../context/page-data';
+import { useJsonPoll } from '../hooks/use-json-poll';
 import { useTranslate } from '../lib/i18n';
 import type { SerializedPdoc, SerializedTdoc, SerializedUser, SerializedUserDict } from '../sections/types';
 import styles from './contest_scoreboard.module.css';
@@ -33,7 +34,7 @@ export interface ScoreboardGroup {
 export type ScoreboardAvailableViews = Record<string, string>;
 
 export type ContestScoreboardPageArgs = {
-  tdoc?: SerializedTdoc & { owner?: number };
+  tdoc?: SerializedTdoc & { owner?: number; unlocked?: boolean };
   tsdoc?: { attend?: 0 | 1 } | null;
   rows?: ScoreboardCell[][];
   udict?: SerializedUserDict;
@@ -42,6 +43,15 @@ export type ContestScoreboardPageArgs = {
   groups?: ScoreboardGroup[];
   availableViews?: ScoreboardAvailableViews;
   scoreboardUrl?: string;
+  /**
+   * Whether the current viewer is allowed to follow record links in the
+   * scoreboard. Mirrors the server-side guard in
+   * `packages/hydrooj/src/handler/contest.ts:317` — `canViewRecord` —
+   * which is `false` while the contest is still live and not configured to
+   * show self records. When false, record cells render as plain text to
+   * avoid leaking record ids that the viewer cannot open.
+   */
+  canViewRecord?: boolean;
 };
 
 export type ContestScoreboardPageProps = {
@@ -105,14 +115,18 @@ export default function ContestScoreboardPage({ _pageData }: ContestScoreboardPa
   const dbRef = useRef<IDBDatabase | null>(null);
 
   const tdoc = args?.tdoc;
-  const rows = args?.rows ?? [];
+  const initialRows = args?.rows ?? [];
   const tsdoc = args?.tsdoc ?? null;
   const udict = args?.udict ?? {};
   const pdict = args?.pdict ?? {};
-  const groups = args?.groups ?? [];
-  const availableViews = args?.availableViews ?? [];
+  const initialGroups = args?.groups ?? [];
+  const initialAvailableViews = args?.availableViews ?? [];
   const pageName = args?.page_name ?? 'contest_scoreboard';
   const scoreboardUrl = args?.scoreboardUrl ?? '';
+  // Server-side permission gate for clickable record cells. Default to true
+  // so payloads that don't include the field (older tests, simple viewers)
+  // don't suddenly hide every link.
+  const canViewRecord = args?.canViewRecord !== false;
 
   const colIndex = useMemo(() => {
     const map: Record<string, number> = {};
@@ -175,19 +189,38 @@ export default function ContestScoreboardPage({ _pageData }: ContestScoreboardPa
     writeHashFilter(next);
   }, []);
 
-  useEffect(() => {
-    if (!tdoc || !scoreboardUrl) return;
-    const begin = new Date(tdoc.beginAt).getTime();
-    const end = new Date(tdoc.endAt).getTime();
-    const tick = () => {
+  // While the contest is in progress, refetch the scoreboard JSON on a slow
+  // cadence so the table keeps ticking without losing the viewer's filter,
+  // stars, scroll position, or open dropdown. The legacy implementation
+  // called `window.location.reload()` every 3 minutes, which wiped
+  // IndexedDB-backed star state and the `#filter=` hash. Use `useJsonPoll`
+  // so each tick is a lightweight JSON round-trip and React re-renders the
+  // existing rows in place.
+  const ongoing = tdoc
+    ? (() => {
+      const begin = new Date(tdoc.beginAt).getTime();
+      const end = new Date(tdoc.endAt).getTime();
       const now = Date.now();
-      if (begin <= now && now <= end) {
-        window.location.reload();
-      }
-    };
-    const id = window.setInterval(tick, 180_000);
-    return () => window.clearInterval(id);
-  }, [tdoc, scoreboardUrl]);
+      return begin <= now && now <= end;
+    })()
+    : false;
+  const pollUrl = typeof window !== 'undefined'
+    ? `${window.location.pathname}${window.location.search}`
+    : '';
+  const { data: polled, refresh: refreshScoreboard } = useJsonPoll<{
+    rows?: ScoreboardCell[][];
+    groups?: ScoreboardGroup[];
+    availableViews?: ScoreboardAvailableViews;
+  }>({
+    url: pollUrl,
+    enabled: ongoing && !!scoreboardUrl,
+    intervalMs: 180_000,
+  });
+  // Polled data supersedes the SSR snapshot when present; we keep the
+  // initial args as the fallback so the very first paint never flickers.
+  const rows = polled?.rows ?? initialRows;
+  const groups = polled?.groups ?? initialGroups;
+  const availableViews = polled?.availableViews ?? initialAvailableViews;
 
   if (!args || !tdoc || rows.length === 0) {
     return (
@@ -229,9 +262,16 @@ export default function ContestScoreboardPage({ _pageData }: ContestScoreboardPa
 
   const isLocked = useMemo(() => {
     if (!tdoc.lockAt) return false;
+    // Honor `tdoc.unlocked`: once the owner clicks "Unlock" on the scoreboard
+    // (`ContestScoreboardHandler.post('unlock')` in handler/contest.ts:989),
+    // the server stamps `unlocked=true` and the freeze banner must disappear
+    // even though `lockAt` is still in the past. Without this gate the ui
+    // side would keep showing the banner and the unlock button stacked on
+    // top of each other indefinitely.
+    if (tdoc.unlocked) return false;
     const lock = new Date(tdoc.lockAt).getTime();
     return Date.now() >= lock;
-  }, [tdoc.lockAt]);
+  }, [tdoc.lockAt, tdoc.unlocked]);
 
   const typePrefix = pageName === 'homework_scoreboard' ? 'homework' : 'contest';
 
@@ -387,9 +427,15 @@ export default function ContestScoreboardPage({ _pageData }: ContestScoreboardPa
                         const content = (
                           <span style={{ color, fontWeight: 600 }}>{String(cell.value)}</span>
                         );
+                        // Match `UiHandler.canViewRecord` (handler/contest.ts:317):
+                        // when the server says the viewer cannot open record
+                        // links, never emit the `<Link>` — otherwise the URL
+                        // would deep-link into a record the user cannot read,
+                        // and the id leaks through the DOM.
+                        const mayLink = canViewRecord && rid;
                         return (
                           <td key={ci} className={tdCls}>
-                            {rid ? (
+                            {mayLink ? (
                               <Link to="record_detail" params={{ rid: String(rid) }}>{content}</Link>
                             ) : (
                               content
@@ -405,10 +451,14 @@ export default function ContestScoreboardPage({ _pageData }: ContestScoreboardPa
                               const inner = (
                                 <span style={{ color, fontWeight: 600 }}>{String(r.value)}</span>
                               );
+                              // Apply the same canViewRecord gate to the
+                              // multi-record cell so a partial reveal does
+                              // not leak a single rid.
+                              const mayLink = canViewRecord && r.raw;
                               return (
                                 <span key={k}>
                                   {k > 0 ? '/' : ''}
-                                  {r.raw ? (
+                                  {mayLink ? (
                                     <Link to="record_detail" params={{ rid: String(r.raw) }}>{inner}</Link>
                                   ) : (
                                     inner
