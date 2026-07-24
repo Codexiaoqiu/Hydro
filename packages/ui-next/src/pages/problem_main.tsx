@@ -1,6 +1,8 @@
 import { STATUS, STATUS_SHORT_TEXTS } from '@hydrooj/common';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from '../components/link';
+import { ProblemSelectionDisplay } from '../components/problem/ProblemSelectionDisplay';
+import { Button } from '../components/primitives/Button';
 import { Card } from '../components/primitives/Card';
 import { Eyebrow } from '../components/primitives/Eyebrow';
 import { Select } from '../components/primitives/Select';
@@ -11,8 +13,9 @@ import { useNavigate } from '../context/router';
 import { useBuildUrl } from '../hooks/use-build-url';
 import { Avatar } from '../lib/avatar';
 import { difficultyAlgorithm, formatN } from '../lib/difficulty';
-import { useTranslate } from '../lib/i18n';
-import { canCreateProblem, isLoggedIn } from '../lib/perms';
+import { detectLocale, useTranslate } from '../lib/i18n';
+import { canCreateProblem, canEditProblem, isLoggedIn } from '../lib/perms';
+import { stringifySearchQuery } from '../lib/search-query';
 import styles from './problem_main.module.css';
 
 interface Pdoc {
@@ -182,6 +185,7 @@ export default function ProblemMain() {
   const buildUrl = useBuildUrl();
   const navigate = useNavigate();
   const t = useTranslate();
+  const [locale] = useState(() => (typeof window === 'undefined' ? 'en' : detectLocale()));
 
   const pdocs = args.pdocs || [];
   const psdict = args.psdict || {};
@@ -192,6 +196,16 @@ export default function ProblemMain() {
   const sort = args.sort || 'default';
 
   const [query, setQuery] = useState(qs);
+  const requestedEditMode = useMemo(() => {
+    if (typeof window === 'undefined') return false;
+    return new URLSearchParams(window.location.search).get('mode') === 'edit';
+  }, []);
+  const [editMode, setEditMode] = useState(requestedEditMode);
+  const [selectedPids, setSelectedPids] = useState<number[]>([]);
+
+  useEffect(() => {
+    if (requestedEditMode) setEditMode(true);
+  }, [requestedEditMode]);
 
   const categorySetting = (UiContext?.problemCategories || {}) as ProblemCategory;
 
@@ -204,7 +218,8 @@ export default function ProblemMain() {
   const submitSearch = (e?: React.FormEvent) => {
     e?.preventDefault();
     const params: Record<string, string> = {};
-    if (query) params.q = query;
+    const normalised = stringifySearchQuery({ text: query });
+    if (normalised) params.q = normalised;
     if (sort && sort !== 'default') params.sort = sort;
     const href = buildUrl('problem_main', {}, params);
     navigate(href);
@@ -220,9 +235,26 @@ export default function ProblemMain() {
   const extraTitle = UiContext?.extraTitleContent as string | undefined;
   const loggedIn = isLoggedIn(UserContext);
   const canCreate = canCreateProblem(UserContext);
+  const canDeleteAny = !!pdocs.length && pdocs.every((p) => canEditProblem(UserContext, p));
+  const canEditAny = !!pdocs.length && pdocs.some((p) => canEditProblem(UserContext, p));
   const statText = pcount > 0
     ? (args.pcountRelation === 'eq' ? `${pcount}${t('ProblemMain.ProblemCount')}` : `${pcount}${t('ProblemMain.ProblemCountRelation')}`)
     : t('ProblemMain.NoProblems');
+
+  const togglePid = (docId: number, checked: boolean) => {
+    setSelectedPids((prev) => {
+      if (checked) return prev.includes(docId) ? prev : [...prev, docId];
+      return prev.filter((id) => id !== docId);
+    });
+  };
+  const selectAllChecked = !!pdocs.length && selectedPids.length === pdocs.length;
+  const toggleAll = (checked: boolean) => {
+    setSelectedPids(checked ? pdocs.map((p) => p.docId) : []);
+  };
+  const afterAction = () => {
+    setSelectedPids([]);
+    navigate(pageData.url || window.location.pathname + window.location.search);
+  };
 
   return (
     <>
@@ -271,6 +303,18 @@ export default function ProblemMain() {
                     { value: 'recent', label: t('ProblemMain.SortRecent') },
                   ]}
                 />
+                {canEditAny && (
+                  <Button
+                    type="button"
+                    onClick={() => setEditMode((v) => !v)}
+                    data-testid="edit-mode-toggle"
+                    variant={editMode ? 'primary' : 'ghost'}
+                  >
+                    {editMode
+                      ? (locale === 'zh_CN' ? '退出编辑模式' : 'Exit edit mode')
+                      : (locale === 'zh_CN' ? '进入编辑模式' : 'Enter edit mode')}
+                  </Button>
+                )}
               </form>
               <div className={styles.stat}>{statText}</div>
             </div>
@@ -281,6 +325,19 @@ export default function ProblemMain() {
               </div>
             ) : (
               <>
+                {editMode && (
+                  <div className={styles.selectAll}>
+                    <label>
+                      <input
+                        type="checkbox"
+                        data-select-all="problem"
+                        checked={selectAllChecked}
+                        onChange={(e) => toggleAll(e.currentTarget.checked)}
+                      />
+                      <span>{locale === 'zh_CN' ? '全选' : 'Select all'}</span>
+                    </label>
+                  </div>
+                )}
                 <div className={styles.list}>
                   {pdocs.map((p) => {
                     const ps = psdict[String(p.docId)];
@@ -294,8 +351,19 @@ export default function ProblemMain() {
                     const difficulty = p.difficulty ?? difficultyAlgorithm(p.nSubmit, p.nAccept) ?? undefined;
                     const uploader = p.uploadedBy;
                     const hasUploader = !!uploader && (!!uploader.uname || !!uploader.avatar || uploader._id !== undefined);
+                    const checked = selectedPids.includes(p.docId);
                     return (
-                      <div key={p.docId} className={styles.row}>
+                      <div key={p.docId} className={`${styles.row} ${editMode ? styles.rowEditing : ''}`}>
+                        {editMode && (
+                          <div className={styles.checkbox}>
+                            <input
+                              type="checkbox"
+                              data-pid={p.docId}
+                              checked={checked}
+                              onChange={(e) => togglePid(p.docId, e.currentTarget.checked)}
+                            />
+                          </div>
+                        )}
                         <div className={styles.id}>{formatPid(p)}</div>
 
                         <div className={styles.title}>
@@ -352,6 +420,16 @@ export default function ProblemMain() {
                   })}
                 </div>
                 <Pager page={page} ppcount={ppcount} qs={qs} sort={sort} buildUrl={buildUrl} />
+                {editMode && selectedPids.length > 0 && (
+                  <ProblemSelectionDisplay
+                    pids={selectedPids}
+                    onAfterAction={afterAction}
+                    canDelete={canDeleteAny}
+                    canCopy={canCreate}
+                    canEdit={canEditAny}
+                    domainId={UiContext?.domainId}
+                  />
+                )}
               </>
             )}
           </Card>

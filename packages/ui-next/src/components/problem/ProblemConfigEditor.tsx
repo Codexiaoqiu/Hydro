@@ -16,6 +16,13 @@ export interface ProblemConfigEditorProps {
   value: string;
   onChange: (nextYaml: string, parsed: ReturnType<typeof parseProblemConfigYaml>) => void;
   height?: number;
+  /**
+   * Imperative handle invoked by `problem_config.tsx` immediately before
+   * Save so the 300ms onChange debounce cannot swallow the most recent
+   * edit. Without this, a quick Save after typing would persist stale
+   * `parsed` state and the reload would orphan the user's text.
+   */
+  onReady?: (api: { flushPendingChange: () => void }) => void;
 }
 
 function FallbackTextarea({ value, onChange, height }: ProblemConfigEditorProps) {
@@ -38,12 +45,16 @@ export function ProblemConfigEditor(props: ProblemConfigEditorProps) {
   // fallback forwards `parseProblemConfigYaml` so any test that types into
   // it still exercises the validation pipeline.
   if (typeof window === 'undefined') return <FallbackTextarea {...props} />;
+  // Fallback path has no debounce — the parent's onReady handle becomes a
+  // no-op so callers can call it unconditionally before Save.
+  const noopApi = { flushPendingChange: () => {} };
   return (
     <Suspense fallback={<FallbackTextarea {...props} />}>
       <MonacoWrapper
         value={props.value}
         onChange={(next) => props.onChange(next, parseProblemConfigYaml(next))}
         height={props.height}
+        onReady={props.onReady ?? (() => {})}
       />
     </Suspense>
   );

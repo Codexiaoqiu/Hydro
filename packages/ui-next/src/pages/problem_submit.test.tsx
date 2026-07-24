@@ -21,6 +21,22 @@ vi.mock('@monaco-editor/react', () => ({
   loader: { config: vi.fn() },
 }));
 
+// Stub idb-keyval so the persisted-draft hook can mount under happy-dom
+// (which does not implement IndexedDB). A small per-test in-memory map
+// keeps the behaviour observable without leaking state across tests.
+const idbStore = new Map<string, string>();
+vi.mock('idb-keyval', () => ({
+  get: (k: string) => Promise.resolve(idbStore.get(k)),
+  set: (k: string, v: string) => {
+    idbStore.set(k, v);
+    return Promise.resolve();
+  },
+  del: (k: string) => {
+    idbStore.delete(k);
+    return Promise.resolve();
+  },
+}));
+
 const defaultArgs = {
   pdoc: {
     docId: 3,
@@ -151,6 +167,59 @@ describe('problem_submit page', () => {
   it('renders the shared problem sidebar menu', () => {
     renderPage();
     expect(screen.getByRole('complementary')).toBeInTheDocument();
+  });
+
+  it('renders the ObjectiveForm for objective problems and hides the code editor + language picker', () => {
+    renderPage({
+      ...defaultArgs,
+      pdoc: {
+        ...defaultArgs.pdoc,
+        config: {
+          type: 'objective',
+          subType: 'single',
+          choices: [
+            { id: 'q1', type: 'single', label: 'Pick one', options: ['A', 'B', 'C'] },
+          ],
+        },
+      },
+      langRange: { _: '_' },
+      langs: { _: { display: '_' } },
+    });
+    // The objective form is mounted with the expected question label.
+    expect(screen.getByText('Pick one')).toBeInTheDocument();
+    expect(screen.getAllByRole('radio')).toHaveLength(3);
+    // Code editor + file upload are suppressed for objective problems.
+    expect(document.querySelector('[data-testid="monaco-stub"]')).toBeNull();
+    expect(document.querySelector('input[type="file"][name="file"]')).toBeNull();
+    // Hidden lang input still pins to `_` like submit_answer.
+    expect(document.querySelector<HTMLInputElement>('input[name="lang"]')?.value).toBe('_');
+  });
+
+  it('objective form submits a YAML-encoded payload in the content field', async () => {
+    const yaml = (await import('js-yaml')).default;
+    renderPage({
+      ...defaultArgs,
+      pdoc: {
+        ...defaultArgs.pdoc,
+        config: {
+          type: 'objective',
+          subType: 'single',
+          choices: [
+            { id: 'q1', type: 'single', label: 'Pick one', options: ['A', 'B', 'C'] },
+          ],
+        },
+      },
+      langRange: { _: '_' },
+      langs: { _: { display: '_' } },
+    });
+    const input = document.querySelector<HTMLInputElement>('input[value="B"]')!;
+    fireEvent.click(input);
+    // The submit button label is i18n'd; in zh_CN it is "提交", in en it is "Submit".
+    fireEvent.click(screen.getByRole('button', { name: /提交|submit/i }));
+    const content = document.querySelector<HTMLInputElement>('input[name="content"]')?.value;
+    expect(content).toBeDefined();
+    // YAML serialization should round-trip back to the same object.
+    expect(yaml.load(content!)).toEqual({ q1: 'B' });
   });
 
   it('resets the code editor and hidden input when pdoc changes in the same page slot', () => {

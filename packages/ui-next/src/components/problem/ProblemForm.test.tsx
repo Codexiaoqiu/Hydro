@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import type { ComponentProps } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { type PageData, PageDataProvider } from '../../context/page-data';
@@ -6,14 +6,29 @@ import { RouterProvider } from '../../context/router';
 import { ToastProvider } from '../primitives';
 import { ProblemForm } from './ProblemForm';
 
+let ctrlEnterCommand: (() => void) | undefined;
+
 vi.mock('@monaco-editor/react', () => ({
-  Editor: (props: { value?: string, onChange?: (v: string | undefined) => void }) => (
-    <textarea
-      data-testid="monaco-stub"
-      value={props.value ?? ''}
-      onChange={(e) => props.onChange?.(e.currentTarget.value)}
-    />
-  ),
+  Editor: (props: {
+    value?: string,
+    onChange?: (v: string | undefined) => void,
+    onMount?: (editor: unknown, monaco: unknown) => void,
+  }) => {
+    props.onMount?.({
+      addAction: vi.fn(),
+      addCommand: (_keybinding: number, handler: () => void) => {
+        ctrlEnterCommand = handler;
+      },
+      onDidPaste: vi.fn(),
+    }, { KeyMod: { CtrlCmd: 1 }, KeyCode: { Enter: 2 } });
+    return (
+      <textarea
+        data-testid="monaco-stub"
+        value={props.value ?? ''}
+        onChange={(e) => props.onChange?.(e.currentTarget.value)}
+      />
+    );
+  },
   loader: { config: vi.fn() },
 }));
 
@@ -86,6 +101,20 @@ describe('problemForm', () => {
     renderForm({ pdoc });
     fireEvent.click(screen.getByRole('button', { name: 'en' }));
     expect(screen.getByDisplayValue(/# English/)).toBeInTheDocument();
+  });
+
+
+  it('submits the form with Ctrl/Cmd+Enter from the markdown editor', async () => {
+    renderForm({ pdoc: { docId: 1, pid: 'p1', title: '' } });
+
+    expect(ctrlEnterCommand).toBeTypeOf('function');
+    await act(async () => {
+      ctrlEnterCommand?.();
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText(/标题不能为空|title is required/i)).toBeInTheDocument();
+    });
   });
 
   it('delete button opens ConfirmDialog, confirms deletes', async () => {

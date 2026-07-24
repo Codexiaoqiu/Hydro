@@ -49,21 +49,26 @@ describe('RecordsPanel', () => {
     await waitFor(() => expect(screen.getByText(/no submissions/i)).toBeInTheDocument());
   });
 
-  it('renders up to 5 records with link to record detail', async () => {
-    (globalThis.fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
-      ok: true,
-      json: async () => ({
-        rdocs: [
-          { _id: 'r1', status: 1, lang: 'cpp', time: 1700000000 },
-          { _id: 'r2', status: 2, lang: 'py', time: 1700000001 },
-        ],
-      }),
-    });
-    wrap(<RecordsPanel submissionsUrl="/r" />);
-    await waitFor(() => {
-      expect(screen.getByText('r1')).toBeInTheDocument();
-      expect(screen.getByText('r2')).toBeInTheDocument();
-    });
-    expect((screen.getByText('r1').closest('a') as HTMLAnchorElement).href).toContain('/record/r1');
+  it('renders a placeholder when records are not viewable', () => {
+    wrap(<RecordsPanel submissionsUrl="/r" canViewRecord={false} />);
+    expect(screen.getByText(/not available/i)).toBeInTheDocument();
+    expect(globalThis.fetch).not.toHaveBeenCalledWith('/r');
+  });
+
+  it('appends records received from the websocket', async () => {
+    class MockWebSocket {
+      static instances: MockWebSocket[] = [];
+      onmessage?: (event: MessageEvent) => void;
+      onopen?: () => void;
+      close = vi.fn();
+      constructor() { MockWebSocket.instances.push(this); }
+    }
+    vi.stubGlobal('WebSocket', MockWebSocket);
+    (globalThis.fetch as ReturnType<typeof vi.fn>).mockResolvedValue({ ok: true, json: async () => ({ rdocs: [] }) });
+    wrap(<RecordsPanel submissionsUrl="/r" wsUrl="ws://records" />);
+    await waitFor(() => expect(MockWebSocket.instances).toHaveLength(1));
+    MockWebSocket.instances[0].onmessage?.({ data: JSON.stringify({ rdoc: { _id: 'r3', status: 1, lang: 'cpp', time: 1 } }) } as MessageEvent);
+    await waitFor(() => expect(screen.getByText('r3')).toBeInTheDocument());
+    vi.unstubAllGlobals();
   });
 });

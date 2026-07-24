@@ -10,6 +10,10 @@ export interface MarkdownPreviewProps {
 
 const PLACEHOLDER_TEXT = '在左侧编辑题目描述，预览会实时显示。';
 
+export function rewriteFileReferences(source: string): string {
+  return source.replace(/file:\/\/([^\s)]+)/g, '/file/$1');
+}
+
 export function MarkdownPreview({ source }: MarkdownPreviewProps): ReactNode {
   const [displayed, setDisplayed] = useState(source);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -43,7 +47,7 @@ export function MarkdownPreview({ source }: MarkdownPreviewProps): ReactNode {
 
   let body: ReactNode;
   try {
-    body = renderArticleBlocks(displayed);
+    body = renderArticleBlocks(rewriteFileReferences(displayed));
   } catch (err) {
     // Render failures should never break the form.
     body = <pre className={styles.fallback}>{displayed}</pre>;
@@ -55,6 +59,9 @@ export function MarkdownPreview({ source }: MarkdownPreviewProps): ReactNode {
       data-testid="markdown-preview"
       aria-label="Rendered preview"
       aria-live="polite"
+      onErrorCapture={(event) => {
+        if (event.target instanceof HTMLImageElement) event.target.classList.add(styles.broken);
+      }}
     >
       {body}
     </div>

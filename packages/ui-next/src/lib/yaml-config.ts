@@ -23,6 +23,7 @@ const PROBLEM_TYPE_VALUES = [
   ProblemType.Interactive,
   ProblemType.Communication,
   ProblemType.Objective,
+  ProblemType.Remote,
 ] as const;
 
 const CHECKER_TYPE_VALUES = [
@@ -186,7 +187,11 @@ const FIELDS_FOR_TYPE = (type: ProblemConfigYaml['type']): Record<string, true> 
     base.manager = true;
     base.num_processes = true;
   }
-  if (type === 'submit_answer') base.subType = true;
+  // `submit_answer` and `remote_judge` both use `subType` to carry a subtype
+  // marker (e.g. submit_answer 'single'/'multi' or remote_judge 'codeforces'/
+  // 'atcoder'). Drop the special-case below that strips `subType` for non
+  // submit_answer types so remote_judge keeps its provider tag.
+  if (type === 'submit_answer' || type === ProblemType.Remote) base.subType = true;
   return base;
 };
 
@@ -201,8 +206,8 @@ export function configYamlFormat(cfg: ProblemConfigYaml): ProblemConfigYaml {
     if (value === undefined) continue;
     if (key.startsWith('__')) continue;
     if (!allowed[key]) continue;
-    // Special-case: drop subType unless submit_answer with single/multi.
-    if (key === 'subType' && cfg.type !== 'submit_answer') continue;
+    // Special-case: drop subType unless type is submit_answer or remote_judge.
+    if (key === 'subType' && cfg.type !== 'submit_answer' && cfg.type !== ProblemType.Remote) continue;
     // Special-case: checker_type is only meaningful for default type.
     if (key === 'checker_type' && cfg.type !== 'default') continue;
     // Special-case: multi_pass must be integer in [2, 20].

@@ -1,5 +1,5 @@
 /* @vitest-environment happy-dom */
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import ContestProblemListPage from './contest_problemlist';
 
@@ -137,9 +137,9 @@ describe('contest_problemlist page', () => {
     );
     expect(screen.getByText('Sum of Two')).toBeInTheDocument();
     expect(screen.getByText('Longest Substring')).toBeInTheDocument();
-    expect(screen.getByText('A')).toBeInTheDocument();
-    expect(screen.getByText('B')).toBeInTheDocument();
-    expect(screen.getByText('100')).toBeInTheDocument();
+    expect(screen.getAllByText('A').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('B').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByTestId('status-score-1').textContent).toBe('100');
   });
 
   it('renders attended banner for ongoing attended contest', () => {
@@ -202,6 +202,159 @@ describe('contest_problemlist page', () => {
     );
     expect(screen.getByText(/What is the time limit/)).toBeInTheDocument();
     expect(screen.getByText(/2 seconds/)).toBeInTheDocument();
+  });
+
+  it('renders the accept / fail SVG icons in the status cell (P2-A.1)', () => {
+    const tdoc = {
+      _id: '60a000000000000000000001',
+      docId: '60a000000000000000000001',
+      title: 'Live',
+      rule: 'acm',
+      beginAt: beginIso,
+      endAt: endIso,
+      duration: 5,
+      owner: 1,
+      pids: [101, 102],
+    };
+    const pdict = {
+      101: { docId: 101, pid: 'A', title: 'A' },
+      102: { docId: 102, pid: 'B', title: 'B' },
+    };
+    const psdict = {
+      101: { rid: '60b001', score: 100, status: 1 }, // STATUS_ACCEPTED
+      102: { rid: '60b002', score: 0, status: 4 },   // STATUS_MEMORY_LIMIT_EXCEEDED → fail
+    };
+    render(
+      <ContestProblemListPage
+        _pageData={buildPageData({
+          tdoc, tsdoc: { attend: 1, subscribe: 0, startAt: beginIso },
+          pdict, psdict, udict: {}, tcdocs: [],
+          showScore: true, canViewRecord: true,
+        })}
+      />,
+    );
+    expect(screen.getByTestId('icon-accept')).toBeInTheDocument();
+    expect(screen.getByTestId('icon-fail')).toBeInTheDocument();
+    expect(screen.getByTestId('status-accept-1')).toBeInTheDocument();
+    expect(screen.getByTestId('status-fail-4')).toBeInTheDocument();
+  });
+
+  it('renders a progress ring for in-progress statuses (P2-A.1)', () => {
+    const tdoc = {
+      _id: '60a000000000000000000001',
+      docId: '60a000000000000000000001',
+      title: 'Live',
+      rule: 'acm',
+      beginAt: beginIso,
+      endAt: endIso,
+      duration: 5,
+      owner: 1,
+      pids: [101],
+    };
+    const psdict = { 101: { rid: '60b001', score: 0, status: 20 } }; // STATUS_JUDGING
+    render(
+      <ContestProblemListPage
+        _pageData={buildPageData({
+          tdoc, tsdoc: { attend: 1, subscribe: 0, startAt: beginIso },
+          pdict: { 101: { docId: 101, pid: 'A', title: 'A' } },
+          psdict, udict: {}, tcdocs: [],
+          showScore: true, canViewRecord: true,
+        })}
+      />,
+    );
+    const progress = screen.getByTestId('status-progress-20');
+    expect(progress.querySelector('svg')).toBeInTheDocument();
+  });
+
+  it('renders submissions list per problem when rdocs present (P2-A.2)', () => {
+    const tdoc = {
+      _id: '60a000000000000000000001',
+      docId: '60a000000000000000000001',
+      title: 'Live',
+      rule: 'acm',
+      beginAt: beginIso,
+      endAt: endIso,
+      duration: 5,
+      owner: 1,
+      pids: [101, 102],
+    };
+    const rdocs = [
+      { _id: '60b01', pid: 101, status: 1, lang: 'cpp' },
+      { _id: '60b02', pid: 102, status: 7, lang: 'py' },
+    ];
+    render(
+      <ContestProblemListPage
+        _pageData={buildPageData({
+          tdoc, tsdoc: { attend: 1, subscribe: 0, startAt: beginIso },
+          pdict: {
+            101: { docId: 101, pid: 'A', title: 'A' },
+            102: { docId: 102, pid: 'B', title: 'B' },
+          },
+          psdict: {}, udict: {}, tcdocs: [], rdocs,
+          showScore: false, canViewRecord: true,
+        })}
+      />,
+    );
+    expect(screen.getByTestId('contest-submissions')).toBeInTheDocument();
+    expect(screen.getByTestId('submissions-101')).toBeInTheDocument();
+    expect(screen.getByTestId('submissions-102')).toBeInTheDocument();
+  });
+
+  it('renders the inline clarification ask form for attended users (P2-A.3)', () => {
+    const tdoc = {
+      _id: '60a000000000000000000001',
+      docId: '60a000000000000000000001',
+      title: 'Live',
+      rule: 'acm',
+      beginAt: beginIso,
+      endAt: endIso,
+      duration: 5,
+      owner: 1,
+      pids: [101],
+    };
+    render(
+      <ContestProblemListPage
+        _pageData={buildPageData({
+          tdoc, tsdoc: { attend: 1, subscribe: 0, startAt: beginIso },
+          pdict: { 101: { docId: 101, pid: 'A', title: 'A' } },
+          psdict: {}, udict: {}, tcdocs: [],
+          showScore: false, canViewRecord: true,
+        })}
+      />,
+    );
+    expect(screen.getByTestId('clar-inline-ask')).toBeInTheDocument();
+  });
+
+
+  it('renders private files when tdoc.privateFiles is present (P2-A.4)', () => {
+    const tdoc = {
+      _id: '60a000000000000000000001',
+      docId: '60a000000000000000000001',
+      title: 'Live',
+      rule: 'acm',
+      beginAt: beginIso,
+      endAt: endIso,
+      duration: 5,
+      owner: 1,
+      pids: [],
+      privateFiles: [
+        { name: 'rule.pdf', size: 4096 },
+        { name: 'sample.txt', size: 512 },
+      ],
+    };
+    render(
+      <ContestProblemListPage
+        _pageData={buildPageData({
+          tdoc, tsdoc: { attend: 1, subscribe: 0, startAt: beginIso },
+          pdict: {}, psdict: {}, udict: {}, tcdocs: [],
+          showScore: false, canViewRecord: true,
+        })}
+      />,
+    );
+    const wrap = screen.getByTestId('contest-private-files');
+    expect(wrap).toBeInTheDocument();
+    expect(wrap.textContent).toContain('rule.pdf');
+    expect(wrap.textContent).toContain('sample.txt');
   });
 
   it('exposes a back link to the contest detail page', () => {

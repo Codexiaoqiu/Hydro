@@ -8,6 +8,7 @@ import { type PageData, PageDataProvider } from '../context/page-data';
 import * as routerMod from '../context/router';
 import { RouterProvider } from '../context/router';
 import { routeMapStore } from '../globals';
+import { ToastProvider } from '../components/primitives/Toast';
 import { ThemeProvider } from '../theme/ThemeProvider';
 import ProblemMain from './problem_main';
 
@@ -29,9 +30,11 @@ function buildPageData(args: PageData['args']): PageData {
 function Providers({ args, children }: { args: PageData['args'], children: ReactNode }) {
   return (
     <ThemeProvider>
-      <PageDataProvider initial={buildPageData(args)}>
-        <RouterProvider>{children}</RouterProvider>
-      </PageDataProvider>
+      <ToastProvider>
+        <PageDataProvider initial={buildPageData(args)}>
+          <RouterProvider>{children}</RouterProvider>
+        </PageDataProvider>
+      </ToastProvider>
     </ThemeProvider>
   );
 }
@@ -322,6 +325,95 @@ describe('problemMain', () => {
     const pill = screen.getByText('★');
     expect(pill).toBeInTheDocument();
     expect(pill.className).toMatch(/diff(?!None)/);
+  });
+
+  describe('edit mode + selection toolbar (P1-A.1 / P1-A.2)', () => {
+    it('hides edit mode controls when ?mode=edit is absent', () => {
+      renderProblem({
+        pdocs: [
+          { docId: 1, domainId: 'system', title: 'P', tag: [], nSubmit: 0, nAccept: 0 },
+        ],
+        psdict: {},
+        page: 1,
+        pcount: 1,
+        ppcount: 1,
+      });
+      expect(screen.queryByRole('button', { name: /进入编辑模式|edit mode/i })).toBeNull();
+      expect(screen.queryByTestId('problem-selection')).toBeNull();
+    });
+
+    it('shows an Edit mode toggle and renders per-row checkboxes when ?mode=edit', () => {
+      renderProblem({
+        pdocs: [
+          { docId: 1000, domainId: 'system', title: 'A + B', tag: [], nSubmit: 0, nAccept: 0 },
+          { docId: 1001, domainId: 'system', title: 'Sort', tag: [], nSubmit: 0, nAccept: 0 },
+        ],
+        psdict: {},
+        page: 1,
+        pcount: 2,
+        ppcount: 1,
+        UserContext: { _id: 1, perm: `BigInt::${(1n << 5n).toString()}` },
+      });
+      fireEvent.click(screen.getByRole('button', { name: /进入编辑模式|edit mode/i }));
+      // After toggling, per-row checkboxes should appear (data-pid on each).
+      const checkboxes = document.querySelectorAll('input[type="checkbox"][data-pid]');
+      expect(checkboxes).toHaveLength(2);
+    });
+
+    it('renders a select-all header checkbox while in edit mode', () => {
+      renderProblem({
+        pdocs: [
+          { docId: 1000, domainId: 'system', title: 'A + B', tag: [], nSubmit: 0, nAccept: 0 },
+        ],
+        psdict: {},
+        page: 1,
+        pcount: 1,
+        ppcount: 1,
+        UserContext: { _id: 1, perm: `BigInt::${(1n << 5n).toString()}` },
+      });
+      fireEvent.click(screen.getByRole('button', { name: /进入编辑模式|edit mode/i }));
+      const selectAll = document.querySelector('input[type="checkbox"][data-select-all]');
+      expect(selectAll).toBeTruthy();
+    });
+
+    it('shows the ProblemSelectionDisplay only when at least one pid is selected', () => {
+      renderProblem({
+        pdocs: [
+          { docId: 1000, domainId: 'system', title: 'A + B', tag: [], nSubmit: 0, nAccept: 0 },
+        ],
+        psdict: {},
+        page: 1,
+        pcount: 1,
+        ppcount: 1,
+        UserContext: { _id: 1, perm: `BigInt::${(1n << 5n).toString()}` },
+      });
+      fireEvent.click(screen.getByRole('button', { name: /进入编辑模式|edit mode/i }));
+      expect(screen.queryByTestId('problem-selection')).toBeNull();
+      const checkbox = document.querySelector('input[type="checkbox"][data-pid]') as HTMLInputElement;
+      fireEvent.click(checkbox);
+      expect(screen.getByTestId('problem-selection')).toBeInTheDocument();
+      expect(screen.getByTestId('problem-selection')).toHaveTextContent(/已选 1/);
+    });
+  });
+
+  describe('search query parsing (P1-A.6)', () => {
+    it('rewrites the URL when the form is submitted with a category: filter', () => {
+      renderProblem({ pdocs: [], psdict: {}, page: 1, pcount: 0, ppcount: 0 });
+      const input = screen.getByLabelText('搜索题目') as HTMLInputElement;
+      fireEvent.change(input, { target: { value: 'category:dp' } });
+      fireEvent.submit(input.closest('form')!);
+      expect(navigateSpy).toHaveBeenCalledWith('/p?q=category%3Adp');
+    });
+
+    it('quotes whitespace-bearing filter values on submit', () => {
+      renderProblem({ pdocs: [], psdict: {}, page: 1, pcount: 0, ppcount: 0 });
+      const input = screen.getByLabelText('搜索题目') as HTMLInputElement;
+      fireEvent.change(input, { target: { value: 'category:"dynamic programming" knapsack' } });
+      fireEvent.submit(input.closest('form')!);
+      expect(navigateSpy).toHaveBeenCalledWith(
+        '/p?q=category%3A%22dynamic+programming%22+knapsack',
+      );
+    });
   });
 
   describe('tagRow collapse', () => {

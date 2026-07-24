@@ -147,8 +147,8 @@ export function ProblemForm({
     if (!langCodes.includes(activeLang)) setActiveLang(langCodes[0]);
   }, [langCodes, activeLang]);
 
-  const submit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const submit = async (e?: FormEvent<HTMLFormElement>) => {
+    e?.preventDefault();
     setSubmitting(true);
     setError(null);
     if (!title.trim()) {
@@ -324,6 +324,7 @@ export function ProblemForm({
               language="markdown"
               onChange={onContentChange}
               onUpload={uploadImage}
+              onSubmit={submit}
               height={420}
               aria-label="problem content"
             />

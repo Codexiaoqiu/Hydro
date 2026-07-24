@@ -51,7 +51,12 @@ html[data-theme='light'] .prefix {
 }
 .right {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 14px;
+}
+.downloadBtn {
+  width: 100%;
 }
 .statCard {
   width: 100%;

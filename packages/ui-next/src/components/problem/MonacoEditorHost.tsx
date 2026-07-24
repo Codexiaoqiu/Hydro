@@ -1,6 +1,7 @@
 import Editor from '@monaco-editor/react';
 import type { OnChange } from '@monaco-editor/react';
-import { useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
+import * as yaml from 'js-yaml';
 import { validateProblemConfigYaml } from '../../lib/yaml-config';
 
 // Real Monaco editor host. Lazy-loaded by `ProblemConfigEditor` so that the
@@ -13,6 +14,16 @@ export interface MonacoEditorHostProps {
   height?: number;
   /** Debounce interval for forwarding onChange. Default 300ms. */
   debounceMs?: number;
+  /**
+   * Imperative handle for the parent page. The page must call
+   * `flushPendingChange()` immediately before reading the page's
+   * `parsed`/`yamlText` state to persist (e.g. right before the Save
+   * button POSTs). Without this, the 300ms debounce can swallow the
+   * user's most recent edit, leaving the freshly-typed text orphaned
+   * when the page is reloaded after Save. The handle is stable across
+   * renders so it can be safely stashed in a ref.
+   */
+  onReady?: (api: { flushPendingChange: () => void }) => void;
 }
 
 export function MonacoEditorHost({
@@ -20,22 +31,48 @@ export function MonacoEditorHost({
   onChange,
   height = 400,
   debounceMs = 300,
+  onReady,
 }: MonacoEditorHostProps) {
   const debouncedRef = useRef<number | null>(null);
   const lastEmittedRef = useRef<string>(value);
+  const pendingValueRef = useRef<string | null>(null);
+  const flushPendingChange = useCallback(() => {
+    if (debouncedRef.current !== null) {
+      window.clearTimeout(debouncedRef.current);
+      debouncedRef.current = null;
+    }
+    if (pendingValueRef.current !== null && pendingValueRef.current !== lastEmittedRef.current) {
+      const next = pendingValueRef.current;
+      pendingValueRef.current = null;
+      lastEmittedRef.current = next;
+      onChange(next);
+    }
+  }, [onChange]);
+
+  useEffect(() => {
+    onReady?.({ flushPendingChange });
+    return () => {
+      if (debouncedRef.current !== null) window.clearTimeout(debouncedRef.current);
+    };
+  }, [flushPendingChange, onReady]);
+
   const handleChange: OnChange = (next) => {
     if (next === undefined) return;
     if (next === lastEmittedRef.current) return;
+    pendingValueRef.current = next;
     if (debouncedRef.current !== null) window.clearTimeout(debouncedRef.current);
     debouncedRef.current = window.setTimeout(() => {
-      lastEmittedRef.current = next;
-      onChange(next);
+      debouncedRef.current = null;
+      if (pendingValueRef.current !== null) {
+        const v = pendingValueRef.current;
+        pendingValueRef.current = null;
+        if (v !== lastEmittedRef.current) {
+          lastEmittedRef.current = v;
+          onChange(v);
+        }
+      }
     }, debounceMs);
   };
-
-  useEffect(() => () => {
-    if (debouncedRef.current !== null) window.clearTimeout(debouncedRef.current);
-  }, []);
 
   // Markers updated whenever the value changes. We surface real validation
   // errors from the same AJV schema that the page uses, so editors see
@@ -47,9 +84,7 @@ export function MonacoEditorHost({
       const update = (raw: string) => {
         let parsed: unknown = null;
         try {
-          // eslint-disable-next-line @typescript-eslint/no-require-imports
-          const jsyaml = require('js-yaml');
-          parsed = jsyaml.load(raw);
+          parsed = yaml.load(raw);
         } catch {
           monaco.editor.setModelMarkers(model, 'hydro-config', [{
             severity: monaco.MarkerSeverity.Error,

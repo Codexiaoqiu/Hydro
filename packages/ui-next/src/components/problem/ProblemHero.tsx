@@ -1,5 +1,6 @@
 import { Ring } from '../charts/Ring';
-import { Chip, Eyebrow } from '../primitives';
+import { Button, Chip, Eyebrow } from '../primitives';
+import { useTranslate } from '../../lib/i18n';
 import styles from './ProblemHero.module.css';
 
 interface PdocLite {
@@ -33,6 +34,18 @@ export function ProblemHero({ pdoc }: Props) {
   const typeLabel = cfg?.type ?? 'default';
   const levelLabel = pdoc.difficulty != null ? `Level ${pdoc.difficulty}` : 'Beginner';
   const prefix = `#${pdoc.pid ?? pdoc.docId}`;
+  const t = useTranslate();
+
+  // The Download button navigates to `/p/:pid/download`, where the server is
+  // expected to serve the file (zip / md / pdf). The Content-Disposition
+  // header — not the URL — decides whether the browser downloads or renders
+  // inline; the path itself is intentionally content-type agnostic so the
+  // same link works for the markdown bundle, the testdata zip, and PDF
+  // additional files alike.
+  const onDownload = () => {
+    if (typeof window === 'undefined') return;
+    window.location.href = `/p/${pdoc.docId}/download`;
+  };
 
   return (
     <section className={styles.hero}>
@@ -73,6 +86,13 @@ export function ProblemHero({ pdoc }: Props) {
             </div>
           </div>
         </div>
+        <Button
+          variant="ghost"
+          onClick={onDownload}
+          aria-label={t('Problem.Download')}
+        >
+          {t('Problem.Download')}
+        </Button>
       </div>
     </section>
   );

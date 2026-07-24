@@ -1,6 +1,5 @@
 import { useScratchpad } from './ScratchpadContext';
 import { useTranslate } from '../../lib/i18n';
-import type { Dispatch, SetStateAction } from 'react';
 
 interface PdocMinimal {
   config?: { type?: string; langs?: string[] } | string;
@@ -19,12 +18,12 @@ export interface ScratchpadToolbarProps {
    * Called with the new rid returned by the pretest POST so the parent
    * (`ScratchpadEditorPane`) can open the WebSocket session.
    */
-  setRid: Dispatch<SetStateAction<string | null>>;
+  setRid: (rid: string | null) => void;
 }
 
 export function ScratchpadToolbar({
   postSubmitUrl,
-  pretestConnUrl: _pretestConnUrl,
+  pretestConnUrl,
   getSubmissionsUrl: _getSubmissionsUrl,
   pdoc,
   onExit,
@@ -70,7 +69,7 @@ export function ScratchpadToolbar({
   return (
     <div role="toolbar" aria-label="Scratchpad toolbar" style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'center', padding: 'var(--space-2) var(--space-3)', borderBottom: '1px solid var(--border)', background: 'var(--surface-elev)' }}>
       {canPretest && (
-        <button type="button" data-hotkey="f9" onClick={runPretest} disabled={state.pretest.running || state.submitting} style={btnStyle}>
+        <button type="button" data-hotkey="f9" onClick={runPretest} disabled={!pretestConnUrl || state.pretest.running || state.submitting} style={btnStyle}>
           {t('Scratchpad.RunPretest')} (F9)
         </button>
       )}

@@ -6,8 +6,23 @@ import { request } from '../../hooks/use-api';
 import { useToast } from '../primitives/Toast';
 import styles from './ContestClarificationForm.module.css';
 
+/**
+ * Jury reply / broadcast form mounted on the dedicated
+ * `/contest/:tid/clarification` page. Mirrors
+ * `packages/ui-default/templates/contest_clarification.html:64-104`.
+ *
+ * Backend (`ContestClarificationHandler.postClarification`,
+ * `handler/contest.ts:690`) hard-codes `owner=0` (jury) for both branches:
+ *   - `mode='reply'` with `did=<doc._id>` → `addClarificationReply`
+ *   - `mode='broadcast'` without `did`    → `addClarification` (subject required)
+ *
+ * The `ask` mode was removed: ui-default has no ask-mode form on this page.
+ * Contestants submit new questions via the inline form on
+ * `/contest/:tid/problems` (ContestProblemListHandler, see
+ * `ContestClarificationInlineForm`), which records owner = this.user._id.
+ */
 export interface ContestClarificationFormProps {
-  mode: 'reply' | 'broadcast' | 'ask';
+  mode: 'reply' | 'broadcast';
   tdoc: { docId: number; pids: number[]; title?: string };
   /** Required when mode === 'reply'. */
   did?: string;
@@ -34,13 +49,11 @@ export function ContestClarificationForm({ mode, tdoc, did, onSubmitted }: Conte
       fd.set('operation', 'clarification');
       fd.set('content', content);
       if (mode === 'reply' && did) fd.set('did', did);
-      // Both `broadcast` (jury) and `ask` (contestant) post a new thread:
-      // no `did`, but a `subject` selector.
-      if (mode === 'broadcast' || mode === 'ask') fd.set('subject', subject);
+      if (mode === 'broadcast') fd.set('subject', subject);
       await request.post(window.location.pathname, fd);
       toast.success(t('ContestClarification.Submitted'));
       setContent('');
-      const payload = (mode === 'broadcast' || mode === 'ask')
+      const payload = mode === 'broadcast'
         ? { subject: Number(subject), content }
         : { did, content };
       onSubmitted(payload);
@@ -51,14 +64,12 @@ export function ContestClarificationForm({ mode, tdoc, did, onSubmitted }: Conte
 
   const titleKey = mode === 'reply'
     ? 'ContestClarification.Reply'
-    : mode === 'ask'
-      ? 'ContestClarification.Ask'
-      : 'ContestClarification.Broadcast';
+    : 'ContestClarification.Broadcast';
 
   return (
     <form className={styles.root} onSubmit={(e) => { e.preventDefault(); submit(); }}>
       <h3 className={styles.title}>{t(titleKey)}</h3>
-      {(mode === 'broadcast' || mode === 'ask') && (
+      {mode === 'broadcast' && (
         <div className={styles.field}>
           <label htmlFor="clar-subject" className={styles.label}>{t('ContestClarification.Subject')}</label>
           <select
@@ -82,7 +93,7 @@ export function ContestClarificationForm({ mode, tdoc, did, onSubmitted }: Conte
         value={content}
         onChange={setContent}
         height={160}
-        aria-label={t('ContestClarification.Subject')}
+        aria-label={t('ContestClarification.Content')}
       />
       <Button type="submit" variant="primary" disabled={busy}>
         {busy ? t('ContestClarification.Submitting') : t('ContestClarification.Submit')}

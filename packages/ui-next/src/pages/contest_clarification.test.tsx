@@ -54,13 +54,8 @@ describe('ContestClarificationPage', () => {
     expect(back.getAttribute('href')).toBe('/contest_detail/7');
   });
 
-  it('renders an Ask Question button for all users', () => {
-    vi.mocked(usePageData).mockReturnValue({
-      args: { tdoc: { docId: 7, pids: [1] }, tcdocs: [], pdict: {}, udict: {} },
-    });
-    render(<ContestClarificationPage />);
-    // The "Ask" key is not in the catalog so the fallback returns the key
-    // string in zh-CN; match either the English label or the literal key.
-    expect(screen.getByRole('button', { name: /ask|ContestClarification\.Ask/i })).toBeInTheDocument();
-  });
+  // Ask button test removed: the /contest/:tid/clarification page no longer
+  // renders an Ask button. Contestants submit new questions via the inline
+  // form on /contest/:tid/problems (ContestClarificationInlineForm), which
+  // matches ui-default layout. This page only hosts the jury Broadcast form.
 });

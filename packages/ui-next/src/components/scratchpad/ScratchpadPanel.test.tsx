@@ -1,6 +1,27 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
+import type { ReactNode } from 'react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ScratchpadPanel } from './ScratchpadPanel';
+
+vi.mock('react-resizable-panels', () => ({
+  Group: ({ children, defaultLayout, onLayoutChanged }: {
+    children: ReactNode;
+    defaultLayout?: Record<string, number>;
+    onLayoutChanged?: (layout: Record<string, number>, meta: { isUserInteraction: boolean }) => void;
+  }) => (
+    <div data-testid="scratchpad-split" data-layout={JSON.stringify(defaultLayout)}>
+      {children}
+      <button
+        type="button"
+        onClick={() => onLayoutChanged?.({ problem: 38, editor: 62 }, { isUserInteraction: true })}
+      >
+        Resize panes
+      </button>
+    </div>
+  ),
+  Panel: ({ children }: { children: ReactNode }) => <div>{children}</div>,
+  Separator: () => <div role="separator" />,
+}));
 
 vi.mock('@monaco-editor/react', () => ({
   default: ({ 'aria-label': ariaLabel }: { 'aria-label'?: string }) => (
@@ -40,6 +61,10 @@ const baseArgs = {
   onExit: vi.fn(),
 };
 
+beforeEach(() => {
+  window.localStorage.clear();
+});
+
 describe('ScratchpadPanel', () => {
   it('renders both panes', () => {
     render(<ScratchpadPanel {...baseArgs} />);
@@ -53,5 +78,24 @@ describe('ScratchpadPanel', () => {
     render(<ScratchpadPanel {...baseArgs} onExit={onExit} />);
     fireEvent.keyDown(window, { key: 'q', altKey: true });
     expect(onExit).toHaveBeenCalledOnce();
+  });
+
+  it('renders a draggable separator between problem and editor panes', () => {
+    render(<ScratchpadPanel {...baseArgs} />);
+    expect(screen.getByRole('separator')).toBeInTheDocument();
+  });
+
+  it('restores and persists the pane layout', () => {
+    window.localStorage.setItem('scratchpad/layout', JSON.stringify({ problem: 45, editor: 55 }));
+    render(<ScratchpadPanel {...baseArgs} />);
+    expect(screen.getByTestId('scratchpad-split')).toHaveAttribute(
+      'data-layout',
+      JSON.stringify({ problem: 45, editor: 55 }),
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Resize panes' }));
+    expect(window.localStorage.getItem('scratchpad/layout')).toBe(
+      JSON.stringify({ problem: 38, editor: 62 }),
+    );
   });
 });

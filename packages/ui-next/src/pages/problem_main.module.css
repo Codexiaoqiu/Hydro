@@ -375,3 +375,42 @@
   gap: var(--space-2);
   flex-wrap: wrap;
 }
+
+.selectAll {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-6);
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-2);
+  font-size: var(--text-sm);
+  color: var(--text-soft);
+}
+
+.selectAll label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  cursor: pointer;
+}
+
+.checkbox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  padding-left: var(--space-2);
+}
+
+.checkbox input,
+.selectAll input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--cyan);
+  cursor: pointer;
+}
+
+/* Edit mode prepends a checkbox column, so widen the grid when needed. */
+.rowEditing {
+  grid-template-columns: 32px 90px 1fr 90px 110px 110px;
+}

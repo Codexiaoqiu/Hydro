@@ -42,6 +42,26 @@ describe('markdownPreview', () => {
     expect(screen.getByRole('table')).toBeTruthy();
   });
 
+  it('rewrites file references to encoded /file paths', () => {
+    render(<MarkdownPreview source="![](file://missing%20image.png)" />);
+    act(() => {
+      vi.advanceTimersByTime(200);
+    });
+    expect(screen.getByTestId('markdown-preview').querySelector('img')?.getAttribute('src')).toBe('/file/missing%20image.png');
+  });
+
+  it('marks an image as broken when it fails to load', () => {
+    render(<MarkdownPreview source="![](missing.zip)" />);
+    act(() => {
+      vi.advanceTimersByTime(200);
+    });
+    const image = screen.getByTestId('markdown-preview').querySelector('img') as HTMLImageElement;
+
+    image.dispatchEvent(new Event('error'));
+
+    expect(image.className).toContain('broken');
+  });
+
   it('does not crash on very long input', () => {
     const longInput = '# '.repeat(50000);
     expect(() => {

@@ -5,6 +5,7 @@ import { Link } from '../components/link';
 import { Alert, Chip, Eyebrow } from '../components/primitives';
 import { TagCloud } from '../components/primitives/TagCloud';
 import { ProblemHero } from '../components/problem/ProblemHero';
+import { ProblemOpenGraph } from '../components/problem/ProblemOpenGraph';
 import { Author } from '../components/sidebar/Author';
 import { type ContestItem, ContestList } from '../components/sidebar/ContestList';
 import { getTidQuery, ProblemSidebar, type ProblemSidebarContext } from '../components/sidebar/ProblemSidebar';
@@ -376,6 +377,7 @@ export default function ProblemDetailPage() {
   if (mode === 'normal') {
     return (
       <main className={styles.page}>
+        <ProblemOpenGraph pdoc={pdoc} />
         <ProblemHero pdoc={pdoc} />
 
         <div className={styles.layout}>

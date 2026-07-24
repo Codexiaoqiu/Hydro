@@ -236,3 +236,26 @@ describe('problem_detail scratchpad mode', () => {
     window.history.pushState = origPushState;
   });
 });
+
+describe('problem_detail normal mode', () => {
+  // Override the scratchpad-mode URL set at the top of this file so the page
+  // actually renders the normal-mode branch (which is where ProblemOpenGraph
+  // is mounted).
+  beforeEach(() => {
+    Object.defineProperty(window, 'location', {
+      value: new URL('http://localhost/p/1'),
+      writable: true,
+    });
+  });
+
+  it('mounts ProblemOpenGraph meta tags when rendered in normal mode', () => {
+    renderProblemDetail({
+      ...defaultArgs,
+      pdoc: { ...defaultArgs.pdoc, title: 'OG Test Problem' },
+    });
+    // ProblemOpenGraph injects og:title / og:description / og:type meta tags.
+    const ogTitle = document.head.querySelector('meta[property="og:title"]');
+    expect(ogTitle).not.toBeNull();
+    expect(ogTitle?.getAttribute('content')).toContain('OG Test Problem');
+  });
+});

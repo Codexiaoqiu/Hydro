@@ -20,6 +20,11 @@ const t = vi.fn((key: string) => {
     'Scratchpad.PretestOutput': 'Output',
     'Scratchpad.CopyOutput': 'Copy output',
     'Scratchpad.ClearOutput': 'Clear output',
+    'Scratchpad.RunPretest': 'Run Pretest',
+    'Scratchpad.SubmitSolution': 'Submit',
+    'Scratchpad.Exit': 'Exit',
+    'Scratchpad.Pretest': 'Pretest',
+    'Scratchpad.Records': 'Records',
   };
   return map[key] ?? key;
 });
@@ -62,5 +67,73 @@ describe('ScratchpadEditorPane', () => {
       />,
     );
     expect(screen.getByLabelText(/input/i)).toBeInTheDocument();
+  });
+
+  it('filters remote-judge languages by validAs, pretest, or remote_judge metadata', () => {
+    wrap(
+      <ScratchpadEditorPane
+        pdoc={{
+          config: {
+            type: 'remote_judge',
+            langs: [
+              { key: 'cpp', display: 'C++', validAs: { codeforces: '54' } },
+              { key: 'py', display: 'Python', pretest: 'python3' },
+              { key: 'java', display: 'Java', remote_judge: true },
+              { key: 'rust', display: 'Rust' },
+              { key: 'pas', display: 'Pascal', pretest: false },
+            ],
+          },
+        }}
+        pretestConnUrl="ws://x"
+        postSubmitUrl="/s"
+        getSubmissionsUrl="/r"
+        problemId={1}
+        UserContext={{ _id: 1 }}
+        onExit={() => {}}
+        rid={null}
+        setRid={() => {}}
+      />,
+    );
+
+    const options = Array.from(screen.getByRole('combobox').querySelectorAll('option'))
+      .map((option) => option.value);
+    expect(options).toEqual(['cpp', 'py', 'java']);
+  });
+
+  it('disables Run Pretest when the websocket URL is empty', () => {
+    wrap(
+      <ScratchpadEditorPane
+        pdoc={{ config: { type: 'default', langs: ['cpp'] } }}
+        pretestConnUrl=""
+        postSubmitUrl="/s"
+        getSubmissionsUrl="/r"
+        problemId={1}
+        UserContext={{ _id: 1 }}
+        onExit={() => {}}
+        rid={null}
+        setRid={() => {}}
+      />,
+    );
+    expect(screen.getByRole('button', { name: /run pretest/i })).toBeDisabled();
+  });
+
+  it('gates record fetching and streaming with UserContext.canViewRecord', () => {
+    const fetchSpy = vi.spyOn(globalThis, 'fetch');
+    wrap(
+      <ScratchpadEditorPane
+        pdoc={{ config: { type: 'default', langs: ['cpp'] } }}
+        pretestConnUrl="ws://x"
+        postSubmitUrl="/s"
+        getSubmissionsUrl="/r"
+        problemId={1}
+        UserContext={{ _id: 1, canViewRecord: false }}
+        onExit={() => {}}
+        rid={null}
+        setRid={() => {}}
+      />,
+    );
+    screen.getByRole('button', { name: /records/i }).click();
+    expect(fetchSpy).not.toHaveBeenCalled();
+    fetchSpy.mockRestore();
   });
 });

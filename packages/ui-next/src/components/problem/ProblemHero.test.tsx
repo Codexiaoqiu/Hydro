@@ -1,5 +1,5 @@
-import { render } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { fireEvent, render } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ProblemHero } from './ProblemHero';
 
 const basePdoc = {
@@ -39,5 +39,56 @@ describe('problemHero', () => {
     const { container } = render(<ProblemHero pdoc={basePdoc} />);
     expect(container.textContent).toContain('1000 ms');
     expect(container.textContent).toContain('1024 MiB');
+  });
+});
+
+describe('problemHero download button (P2-B.1)', () => {
+  let originalLocation: Location;
+  let assignedHref: string;
+
+  beforeEach(() => {
+    assignedHref = '';
+    originalLocation = window.location;
+    // jsdom does not allow direct location.href reassignment; stub it so the
+    // click handler can set window.location.href deterministically.
+    Object.defineProperty(window, 'location', {
+      configurable: true,
+      writable: true,
+      value: { ...originalLocation, href: '' } as unknown as Location,
+    });
+    Object.defineProperty(window.location, 'href', {
+      configurable: true,
+      get() { return assignedHref; },
+      set(v: string) { assignedHref = v; },
+    });
+  });
+
+  afterEach(() => {
+    Object.defineProperty(window, 'location', { configurable: true, writable: true, value: originalLocation });
+  });
+
+  it('renders a Download button labelled in the active locale', () => {
+    const { getByRole } = render(<ProblemHero pdoc={basePdoc} />);
+    // locale is pinned to zh_CN in test/setup.ts → '下载'
+    const btn = getByRole('button', { name: /下载|download/i });
+    expect(btn).toBeTruthy();
+  });
+
+  it('renders the Download button after the pass-rate stat card', () => {
+    const { container } = render(<ProblemHero pdoc={basePdoc} />);
+    const statCard = container.querySelector('[class*="statCard"]') as HTMLElement;
+    const btn = container.querySelector('button[class*="btn"]') as HTMLButtonElement;
+    expect(statCard).toBeTruthy();
+    expect(btn).toBeTruthy();
+    // The button must be a sibling/descendant of the right column, not buried
+    // inside the title block on the left.
+    expect(btn.closest('[class*="right"]') || btn.parentElement?.parentElement).toBeTruthy();
+  });
+
+  it('clicking Download navigates the browser to /p/:pid/download', () => {
+    const { getByRole } = render(<ProblemHero pdoc={basePdoc} />);
+    const btn = getByRole('button', { name: /下载|download/i });
+    fireEvent.click(btn);
+    expect(assignedHref).toBe('/p/1000/download');
   });
 });

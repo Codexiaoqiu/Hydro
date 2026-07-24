@@ -24,7 +24,13 @@ export default function ContestClarificationPage() {
   const [items, setItems] = useState<ClarItem[]>(() => args?.tcdocs ?? []);
   const [replyTo, setReplyTo] = useState<string | null>(null);
   const [broadcastOpen, setBroadcastOpen] = useState(false);
-  const [askOpen, setAskOpen] = useState(false);
+  // Ask mode removed: ui-default has no ask form on the clarification page
+  // (see templates/contest_clarification.html). Contestants submit questions
+  // via the inline form on /contest/:tid/problems (ContestClarificationInlineForm),
+  // which calls ContestProblemListHandler.postClarification and records owner
+  // = this.user._id. The previous "ask" branch here was routed to
+  // ContestClarificationHandler which hard-codes owner=0 (jury) — the route
+  // was wrong by construction.
 
   if (!tdoc) return <p style={{ padding: 'var(--space-6)' }}>{t('Common.Loading')}</p>;
 
@@ -59,20 +65,10 @@ export default function ContestClarificationPage() {
   };
 
   const onAskSubmitted = (payload?: { subject?: number; content?: string }) => {
-    setAskOpen(false);
-    if (payload?.content) {
-      // Contestant-authored clarification: use a non-zero owner -> response
-      // from the server will overwrite `owner` with the real uid when the
-      // page is polled again.
-      const newItem: ClarItem = {
-        _id: fakeId(),
-        subject: payload.subject ?? -1,
-        owner: 1,
-        content: payload.content,
-        reply: [],
-      };
-      setItems((prev) => [newItem, ...prev]);
-    }
+    // Dead branch retained as a no-op so the type union still compiles if
+    // callers are added later. The ContestClarificationForm no longer
+    // accepts mode='ask', so this handler will not fire under current UI.
+    void payload;
   };
 
   return (
@@ -83,9 +79,7 @@ export default function ContestClarificationPage() {
           <header className={styles.header}>
             <h1 className={styles.title}>{t('ContestClarification.Title')}</h1>
             <div className={styles.headerActions}>
-              <Button variant="ghost" onClick={() => setAskOpen(true)}>
-                {t('ContestClarification.Ask')}
-              </Button>
+              {/* Ask mode button removed — see comment on askOpen state. */}
               <Button variant="primary" onClick={() => setBroadcastOpen(true)}>
                 {t('ContestClarification.Broadcast')}
               </Button>
@@ -99,13 +93,10 @@ export default function ContestClarificationPage() {
             currentUid={currentUid}
             onReply={(did) => setReplyTo(did)}
           />
-          {(replyTo || broadcastOpen || askOpen) && (
+          {(replyTo || broadcastOpen) && (
             <div className={styles.replyForm}>
               {broadcastOpen && (
                 <ContestClarificationForm mode="broadcast" tdoc={tdoc as any} onSubmitted={onBroadcastSubmitted} />
-              )}
-              {askOpen && (
-                <ContestClarificationForm mode="ask" tdoc={tdoc as any} onSubmitted={onAskSubmitted} />
               )}
               {replyTo && (
                 <ContestClarificationForm mode="reply" tdoc={tdoc as any} did={replyTo} onSubmitted={onReplySubmitted(replyTo)} />

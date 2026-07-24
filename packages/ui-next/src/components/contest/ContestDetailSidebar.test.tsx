@@ -193,4 +193,42 @@ describe('contestDetailSidebar', () => {
     );
     expect(screen.getByRole('link', { name: /所有提交|All submissions/i })).toBeInTheDocument();
   });
+
+  it('renders the Print link when tdoc.allowPrint is true and the contest is ongoing', () => {
+    render(
+      <ContestDetailSidebar
+        tdoc={tdoc({ allowPrint: true })}
+        tsdoc={null}
+        udict={udict()}
+        urlForFile={(n) => `/f/${n}`}
+      />,
+    );
+    expect(screen.getByRole('link', { name: /打印|Print/i })).toBeInTheDocument();
+  });
+
+  it('does not render the Print link when tdoc.allowPrint is false', () => {
+    render(
+      <ContestDetailSidebar
+        tdoc={tdoc({ allowPrint: false })}
+        tsdoc={null}
+        udict={udict()}
+        urlForFile={(n) => `/f/${n}`}
+      />,
+    );
+    expect(screen.queryByRole('link', { name: /打印|^Print$/i })).not.toBeInTheDocument();
+  });
+
+  it('Print link points to contest_print route with the resolved tid', () => {
+    render(
+      <ContestDetailSidebar
+        tdoc={tdoc({ allowPrint: true, docId: '60a000000000000000000abc' })}
+        tsdoc={null}
+        udict={udict()}
+        urlForFile={(n) => `/f/${n}`}
+      />,
+    );
+    const printLink = screen.getByRole('link', { name: /打印|Print/i });
+    // The mock Link renders href="/contest_print/${tid}" with tid=docId
+    expect(printLink.getAttribute('href')).toBe('/contest_print/60a000000000000000000abc');
+  });
 });

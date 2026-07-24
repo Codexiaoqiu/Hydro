@@ -14,6 +14,7 @@ registerPage('contest_create', () => import('./contest_create'));
 registerPage('contest_balloon', () => import('./contest_balloon'));
 registerPage('contest_clarification', () => import('./contest_clarification'));
 registerPage('contest_edit', () => import('./contest_edit'));
+registerPage('contest_print', () => import('./contest_print'));
 registerPage('problem_main', () => import('./problem_main'));
 registerPage('user_login', () => import('./user_login'), { layout: 'auth' });
 registerPage('user_register', () => import('./user_register'), { layout: 'auth' });

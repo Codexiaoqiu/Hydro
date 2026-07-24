@@ -1,5 +1,5 @@
 import type { OnMount } from '@monaco-editor/react';
-import { lazy, Suspense, useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import styles from './MarkdownEditor.module.css';
 import { MarkdownPreview } from './MarkdownPreview';
 
@@ -12,6 +12,7 @@ export interface MarkdownEditorProps {
   language?: 'markdown' | string;
   onChange: (val: string) => void;
   onUpload?: (files: File[]) => Promise<string[]>;
+  onSubmit?: () => void;
   height?: number | string;
   'aria-label'?: string;
 }
@@ -22,9 +23,13 @@ function readScheme(): 'light' | 'dark' {
 }
 
 export function MarkdownEditor({
-  value, language = 'markdown', onChange, onUpload, height = 360, ...rest
+  value, language = 'markdown', onChange, onUpload, onSubmit, height = 360, ...rest
 }: MarkdownEditorProps) {
   const [theme, setTheme] = useState<'light' | 'dark'>(() => readScheme());
+  const onSubmitRef = useRef(onSubmit);
+  const onUploadRef = useRef(onUpload);
+  onSubmitRef.current = onSubmit;
+  onUploadRef.current = onUpload;
 
   useEffect(() => {
     const onThemeChange = () => setTheme(readScheme());
@@ -32,7 +37,28 @@ export function MarkdownEditor({
     return () => window.removeEventListener('hydro:theme-change', onThemeChange);
   }, []);
 
-  const handleMount: OnMount = (editor, _monaco) => {
+  const handleMount: OnMount = (editor, monaco) => {
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => onSubmitRef.current?.());
+
+    const uploadPastedFiles = async (files: File[]) => {
+      const upload = onUploadRef.current;
+      if (!upload) return;
+      const supported = files.filter((file) => file.type.startsWith('image/') || file.type === 'application/zip');
+      if (!supported.length) return;
+      const urls = await upload(supported);
+      const markdown = urls.map((url, index) => (
+        supported[index]?.type.startsWith('image/')
+          ? `![](${url})`
+          : `[${supported[index]?.name || 'file.zip'}](${url})`
+      )).join('\n');
+      if (markdown) editor.trigger('keyboard', 'type', { text: markdown });
+    };
+
+    editor.onDidPaste((event) => {
+      const clipboardData = event.clipboardEvent?.clipboardData;
+      if (clipboardData?.files.length) void uploadPastedFiles(Array.from(clipboardData.files));
+    });
+
     if (onUpload) {
       editor.addAction({
         id: 'hydro.upload-image',
@@ -44,8 +70,9 @@ export function MarkdownEditor({
           input.accept = 'image/*';
           input.multiple = true;
           input.onchange = async () => {
-            if (!input.files?.length) return;
-            const urls = await onUpload(Array.from(input.files));
+            const upload = onUploadRef.current;
+            if (!input.files?.length || !upload) return;
+            const urls = await upload(Array.from(input.files));
             editor.trigger('keyboard', 'type', { text: urls.map((u) => `![](${u})`).join('\n') });
           };
           input.click();

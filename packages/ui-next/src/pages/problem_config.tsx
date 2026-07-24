@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { Button } from '../components/primitives/Button';
 import { ConfirmDialog } from '../components/primitives/ConfirmDialog';
 import { useToast } from '../components/primitives/Toast';
@@ -39,6 +39,12 @@ export default function ProblemConfigPage() {
   const [parsed, setParsed] = useState<ProblemConfigYaml>(initialConfig);
   const [saving, setSaving] = useState(false);
   const [confirmInvalid, setConfirmInvalid] = useState(false);
+  // Imperative handle from MonacoEditorHost so Save can flush the 300ms
+  // debounce before persisting `parsed` (see Important #5 in §十.6).
+  const editorApiRef = useRef<{ flushPendingChange: () => void } | null>(null);
+  const onEditorReady = useCallback((api: { flushPendingChange: () => void }) => {
+    editorApiRef.current = api;
+  }, []);
 
   const validation = useMemo(() => validateProblemConfigYaml(parsed), [parsed]);
   const validationOk = validation.ok;
@@ -52,7 +58,12 @@ export default function ProblemConfigPage() {
   }, []);
 
   const onAutoDetect = useCallback(() => {
-    const files = args?.testdata ?? [];
+    // Backend injects `testdata` via `sortFiles(this.pdoc.data || [])` — the
+    // model field is `FileInfo[]` (objects with `.name`), not a flat string
+    // array. Normalize to string[] here so `detectSubtasks` can keep its
+    // `string[]` contract; tolerate the legacy string form for tests.
+    const raw = args?.testdata ?? [];
+    const files = raw.map((f) => (typeof f === 'string' ? f : f.name));
     const subtasks = detectSubtasks(files);
     const next: ProblemConfigYaml = { ...parsed, subtasks: subtasks.map((s) => ({
       type: 'sum' as const,
@@ -67,6 +78,9 @@ export default function ProblemConfigPage() {
 
   const save = useCallback(async (force = false) => {
     if (!args?.pdoc) return;
+    // Flush any pending 300ms Monaco debounce BEFORE reading `parsed` so a
+    // Save clicked immediately after typing cannot persist a stale state.
+    editorApiRef.current?.flushPendingChange();
     if (!validation.ok && !force) {
       // I-3: when validation fails the user can still confirm to save anyway.
       // The ConfirmDialog intercepts and re-invokes save(true) on confirm.
@@ -127,7 +141,7 @@ export default function ProblemConfigPage() {
         ))}
       </nav>
       <main className={styles.body}>
-        {tab === 'editor' && <ProblemConfigEditor value={yamlText} onChange={onYamlChange} />}
+        {tab === 'editor' && <ProblemConfigEditor value={yamlText} onChange={onYamlChange} onReady={onEditorReady} />}
         {tab === 'basic' && <ProblemConfigBasicForm config={parsed} onChange={(next) => { setParsed(next); setYamlText(dumpProblemConfigYaml(next)); }} />}
         {tab === 'subtasks' && (
           <ProblemConfigTree
