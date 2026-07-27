@@ -9,7 +9,7 @@
  *   2. Global opt-out: `/admin/ui?next=on|off` writes to `SettingModel` on
  *      the backend; we read `UiContext.uiNext` (boolean) and force-disable.
  */
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useUiContext } from '../context/page-data';
 
 const STORAGE_KEY = 'hydro.disableNext';
@@ -33,19 +33,25 @@ export interface DisableNextState {
   disabled: boolean;
   reason: 'query' | 'global' | 'none';
   enable: () => void;
+  /**
+   * Persist a per-session kill-switch and reload.
+   *
+   * The `via` parameter is retained for backward compatibility but ignored:
+   * the previous `'global'` branch was dead code (no internal consumer and
+   * the global flag is server-controlled via `UiContext.uiNext`, see
+   * `admin_ui.tsx`). Only the `'query'` layer can be flipped from the
+   * client; any other value is treated as `'query'`.
+   */
   disable: (via?: 'query' | 'global') => void;
 }
 
 export function useDisableNext(): DisableNextState {
   const ui = useUiContext();
   const [queryFlag, setQueryFlag] = useState<boolean>(() => readPersistedFlag());
-  const [globalFlag, setGlobalFlag] = useState<boolean>(() =>
-    !!(ui as unknown as { uiNext?: boolean })?.uiNext === false,
-  );
-
-  useEffect(() => {
-    setGlobalFlag(!!(ui as unknown as { uiNext?: boolean })?.uiNext === false);
-  }, [ui]);
+  // `globalFlag` is read-only: it tracks the server-controlled setting
+  // (`UiContext.uiNext`) and is recomputed every render from `ui`. The
+  // client can never set it — that's by design (q.md R7 reload-loop fix).
+  const globalFlag = !!((ui as unknown as { uiNext?: boolean })?.uiNext === false);
 
   const state = useMemo<DisableNextState>(() => {
     const reason: DisableNextState['reason'] = queryFlag ? 'query' : globalFlag ? 'global' : 'none';
@@ -65,7 +71,6 @@ export function useDisableNext(): DisableNextState {
         // Surface the conflict and let the admin toggle be the only path
         // that re-enables ui-next.
         if (reason === 'global') {
-          // eslint-disable-next-line no-console
           console.warn('[useDisableNext] ui-next is disabled by an admin setting; clear it at /admin/ui?next=on');
           return;
         }
@@ -82,13 +87,12 @@ export function useDisableNext(): DisableNextState {
           window.location.href = url.toString();
         }
       },
-      disable: (via = 'query') => {
-        if (via === 'query') {
-          try { window.sessionStorage.setItem(STORAGE_KEY, '1'); } catch { /* ignore */ }
-          setQueryFlag(true);
-        } else {
-          setGlobalFlag(true);
-        }
+      disable: (_via = 'query') => {
+        // The `_via` parameter is intentionally ignored — see the JSDoc on
+        // `DisableNextState.disable`. Only the per-session query layer can
+        // be flipped client-side; the global layer is server-controlled.
+        try { window.sessionStorage.setItem(STORAGE_KEY, '1'); } catch { /* ignore */ }
+        setQueryFlag(true);
         if (typeof window !== 'undefined') window.location.reload();
       },
     };

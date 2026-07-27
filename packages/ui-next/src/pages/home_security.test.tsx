@@ -2,8 +2,8 @@
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { type PageData, PageDataProvider } from '../context/page-data';
 import { ToastProvider } from '../components/primitives/Toast';
+import { type PageData, PageDataProvider } from '../context/page-data';
 import HomeSecurityPage from './home_security';
 
 function makePageData(args: Record<string, unknown> = {}): PageData {
@@ -22,7 +22,7 @@ function makePageData(args: Record<string, unknown> = {}): PageData {
   };
 }
 
-function Providers({ args, children }: { args: Record<string, unknown>; children: ReactNode }) {
+function Providers({ args, children }: { args: Record<string, unknown>, children: ReactNode }) {
   return (
     <PageDataProvider initial={makePageData(args)}>
       <ToastProvider>{children}</ToastProvider>
@@ -65,7 +65,7 @@ describe('home_security', () => {
     expect(deleteLinks[0].getAttribute('href')).toContain('delete_authn');
   });
 
-  it('POSTs change_mail when the dialog form is submitted', async () => {
+  it('pOSTs change_mail when the dialog form is submitted', async () => {
     const fetchSpy = vi.spyOn(window, 'fetch').mockImplementation(async () => ({
       ok: true, status: 200,
       headers: { get: () => '' },

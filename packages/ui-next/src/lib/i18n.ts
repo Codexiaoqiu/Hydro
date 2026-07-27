@@ -72,6 +72,7 @@ export const zhCN: Catalog = {
   'Common.Back': '返回',
   'Common.Loading': '加载中…',
   'Common.Or': '或',
+  'Common.Hide': '隐藏',
   'Common.Home': '首页',
   'Common.Problems': '题库',
   'Common.Contests': '比赛',
@@ -91,6 +92,7 @@ export const zhCN: Catalog = {
   'Common.Lang': '语言',
   'Common.Status': '状态',
   'Common.Score': '分数',
+  'Common.Show': '显示',
   'Common.Time': '时间',
   'Common.ID': 'ID',
 
@@ -782,6 +784,7 @@ export const en: Catalog = {
   'Common.Back': 'Back',
   'Common.Loading': 'Loading…',
   'Common.Or': 'or',
+  'Common.Hide': 'Hide',
   'Common.Home': 'Home',
   'Common.Problems': 'Problems',
   'Common.Contests': 'Contests',
@@ -801,6 +804,7 @@ export const en: Catalog = {
   'Common.Lang': 'Lang',
   'Common.Status': 'Status',
   'Common.Score': 'Score',
+  'Common.Show': 'Show',
   'Common.Time': 'Time',
   'Common.ID': 'ID',
 

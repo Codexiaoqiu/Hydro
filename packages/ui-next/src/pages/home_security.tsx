@@ -11,12 +11,12 @@
  * dispatches based on that field.
  */
 import {
-  type FormEvent, useEffect, useRef, useState,
-} from 'react';
-import QRCode from 'qrcode';
-import {
   browserSupportsWebAuthn, platformAuthenticatorIsAvailable, startRegistration,
 } from '@simplewebauthn/browser';
+import QRCode from 'qrcode';
+import {
+  type FormEvent, useEffect, useRef, useState,
+} from 'react';
 import { Alert, Button } from '../components/primitives';
 import { Modal } from '../components/primitives/Modal';
 import { useToast } from '../components/primitives/Toast';
@@ -58,7 +58,7 @@ interface AuthenticatorEntry {
 }
 
 interface Args {
-  UserContext?: { _id?: number; uname?: string; mail?: string };
+  UserContext?: { _id?: number, uname?: string, mail?: string };
   sudoUid?: number | null;
   sessions?: SessionEntry[];
   authenticators?: AuthenticatorEntry[];
@@ -66,6 +66,21 @@ interface Args {
 }
 
 type DialogKind = null | 'changeMail' | 'tfa' | 'webauthn' | 'webauthn-name';
+
+/**
+ * Tiny canvas wrapper that re-renders the QR code whenever `data` changes.
+ * Kept inline (not exported) because the TOTP flow is the only caller.
+ * Defined before `HomeSecurityPage` so the JSX inside the TOTP modal can
+ * reference it without a forward-reference lint hit.
+ */
+function QRCodeCanvas({ data, size }: { data: string, size: number }) {
+  const ref = useRef<HTMLCanvasElement | null>(null);
+  useEffect(() => {
+    if (!ref.current) return;
+    QRCode.toCanvas(ref.current, data, { width: size }).catch(() => undefined);
+  }, [data, size]);
+  return <canvas ref={ref} />;
+}
 
 export default function HomeSecurityPage() {
   const { args } = usePageData() as unknown as { args: Args };
@@ -80,6 +95,7 @@ export default function HomeSecurityPage() {
   const [dialog, setDialog] = useState<DialogKind>(null);
   const [tfaSecret, setTfaSecret] = useState('');
   const [tfaQr, setTfaQr] = useState('');
+  const [tfaSecretVisible, setTfaSecretVisible] = useState(false);
   const [secureCtx, setSecureCtx] = useState(true);
   const [webauthnReady, setWebauthnReady] = useState<boolean | null>(null);
   const [webauthnPlatform, setWebauthnPlatform] = useState<boolean | null>(null);
@@ -87,10 +103,12 @@ export default function HomeSecurityPage() {
   // Detect WebAuthn support + platform authenticator once on mount so the
   // menu doesn't issue async probes on each click.
   useEffect(() => {
+    // These setters intentionally run synchronously here: they hydrate
+    // React state from external values (window.isSecureContext, the
+    // @simplewebauthn capability probes). The "mount-once" semantics
+    // make this the canonical sync-from-external pattern.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSecureCtx(typeof window !== 'undefined' && !!window.isSecureContext);
-    // @simplewebauthn/browser exports `browserSupportsWebAuthn` as a sync
-    // boolean; `platformAuthenticatorIsAvailable` may return either a boolean
-    // or a Promise<boolean> depending on the package version. Normalise both.
     const supported = browserSupportsWebAuthn();
     setWebauthnReady(Boolean(supported));
     Promise.resolve(platformAuthenticatorIsAvailable() as unknown)
@@ -150,7 +168,7 @@ export default function HomeSecurityPage() {
       }
       toast.info(t('HomeSecurity.WebauthnFollowDevice'));
       const credential = await startRegistration({ optionsJSON: reg.authOptions });
-      (window as unknown as { __hydroWebauthnPending?: unknown }).__hydroWebauthnPending = credential;
+      setPendingCredential(credential);
       setDialog('webauthn-name');
     } catch (err: unknown) {
       toast.error((err as Error).message);
@@ -160,7 +178,7 @@ export default function HomeSecurityPage() {
   const submitWebauthnName = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
-    const credential = (window as unknown as { __hydroWebauthnPending?: unknown }).__hydroWebauthnPending;
+    const credential = pendingCredential;
     if (!credential) {
       setDialog(null);
       return;
@@ -172,7 +190,7 @@ export default function HomeSecurityPage() {
         result: credential,
       });
       toast.success(t('HomeSecurity.WebauthnSuccess'));
-      delete (window as unknown as { __hydroWebauthnPending?: unknown }).__hydroWebauthnPending;
+      setPendingCredential(null);
       setDialog(null);
       setTimeout(() => window.location.reload(), 1500);
     } catch (err: unknown) {
@@ -217,13 +235,15 @@ export default function HomeSecurityPage() {
         {authenticators.length > 0 && (
           <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
             {authenticators.map((a) => (
-              <li key={a.credentialID} style={{
-                padding: 'var(--space-3)',
-                background: 'var(--surface)',
-                border: '1px solid var(--border)',
-                borderRadius: 'var(--radius-md)',
-                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-              }}>
+              <li
+                key={a.credentialID}
+                style={{
+                  padding: 'var(--space-3)',
+                  background: 'var(--surface)',
+                  border: '1px solid var(--border)',
+                  borderRadius: 'var(--radius-md)',
+                  display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                }}>
                 <div>
                   <div style={{ fontWeight: 600 }}>{a.name || a.credentialID}</div>
                   <div style={{ color: 'var(--text-mute)', fontSize: 'var(--text-xs)' }}>
@@ -268,7 +288,8 @@ export default function HomeSecurityPage() {
                   <td style={{ padding: 'var(--space-2)' }}>{s.updateGeoip ?? '—'}</td>
                   <td style={{ padding: 'var(--space-2)' }}>
                     {!s.isCurrent && (
-                      <a href={`/home/security?operation=delete_session&sessionId=${encodeURIComponent(s._id)}`}
+                      <a
+                        href={`/home/security?operation=delete_session&sessionId=${encodeURIComponent(s._id)}`}
                         style={{ color: 'var(--accent)' }}
                       >
                         {t('HomeSecurity.Terminate')}
@@ -286,17 +307,28 @@ export default function HomeSecurityPage() {
         <form onSubmit={submitChangeMail} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
           <label style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
             <span style={{ fontSize: 'var(--text-sm)' }}>{t('HomeSecurity.CurrentPassword')}</span>
-            <input name="password" type="password" required autoFocus
+            <input
+              name="password"
+              type="password"
+              required
+              autoFocus
               style={{ padding: 'var(--space-2)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)' }} />
           </label>
           <label style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
             <span style={{ fontSize: 'var(--text-sm)' }}>{t('HomeSecurity.CurrentEmailReadonly')}</span>
-            <input name="currentEmail" type="text" value={currentMail} disabled
+            <input
+              name="currentEmail"
+              type="text"
+              value={currentMail}
+              disabled
               style={{ padding: 'var(--space-2)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)', opacity: 0.6 }} />
           </label>
           <label style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
             <span style={{ fontSize: 'var(--text-sm)' }}>{t('HomeSecurity.NewEmail')}</span>
-            <input name="mail" type="text" required
+            <input
+              name="mail"
+              type="text"
+              required
               style={{ padding: 'var(--space-2)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)' }} />
           </label>
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--space-2)' }}>
@@ -312,18 +344,34 @@ export default function HomeSecurityPage() {
           {tfaQr && (
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-2)' }}>
               <QRCodeCanvas data={tfaQr} size={180} />
-              <code
-                onClick={(e) => { (e.currentTarget.textContent = tfaSecret); }}
-                style={{ cursor: 'pointer', fontSize: 'var(--text-xs)' }}
-                title="Click to reveal"
+              <button
+                type="button"
+                onClick={() => setTfaSecretVisible((v) => !v)}
+                aria-pressed={tfaSecretVisible}
+                aria-label={tfaSecretVisible ? t('Common.Hide') : t('Common.Show')}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  padding: 0,
+                  font: 'inherit',
+                  color: 'var(--accent)',
+                  cursor: 'pointer',
+                  fontSize: 'var(--text-xs)',
+                }}
               >
-                {tfaSecret.replace(/./g, '•')}
-              </code>
+                {tfaSecretVisible ? tfaSecret : tfaSecret.replace(/./g, '•')}
+              </button>
             </div>
           )}
           <label style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
             <span style={{ fontSize: 'var(--text-sm)' }}>{t('HomeSecurity.TfaCode')}</span>
-            <input name="tfa_code" type="text" required autoFocus inputMode="numeric" pattern="\d{6}"
+            <input
+              name="tfa_code"
+              type="text"
+              required
+              autoFocus
+              inputMode="numeric"
+              pattern="\d{6}"
               style={{ padding: 'var(--space-2)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)' }} />
           </label>
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--space-2)' }}>
@@ -334,8 +382,13 @@ export default function HomeSecurityPage() {
       </Modal>
 
       <Modal open={dialog === 'webauthn'} onClose={() => setDialog(null)} title={t('HomeSecurity.ChooseAuthnType')}>
-        <ol style={{ paddingLeft: 'var(--space-5)' }}>
-          <li><Button variant="primary" onClick={() => openWebauthn('tfa')}>{t('HomeSecurity.TwoFactor')}</Button></li>
+        {/* TOTP is intentionally NOT offered here — it lives behind the
+            dedicated "Enable two-factor" button above (see `openTfa`).
+            Mixing the two flows into one picker confuses users (TOTP is
+            not a WebAuthn authenticator) and previously caused a TS type
+            error (`openWebauthn('tfa')` against a `'platform' | 'cross-platform'`
+            parameter signature). */}
+        <ol style={{ paddingLeft: 'var(--space-5)', display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
           <li>
             <Button
               variant="ghost"
@@ -357,7 +410,11 @@ export default function HomeSecurityPage() {
         <form onSubmit={submitWebauthnName} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
           <label style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
             <span style={{ fontSize: 'var(--text-sm)' }}>{t('HomeSecurity.AuthnName')}</span>
-            <input name="webauthn_name" type="text" required autoFocus
+            <input
+              name="webauthn_name"
+              type="text"
+              required
+              autoFocus
               style={{ padding: 'var(--space-2)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)' }} />
           </label>
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--space-2)' }}>
@@ -368,17 +425,4 @@ export default function HomeSecurityPage() {
       </Modal>
     </main>
   );
-}
-
-/**
- * Tiny canvas wrapper that re-renders the QR code whenever `data` changes.
- * We keep it inline (not exported) because the TOTP flow is the only caller.
- */
-function QRCodeCanvas({ data, size }: { data: string; size: number }) {
-  const ref = useRef<HTMLCanvasElement | null>(null);
-  useEffect(() => {
-    if (!ref.current) return;
-    QRCode.toCanvas(ref.current, data, { width: size }).catch(() => undefined);
-  }, [data, size]);
-  return <canvas ref={ref} />;
 }

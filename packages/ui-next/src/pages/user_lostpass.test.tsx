@@ -6,7 +6,7 @@ import { type PageData, PageDataProvider } from '../context/page-data';
 import { RouterProvider } from '../context/router';
 import UserLostPassPage from './user_lostpass';
 
-function makePageData(args: Partial<{ UserContext: Record<string, unknown>; smtpConfigured: boolean }> = {}): PageData {
+function makePageData(args: Partial<{ UserContext: Record<string, unknown>, smtpConfigured: boolean }> = {}): PageData {
   return {
     name: 'user_lostpass',
     template: 'user_lostpass.html',
@@ -46,7 +46,7 @@ describe('user_lostpass', () => {
     expect(screen.queryByRole('button', { name: /发送密码重置邮件|Send password reset email/ })).not.toBeInTheDocument();
   });
 
-  it('POSTs to /lostpass and renders a success Alert after a successful submission', async () => {
+  it('pOSTs to /lostpass and renders a success Alert after a successful submission', async () => {
     const fetchSpy = vi.spyOn(window, 'fetch').mockImplementation(async () => ({
       ok: true, status: 204,
       headers: { get: () => '' },

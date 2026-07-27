@@ -54,6 +54,36 @@ const INJECT_MARKER = '<!-- __HYDRO_INJECTION__DO_NOT_REMOVE_THIS__ -->';
 const escapeForScript = (data: string) => data.replace(/</g, '\\u003c');
 const buildInject = (data: string) => `<script id="__HYDRO_INJECTION__" type="application/json">${escapeForScript(data)}</script>`;
 
+// Parse an Accept-Language header into the highest-priority tag, ignoring q=
+// values for simplicity (we only need a single best-match hint to feed into
+// resolveLocale). Returns null when the header is absent or empty.
+function parseAcceptLanguage(header: string | undefined | null): string | null {
+    if (!header) return null;
+    // Each entry: "tag[;q=...]". Pick the first tag and normalise separators.
+    const first = header.split(',')[0];
+    if (!first) return null;
+    const tag = first.split(';')[0].trim();
+    return tag || null;
+}
+
+/**
+ * Minimal structural type for what we read off `context.handler` inside the
+ * renderer. Defined locally to avoid pulling the whole `Handler` class (and
+ * its decorator-generated statics) into the type graph — `Handler` lives in
+ * `hydrooj` and the framework also decorates subclasses, so a structural
+ * duck-type is both safer and lighter than `import type { Handler }`.
+ */
+interface RenderHandler {
+    context: {
+        _matchedRouteName: string;
+        req: { url: string };
+        request?: { headers?: Record<string, string | string[] | undefined> };
+        UserContext?: { viewLang?: string };
+    };
+    response: { template?: string };
+    UiContext?: { locale?: string };
+}
+
 /**
  * Serialize the `__HYDRO_INJECTION__` payload shared by both the DEV (Vite) and
  * PROD (static) renderers. Centralising this avoids field drift between the two
@@ -68,7 +98,7 @@ const buildInject = (data: string) => `<script id="__HYDRO_INJECTION__" type="ap
  *                          only make sense in one of the two paths.
  */
 function serializeInjection(
-    handler: any,
+    handler: RenderHandler,
     routeMap: Record<string, string>,
     endpoint: string | undefined,
     handlerArgs: Record<string, unknown>,
@@ -80,27 +110,15 @@ function serializeInjection(
         name: handlerContext._matchedRouteName,
         template: handler.response.template || '',
         args: handlerArgs,
-        url: handlerContext.req.url!,
+        url: handlerContext.req.url,
         route_map: routeMap,
         endpoint,
-        locale: (handlerContext.UserContext as unknown as { viewLang?: string })?.viewLang
+        locale: handlerContext.UserContext?.viewLang
             || handler.UiContext?.locale
-            || parseAcceptLanguage(handlerContext.request?.headers?.['accept-language'])
+            || parseAcceptLanguage(handlerContext.request?.headers?.['accept-language'] as string | undefined)
             || undefined,
         ...extras,
-    }, serializer(false, handler));
-}
-
-// Parse an Accept-Language header into the highest-priority tag, ignoring q=
-// values for simplicity (we only need a single best-match hint to feed into
-// resolveLocale). Returns null when the header is absent or empty.
-function parseAcceptLanguage(header: string | undefined | null): string | null {
-    if (!header) return null;
-    // Each entry: "tag[;q=...]". Pick the first tag and normalise separators.
-    const first = header.split(',')[0];
-    if (!first) return null;
-    const tag = first.split(';')[0].trim();
-    return tag || null;
+    }, serializer(false, handler as never));
 }
 
 function getAddonEntries(): Record<string, string> {

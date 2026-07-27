@@ -11,7 +11,7 @@ import UserLoginPage from './user_login';
 vi.mock('../components/auth/LoginForm', () => ({
   LoginForm: ({ builtInLogin, loginMethods, redirect, wide }: {
     builtInLogin: boolean;
-    loginMethods?: { id: string; text: string }[];
+    loginMethods?: { id: string, text: string }[];
     redirect?: string;
     wide?: boolean;
   }) => (
@@ -25,7 +25,7 @@ vi.mock('../components/auth/LoginForm', () => ({
   ),
 }));
 
-function makePageData(args: Partial<{ UserContext: Record<string, unknown>; redirect: string; builtInLogin: boolean; loginMethods: { id: string; text: string }[] }> = {}): PageData {
+function makePageData(args: Partial<{ UserContext: Record<string, unknown>, redirect: string, builtInLogin: boolean, loginMethods: { id: string, text: string }[] }> = {}): PageData {
   return {
     name: 'user_login',
     template: 'user_login.html',

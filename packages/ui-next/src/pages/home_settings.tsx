@@ -10,9 +10,9 @@
  */
 import { type FormEvent, useMemo, useState } from 'react';
 import { Alert, Button, Input } from '../components/primitives';
+import { useToast } from '../components/primitives/Toast';
 import { usePageData } from '../context/page-data';
 import { request } from '../hooks/use-api';
-import { useToast } from '../components/primitives/Toast';
 import { useTranslate } from '../lib/i18n';
 
 // Mirrors packages/hydrooj/src/model/setting.ts::_Setting. Only the fields we
@@ -45,7 +45,7 @@ function isHidden(flag?: number) {
   return Boolean(flag && (flag & FLAG_HIDDEN));
 }
 
-function Field({ s, value, onChange }: { s: SettingRow; value: unknown; onChange: (v: unknown) => void }) {
+function Field({ s, value, onChange }: { s: SettingRow, value: unknown, onChange: (v: unknown) => void }) {
   if (s.type === 'boolean') {
     return (
       <label style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'center' }}>
@@ -115,7 +115,16 @@ export default function HomeSettingsPage() {
   const { args } = usePageData() as unknown as { args: Args };
   const t = useTranslate();
   const toast = useToast();
-  const rows = args.settings ?? [];
+  // `args.settings ?? []` produces a fresh array reference every render, which
+  // would invalidate every downstream `useMemo`. Stabilise it first by
+  // JSON-fingerprinting the row contents — cheap and exact for this page
+  // because each row is a small JSON object.
+  const settingsKey = useMemo(() => JSON.stringify(args.settings ?? []), [args.settings]);
+  const rows = useMemo<SettingRow[]>(
+    () => (args.settings ?? []) as SettingRow[],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [settingsKey],
+  );
 
   // Initialize values from server-injected `current` (user doc), falling back
   // to schema defaults when the field is unset.
@@ -123,7 +132,7 @@ export default function HomeSettingsPage() {
     const init: Record<string, unknown> = {};
     for (const s of rows) {
       const v = args.current?.[s.key];
-      init[s.key] = v === undefined || v === null ? s.value : v;
+      init[s.key] = v ?? s.value;
     }
     return init;
   });
@@ -181,12 +190,14 @@ export default function HomeSettingsPage() {
 
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
         {Object.entries(grouped).map(([family, settings]) => (
-          <section key={family} style={{
-            padding: 'var(--space-4)',
-            border: '1px solid var(--border)',
-            borderRadius: 'var(--radius-lg)',
-            background: 'var(--surface)',
-          }}>
+          <section
+            key={family}
+            style={{
+              padding: 'var(--space-4)',
+              border: '1px solid var(--border)',
+              borderRadius: 'var(--radius-lg)',
+              background: 'var(--surface)',
+            }}>
             <h2 style={{
               fontSize: 'var(--text-md)',
               margin: '0 0 var(--space-3)',
@@ -196,10 +207,12 @@ export default function HomeSettingsPage() {
             </h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
               {settings.map((s) => (
-                <label key={s.key} style={{
-                  display: 'flex', flexDirection: 'column', gap: 'var(--space-1)',
-                  opacity: isDisabled(s.flag) ? 0.6 : 1,
-                }}>
+                <label
+                  key={s.key}
+                  style={{
+                    display: 'flex', flexDirection: 'column', gap: 'var(--space-1)',
+                    opacity: isDisabled(s.flag) ? 0.6 : 1,
+                  }}>
                   <span style={{ fontSize: 'var(--text-sm)', fontWeight: 600 }}>
                     {s.name || s.key}
                   </span>

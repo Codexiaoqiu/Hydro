@@ -17,8 +17,18 @@ class FakeWebSocket {
     this.url = url;
     FakeWebSocket.instances.push(this);
   }
+
   send(data: string) { this.sent.push(data); }
-  close() { this.readyState = 3; FakeWebSocket.instances = FakeWebSocket.instances.filter((w) => w !== this); }
+  // Mutating the static `instances` array on close mirrors the real
+  // WebSocket contract (the connection no longer exists once `close()`
+  // resolves) and keeps `FakeWebSocket.instances.length` aligned with the
+  // number of currently-open sockets. Tests that assert on that length
+  // rely on this behaviour.
+  close() {
+    this.readyState = 3;
+    FakeWebSocket.instances = FakeWebSocket.instances.filter((w) => w !== this);
+  }
+
   // Test helper: simulate an inbound message frame.
   emitServerEvent(payload: unknown) {
     this.onmessage?.({ data: JSON.stringify({ operation: 'event', payload }) });
@@ -40,7 +50,7 @@ function makePageData(args: Record<string, unknown> = {}): PageData {
   };
 }
 
-function Providers({ args, children }: { args: Record<string, unknown>; children: ReactNode }) {
+function Providers({ args, children }: { args: Record<string, unknown>, children: ReactNode }) {
   return <PageDataProvider initial={makePageData(args)}>{children}</PageDataProvider>;
 }
 

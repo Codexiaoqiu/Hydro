@@ -2,9 +2,9 @@
 import { STATUS } from '@hydrooj/common';
 import { act, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { ToastProvider } from '../components/primitives';
 import { PageDataProvider } from '../context/page-data';
 import { RouterProvider } from '../context/router';
-import { ToastProvider } from '../components/primitives';
 import RecordDetailPage from './record_detail';
 
 class FakeEventSource {
@@ -16,9 +16,11 @@ class FakeEventSource {
     this.url = url;
     FakeEventSource.instances.push(this);
   }
+
   addEventListener(name: string, cb: (ev: { data: string }) => void) {
     (this.listeners[name] ||= []).push(cb);
   }
+
   close() { this.closed = true; }
   emit(name: string, data: unknown) {
     for (const cb of this.listeners[name] || []) cb({ data: JSON.stringify(data) });

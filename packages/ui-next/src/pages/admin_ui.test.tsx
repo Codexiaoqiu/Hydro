@@ -6,7 +6,7 @@ import { type PageData, PageDataProvider } from '../context/page-data';
 import { PRIV } from '../lib/perm-constants';
 import AdminUiPage from './admin_ui';
 
-function makePageData(args: Partial<{ UserContext: Record<string, unknown>; uiNext: boolean }> = {}): PageData {
+function makePageData(args: Partial<{ UserContext: Record<string, unknown>, uiNext: boolean }> = {}): PageData {
   return {
     name: 'admin_ui',
     template: 'admin_ui.html',
@@ -20,7 +20,7 @@ function makePageData(args: Partial<{ UserContext: Record<string, unknown>; uiNe
   };
 }
 
-function Providers({ args, children }: { args: Partial<{ UserContext: Record<string, unknown>; uiNext: boolean }>, children: ReactNode }) {
+function Providers({ args, children }: { args: Partial<{ UserContext: Record<string, unknown>, uiNext: boolean }>, children: ReactNode }) {
   return (
     <PageDataProvider initial={makePageData(args)}>
       {children}
@@ -56,7 +56,7 @@ describe('admin_ui', () => {
     expect(submit.disabled).toBe(true);
   });
 
-  it('POSTs `next=on` to /admin/ui when toggled on, then shows success alert', async () => {
+  it('pOSTs `next=on` to /admin/ui when toggled on, then shows success alert', async () => {
     const fetchMock = vi.fn().mockResolvedValue({ ok: true, status: 204, headers: { get: () => '' }, text: async () => '' });
     vi.stubGlobal('fetch', fetchMock);
     render(<Providers args={{ uiNext: false, UserContext: { priv: PRIV.PRIV_EDIT_SYSTEM } }}><AdminUiPage /></Providers>);
@@ -71,7 +71,7 @@ describe('admin_ui', () => {
     expect(url).toBe('/admin/ui');
     expect((init as RequestInit).method).toBe('POST');
     expect(String((init as RequestInit).body)).toContain('next=on');
-    expect(screen.getAllByText(/Saved|已保存|Saved/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Saved|已保存/).length).toBeGreaterThan(0);
     vi.unstubAllGlobals();
   });
 

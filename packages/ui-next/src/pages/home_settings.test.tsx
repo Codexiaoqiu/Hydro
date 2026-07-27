@@ -2,8 +2,8 @@
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { type PageData, PageDataProvider } from '../context/page-data';
 import { ToastProvider } from '../components/primitives/Toast';
+import { type PageData, PageDataProvider } from '../context/page-data';
 import HomeSettingsPage from './home_settings';
 
 function makePageData(args: Record<string, unknown> = {}): PageData {
@@ -23,7 +23,7 @@ function makePageData(args: Record<string, unknown> = {}): PageData {
   };
 }
 
-function Providers({ args, children }: { args: Record<string, unknown>; children: ReactNode }) {
+function Providers({ args, children }: { args: Record<string, unknown>, children: ReactNode }) {
   return (
     <PageDataProvider initial={makePageData(args)}>
       <ToastProvider>{children}</ToastProvider>
@@ -71,7 +71,7 @@ describe('home_settings', () => {
     expect((screen.getByDisplayValue('English') as HTMLSelectElement)).toBeInTheDocument();
   });
 
-  it('POSTs the form to /home/settings/<category> on save with all current values', async () => {
+  it('pOSTs the form to /home/settings/<category> on save with all current values', async () => {
     const fetchSpy = vi.spyOn(window, 'fetch').mockImplementation(async () => ({
       ok: true, status: 200,
       headers: { get: () => '' },

@@ -50,12 +50,18 @@ export function MessagePane({
         display: 'flex', alignItems: 'center', gap: 'var(--space-3)',
       }}>
         {conversation.udoc.avatarUrl
-          ? <img src={conversation.udoc.avatarUrl} alt="" width={28} height={28}
-              style={{ borderRadius: '50%', objectFit: 'cover' }} />
-          : <span aria-hidden style={{
-            width: 28, height: 28, borderRadius: '50%',
-            background: 'var(--bg-3)', display: 'inline-block',
-          }} />}
+          ? <img
+            src={conversation.udoc.avatarUrl}
+            alt=""
+            width={28}
+            height={28}
+            style={{ borderRadius: '50%', objectFit: 'cover' }} />
+          : <span
+            aria-hidden
+            style={{
+              width: 28, height: 28, borderRadius: '50%',
+              background: 'var(--bg-3)', display: 'inline-block',
+            }} />}
         <span>{conversation.udoc.uname ?? `#${conversation.targetUid}`}</span>
       </header>
       <div

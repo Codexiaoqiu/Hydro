@@ -15,11 +15,11 @@
  * the *other* party's uid), server accepts `POST /home/messages` for send
  * and delete, server pushes `user/message` events on the websocket.
  */
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { usePageData, useUiContext } from '../context/page-data';
+import { useEffect, useMemo, useState } from 'react';
 import { ConversationList } from '../components/messages/ConversationList';
 import { MessagePane } from '../components/messages/MessagePane';
 import type { Conversation, HomeMessagesArgs, MessageMdoc, MessageUdoc } from '../components/messages/types';
+import { usePageData, useUiContext } from '../context/page-data';
 import { useMessageStream } from '../hooks/useMessageStream';
 import { useTranslate } from '../lib/i18n';
 
@@ -32,6 +32,39 @@ function readSessionId(): string {
   return match?.[1] ?? '';
 }
 
+function sortConversations(list: Conversation[]): Conversation[] {
+  return [...list].sort((a, b) => {
+    const aLast = a.messages[a.messages.length - 1]?._id ?? '';
+    const bLast = b.messages[b.messages.length - 1]?._id ?? '';
+    return bLast.localeCompare(aLast);
+  });
+}
+
+/**
+ * Merge server-injected initial conversations with any locally-accumulated
+ * messages. Used both at first mount (when local state is empty) and on every
+ * SPA re-injection (when we must keep optimistic / unsynced entries).
+ */
+function mergeConversations(
+  initial: Conversation[],
+  local: Conversation[],
+): Conversation[] {
+  if (!local.length) return initial;
+  const byId = new Map<number, Conversation>();
+  for (const c of initial) byId.set(c.targetUid, { ...c, messages: [...c.messages] });
+  for (const c of local) {
+    const existing = byId.get(c.targetUid);
+    if (!existing) {
+      byId.set(c.targetUid, c);
+      continue;
+    }
+    const seen = new Set(existing.messages.map((m) => String(m._id)));
+    const extras = c.messages.filter((m) => !seen.has(String(m._id)));
+    existing.messages = [...existing.messages, ...extras];
+  }
+  return sortConversations(Array.from(byId.values()));
+}
+
 function buildInitial(args: HomeMessagesArgs): Conversation[] {
   const out: Conversation[] = [];
   const grouped = args.messages ?? {};
@@ -40,19 +73,11 @@ function buildInitial(args: HomeMessagesArgs): Conversation[] {
     out.push({
       targetUid,
       udoc: conv.udoc,
-      messages: conv.messages ?? [],
+      // Server stores most-recent-first; reverse so render order is chronological.
+      messages: [...(conv.messages ?? [])].reverse(),
     });
   }
-  // Most recent message first within each thread; sort threads by recency.
-  for (const c of out) {
-    c.messages = [...c.messages].reverse();
-  }
-  out.sort((a, b) => {
-    const at = a.messages[a.messages.length - 1]?._id ?? '';
-    const bt = b.messages[b.messages.length - 1]?._id ?? '';
-    return bt.localeCompare(at);
-  });
-  return out;
+  return sortConversations(out);
 }
 
 export default function HomeMessagesPage() {
@@ -61,38 +86,60 @@ export default function HomeMessagesPage() {
   const t = useTranslate();
   const selfUid = args.selfUid ?? 0;
 
-  const [conversations, setConversations] = useState<Conversation[]>(() => buildInitial(args));
+  // Build the initial server snapshot once; subsequent re-injections are
+  // merged via `mergeConversations` so optimistic / unsynced local messages
+  // survive SPA navigation. `args` is itself a stable reference per mount,
+  // so this only re-runs on actual page remount.
+  const initialConversations = useMemo(() => buildInitial(args), [args]);
+  const [conversations, setConversations] = useState<Conversation[]>(initialConversations);
   const [selected, setSelected] = useState<number | null>(
-    () => buildInitial(args)[0]?.targetUid ?? null,
+    initialConversations[0]?.targetUid ?? null,
   );
-  const conversationsRef = useRef(conversations);
-  conversationsRef.current = conversations;
 
   // Live updates — every push carries both the new message and the sender.
-  const handleIncoming = (payload: { udoc: MessageUdoc; mdoc: MessageMdoc }) => {
+  // Dedup rules:
+  //   1. Same `_id` ⇒ already present, ignore (server may broadcast twice).
+  //   2. A pending `local-*` with the same `(from, to, content)` ⇒ the WS
+  //      echo of *our own* optimistic send; drop the local stub so the user
+  //      only sees the server-canonical entry once.
+  const handleIncoming = (payload: { udoc: MessageUdoc, mdoc: MessageMdoc }) => {
     const senderUid = payload.udoc._id;
     if (!senderUid || !payload.mdoc) return;
     setConversations((prev) => {
+      const incomingId = String(payload.mdoc._id);
       const existing = prev.find((c) => c.targetUid === senderUid);
-      const nextMsgs = payload.mdoc;
       if (existing) {
-        return prev
-          .map((c) => (c.targetUid === senderUid
-            ? { ...c, messages: [...c.messages, nextMsgs] }
-            : c))
-          .sort((a, b) => {
-            const aLast = a.messages[a.messages.length - 1]?._id ?? '';
-            const bLast = b.messages[b.messages.length - 1]?._id ?? '';
-            return bLast.localeCompare(aLast);
-          });
+        const hasSameId = existing.messages.some((m) => String(m._id) === incomingId);
+        if (!hasSameId) {
+          const isOwnEcho = existing.messages.some((m) =>
+            String(m._id).startsWith('local-')
+            && m.from === payload.mdoc.from
+            && String(m.to) === String(payload.mdoc.to)
+            && m.content === payload.mdoc.content,
+          );
+          const nextMessages = isOwnEcho
+            // Replace the local stub with the server-canonical entry so the
+            // visible row carries the real ObjectId.
+            ? existing.messages
+              .filter((m) => !String(m._id).startsWith('local-')
+                || m.from !== payload.mdoc.from
+                || String(m.to) !== String(payload.mdoc.to)
+                || m.content !== payload.mdoc.content)
+              .concat(payload.mdoc)
+            : [...existing.messages, payload.mdoc];
+          return sortConversations(prev.map((c) => (c.targetUid === senderUid
+            ? { ...c, messages: nextMessages }
+            : c)));
+        }
+        return prev;
       }
       // New conversation — prepend and select it.
       const fresh: Conversation = {
         targetUid: senderUid,
         udoc: payload.udoc,
-        messages: [nextMsgs],
+        messages: [payload.mdoc],
       };
-      return [fresh, ...prev];
+      return sortConversations([fresh, ...prev]);
     });
     // Auto-select the conversation that just received a message so the user
     // sees it without an extra click (mirrors the ui-default behaviour).
@@ -119,10 +166,20 @@ export default function HomeMessagesPage() {
   });
 
   // Keep the underlying server injection in sync if a router refresh
-  // re-mounts the page (SPA navigation between routes).
+  // re-mounts the page (SPA navigation between routes). Merge rather than
+  // replace so optimistic stubs and unsynced WS events survive the swap.
+  // We intentionally depend on the JSON-serialised contents so a router
+  // refresh that yields an equivalent object doesn't trigger a no-op merge.
+  // The `set-state-in-effect` and `exhaustive-deps` lints are by design —
+  // this is the canonical sync-state-with-prop pattern (see React docs:
+  // "You Might Not Need an Effect → Adjusting some state when a prop
+  // changes"). Documented inline on the setState line.
+  const argsMessages = args.messages;
   useEffect(() => {
-    setConversations(buildInitial(args));
-  }, [args.messages]);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setConversations((prev) => mergeConversations(buildInitial({ ...args, messages: argsMessages }), prev));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(argsMessages ?? {}), selfUid]);
 
   const active = useMemo(
     () => conversations.find((c) => c.targetUid === selected) ?? null,
@@ -135,20 +192,16 @@ export default function HomeMessagesPage() {
     fd.set('content', content);
     const res = await fetch('/home/messages', { method: 'POST', body: fd, credentials: 'same-origin' });
     if (!res.ok) throw new Error(`send failed: ${res.status}`);
-    // Optimistic append; the WebSocket echo will dedupe if the server
-    // happens to broadcast the same message back to us.
-    setConversations((prev) => prev
-      .map((c) => (c.targetUid === targetUid
-        ? {
-          ...c,
-          messages: [...c.messages, {
-            _id: `local-${Date.now()}`,
-            from: selfUid,
-            to: targetUid,
-            content,
-          }],
-        }
-        : c)));
+    // Optimistic append with a `local-*` id. The WS echo handler above
+    // matches this stub by `(from, to, content)` and replaces it with the
+    // server-canonical message, so the user only sees one row.
+    const localId = `local-${Date.now()}-${Math.random().toString(16).slice(2, 8)}`;
+    setConversations((prev) => prev.map((c) => (c.targetUid === targetUid
+      ? {
+        ...c,
+        messages: [...c.messages, { _id: localId, from: selfUid, to: targetUid, content }],
+      }
+      : c)));
   };
 
   const deleteMessage = async (targetUid: number, id: string) => {
@@ -165,10 +218,17 @@ export default function HomeMessagesPage() {
     fd.set('messageId', id);
     const res = await fetch('/home/messages', { method: 'POST', body: fd, credentials: 'same-origin' });
     if (!res.ok) throw new Error(`delete failed: ${res.status}`);
-    setConversations((prev) => prev
-      .map((c) => (c.targetUid === targetUid
+    setConversations((prev) => {
+      const target = prev.find((c) => c.targetUid === targetUid);
+      // Idempotent: if the server confirms a delete we already removed
+      // locally (e.g. via a parallel WS event), the post-fetch update
+      // would be a no-op anyway, but guard against double-decrement by
+      // skipping when the id is already gone.
+      if (!target?.messages.some((m) => String(m._id) === id)) return prev;
+      return prev.map((c) => (c.targetUid === targetUid
         ? { ...c, messages: c.messages.filter((m) => String(m._id) !== id) }
-        : c)));
+        : c));
+    });
   };
 
   return (

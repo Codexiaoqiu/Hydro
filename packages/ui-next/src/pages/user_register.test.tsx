@@ -6,7 +6,7 @@ import { type PageData, PageDataProvider } from '../context/page-data';
 import { RouterProvider } from '../context/router';
 import UserRegisterPage from './user_register';
 
-function makePageData(args: Partial<{ UserContext: Record<string, unknown>; mail: string }> = {}): PageData {
+function makePageData(args: Partial<{ UserContext: Record<string, unknown>, mail: string }> = {}): PageData {
   return {
     name: 'user_register',
     template: 'user_register.html',
@@ -44,7 +44,7 @@ describe('user_register', () => {
     expect(input.value).toBe('prefilled@example.com');
   });
 
-  it('POSTs mail to /register and switches to the email-sent success state', async () => {
+  it('pOSTs mail to /register and switches to the email-sent success state', async () => {
     // use-api.ts calls res.clone().json() inside parseError; for a 204 the
     // success branch never reads the body, so a clone stub is unnecessary,
     // but a matching `text` keeps polyfills happy.

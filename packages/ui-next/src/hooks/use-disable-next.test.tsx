@@ -2,7 +2,7 @@
 import { act, renderHook } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { PageDataProvider, type PageData } from '../context/page-data';
+import { type PageData, PageDataProvider } from '../context/page-data';
 import { useDisableNext } from './use-disable-next';
 
 const STORAGE_KEY = 'hydro.disableNext';

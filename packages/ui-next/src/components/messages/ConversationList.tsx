@@ -6,7 +6,7 @@ export interface ConversationListProps {
   selected: number | null;
   onSelect: (targetUid: number) => void;
   /** Localized renderer hooks. */
-  labels: { empty: string; you: string };
+  labels: { empty: string, you: string };
 }
 
 /**
@@ -65,12 +65,18 @@ export function ConversationList({
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
               {c.udoc.avatarUrl
-                ? <img src={c.udoc.avatarUrl} alt="" width={28} height={28}
-                    style={{ borderRadius: '50%', objectFit: 'cover' }} />
-                : <span aria-hidden style={{
-                  width: 28, height: 28, borderRadius: '50%',
-                  background: 'var(--bg-3)', display: 'inline-block',
-                }} />}
+                ? <img
+                  src={c.udoc.avatarUrl}
+                  alt=""
+                  width={28}
+                  height={28}
+                  style={{ borderRadius: '50%', objectFit: 'cover' }} />
+                : <span
+                  aria-hidden
+                  style={{
+                    width: 28, height: 28, borderRadius: '50%',
+                    background: 'var(--bg-3)', display: 'inline-block',
+                  }} />}
               <span style={{ fontWeight: 600, fontSize: 'var(--text-sm)' }}>
                 {c.udoc.uname ?? `#${c.targetUid}`}
               </span>
