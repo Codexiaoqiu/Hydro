@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link } from '../components/link';
 import { Alert, Button } from '../components/primitives';
 import { usePageData } from '../context/page-data';
+import { useNavigate } from '../context/router';
 import { HydroClientError } from '../hooks/use-api';
 import { useTranslate } from '../lib/i18n';
 

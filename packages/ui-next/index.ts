@@ -18,6 +18,27 @@ const PENDING_HTML = `<html>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hydro</title>
+    <script>
+(function () {
+    var KEY = '__hydroPendingReload';
+    var MAX = 5;
+    try {
+        var n = parseInt(sessionStorage.getItem(KEY) || '0', 10);
+        n = isNaN(n) ? 1 : n + 1;
+        sessionStorage.setItem(KEY, String(n));
+        if (n > MAX) {
+            document.addEventListener('DOMContentLoaded', function () {
+                document.body.innerHTML = '<p>Hydro UI build did not finish after ' + MAX + ' reloads.</p>'
+                    + '<p>If this persists, the production bundle may be stuck. Please contact the site administrator.</p>'
+                    + '<p><a href="." onclick="sessionStorage.removeItem(\\'' + KEY + '\\'); location.reload(); return false;">Try again</a></p>';
+            });
+            // Stop the meta refresh from firing when the build really is stuck.
+            var meta = document.querySelector('meta[http-equiv="refresh"]');
+            if (meta) meta.parentNode.removeChild(meta);
+        }
+    } catch (e) { /* ignore — private mode etc. */ }
+})();
+    </script>
     <meta http-equiv="refresh" content="3">
 </head>
 <body>
@@ -32,6 +53,43 @@ const INJECT_MARKER = '<!-- __HYDRO_INJECTION__DO_NOT_REMOVE_THIS__ -->';
 // load-bearing.
 const escapeForScript = (data: string) => data.replace(/</g, '\\u003c');
 const buildInject = (data: string) => `<script id="__HYDRO_INJECTION__" type="application/json">${escapeForScript(data)}</script>`;
+
+/**
+ * Serialize the `__HYDRO_INJECTION__` payload shared by both the DEV (Vite) and
+ * PROD (static) renderers. Centralising this avoids field drift between the two
+ * arms of `apply()` — every new injected field is added in exactly one place.
+ *
+ * @param handler           The framework Handler instance (`context.handler`).
+ * @param routeMap          `ctx.server.routeMap` resolved at call time.
+ * @param endpoint          `ctx.setting.get('server.url')`, possibly undefined.
+ * @param handlerArgs       Merged args the renderer wants to expose to the
+ *                          client (`UserContext` + `UiContext` + handler body).
+ * @param extras            Caller-specific fields (e.g. `plugins_url`) that
+ *                          only make sense in one of the two paths.
+ */
+function serializeInjection(
+    handler: any,
+    routeMap: Record<string, string>,
+    endpoint: string | undefined,
+    handlerArgs: Record<string, unknown>,
+    extras: Record<string, unknown> = {},
+): string {
+    const handlerContext = handler.context;
+    return JSON.stringify({
+        HYDRO_INJECTED: true,
+        name: handlerContext._matchedRouteName,
+        template: handler.response.template || '',
+        args: handlerArgs,
+        url: handlerContext.req.url!,
+        route_map: routeMap,
+        endpoint,
+        locale: (handlerContext.UserContext as unknown as { viewLang?: string })?.viewLang
+            || handler.UiContext?.locale
+            || parseAcceptLanguage(handlerContext.request?.headers?.['accept-language'])
+            || undefined,
+        ...extras,
+    }, serializer(false, handler));
+}
 
 // Parse an Accept-Language header into the highest-priority tag, ignoring q=
 // values for simplicity (we only need a single best-match hint to feed into
@@ -214,23 +272,17 @@ export async function apply(ctx: Context) {
             asFallback: true,
             priority: 100,
             async render(_name, args, context) {
-                const serialized = JSON.stringify({
-                    HYDRO_INJECTED: true,
-                    name: context.handler.context._matchedRouteName,
-                    template: context.handler.response.template || '',
-                    args: {
+                const handler = context.handler;
+                const serialized = serializeInjection(
+                    handler,
+                    ctx.server.routeMap,
+                    ctx.setting.get('server.url') || undefined,
+                    {
                         UserContext: context.UserContext,
-                        UiContext: context.handler.UiContext,
+                        UiContext: handler.UiContext,
                         ...args,
                     },
-                    url: context.handler.context.req.url!,
-                    route_map: ctx.server.routeMap,
-                    endpoint: ctx.setting.get('server.url') || undefined,
-                    locale: (context.UserContext as unknown as { viewLang?: string })?.viewLang
-                        || context.handler.UiContext?.locale
-                        || parseAcceptLanguage(context.handler.context.request?.headers?.['accept-language'])
-                        || undefined,
-                }, serializer(false, context.handler));
+                );
                 const htmlToRender = html.replace(INJECT_MARKER, buildInject(serialized)).replace('</head>', `<script>${THEME_INIT_SCRIPT}</script></head>`);
                 return await vite.transformIndexHtml(context.handler.context.req.url!, htmlToRender);
             },
@@ -251,25 +303,19 @@ export async function apply(ctx: Context) {
             async render(_name, args, context) {
                 const indexHtml = path.join(__dirname, 'public', 'index.html');
                 if (!fs.existsSync(indexHtml)) return PENDING_HTML;
+                const handler = context.handler;
                 const html = fs.readFileSync(indexHtml, 'utf-8').replace('</head>', `<script>${THEME_INIT_SCRIPT}</script></head>`);
-                const serialized = JSON.stringify({
-                    HYDRO_INJECTED: true,
-                    name: context.handler.context._matchedRouteName,
-                    template: context.handler.response.template || '',
-                    args: {
+                const serialized = serializeInjection(
+                    handler,
+                    ctx.server.routeMap,
+                    ctx.setting.get('server.url') || undefined,
+                    {
                         UserContext: context.UserContext,
-                        UiContext: context.handler.UiContext,
+                        UiContext: handler.UiContext,
                         ...args,
                     },
-                    url: context.handler.context.req.url!,
-                    route_map: ctx.server.routeMap,
-                    endpoint: ctx.setting.get('server.url') || undefined,
-                    locale: (context.UserContext as unknown as { viewLang?: string })?.viewLang
-                        || context.handler.UiContext?.locale
-                        || parseAcceptLanguage(context.handler.context.request?.headers?.['accept-language'])
-                        || undefined,
-                    plugins_url: `/plugins/${hashes['plugins.js'] || '00000000'}/plugins.js`,
-                }, serializer(false, context.handler));
+                    { plugins_url: `/plugins/${hashes['plugins.js'] || '00000000'}/plugins.js` },
+                );
                 return html.replace(INJECT_MARKER, buildInject(serialized));
             },
         });

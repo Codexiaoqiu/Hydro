@@ -34,3 +34,6 @@ registerPage('problem_hack', () => import('./problem_hack'));
 registerPage('record_detail', () => import('./record_detail'));
 registerPage('record_main', () => import('./record_main'));
 registerPage('admin_ui', () => import('./admin_ui'));
+registerPage('home_messages', () => import('./home_messages'));
+registerPage('home_security', () => import('./home_security'));
+registerPage('home_settings', () => import('./home_settings'));

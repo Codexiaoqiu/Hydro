@@ -121,4 +121,30 @@ describe('record_detail postMessage', () => {
     // off-by-one — verify *some* status text is rendered after the update.
     expect(screen.getAllByText(/通过|答案错误|答案正确|编译错误/).length).toBeGreaterThan(0);
   });
+
+  it('renders without crashing when rdoc is fully empty', () => {
+    // Defensive: the handler might emit a record with _id only (e.g. shortly
+    // after submission). The page must not throw on missing fields.
+    expect(() => renderPage(buildArgs({ rdoc: { _id: 'r0', uid: 1 } }))).not.toThrow();
+    // The download code button should still render in the action row.
+    expect(screen.getAllByText(/Download|下载/).length).toBeGreaterThan(0);
+  });
+
+  it('does not render rejudge buttons for non-admin users', () => {
+    renderPage(buildArgs({ UserContext: { _id: 99, hasPerm: () => false } }));
+    // Rejudge button is gated behind canRejudgeAny; non-admin should not see it.
+    // i18n key RecordDetail.Rejudge: "重新评测" / "Rejudge".
+    expect(screen.queryByText(/重新评测|Rejudge/)).not.toBeInTheDocument();
+    // i18n key RecordDetail.CancelScore: "取消计分" / "Cancel score".
+    expect(screen.queryByText(/取消计分|Cancel score/)).not.toBeInTheDocument();
+  });
+
+  it('renders rejudge + cancel buttons for admin users', () => {
+    // PERM_REJUDGE = 1n << 14n = 16384; supply the BigInt string so the
+    // perm parser picks it up. The page checks `canRejudgeAny` which reads
+    // the perm bitmask.
+    renderPage(buildArgs({ UserContext: { _id: 99, perm: 'BigInt::16384' } }));
+    expect(screen.getAllByText(/重新评测|Rejudge/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/取消计分|Cancel score/).length).toBeGreaterThan(0);
+  });
 });

@@ -53,9 +53,29 @@ export function useDisableNext(): DisableNextState {
       disabled: reason !== 'none',
       reason,
       enable: () => {
+        // No-op when nothing is disabling us. Without this guard an
+        // unconditional "Re-enable ui-next" button could trigger a
+        // reload-as-side-effect and waste a request on a page that's
+        // already on ui-next.
+        if (reason === 'none') return;
+        // Admin flipped the global kill-switch via /admin/ui?next=off. The
+        // client cannot override a server-controlled setting: clearing the
+        // local flag and reloading would just bounce us back into the
+        // disabled state (the source of q.md risk R7's "reload loop").
+        // Surface the conflict and let the admin toggle be the only path
+        // that re-enables ui-next.
+        if (reason === 'global') {
+          // eslint-disable-next-line no-console
+          console.warn('[useDisableNext] ui-next is disabled by an admin setting; clear it at /admin/ui?next=on');
+          return;
+        }
+        // reason === 'query' — only clear the query-sticky layer, then
+        // reload the page so the URL bar is also clean. The global flag is
+        // deliberately not touched: if the admin setting is also off, the
+        // subsequent render will re-establish `reason === 'global'`, which
+        // is the intended behaviour.
         try { window.sessionStorage.removeItem(STORAGE_KEY); } catch { /* ignore */ }
         setQueryFlag(false);
-        setGlobalFlag(false);
         if (typeof window !== 'undefined') {
           const url = new URL(window.location.href);
           url.searchParams.delete(QUERY_KEY);
