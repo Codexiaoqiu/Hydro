@@ -1,0 +1,4 @@
+.section { display: flex; flex-direction: column; gap: var(--space-3, 12px); }
+.compose { padding: var(--space-3, 12px); border: 1px dashed var(--border, rgba(0,0,0,0.18)); border-radius: var(--radius-sm, 6px); }
+.empty { color: var(--fg-muted, #888); text-align: center; padding: var(--space-4, 16px); }
+.list { list-style: none; padding: 0; margin: 0; }

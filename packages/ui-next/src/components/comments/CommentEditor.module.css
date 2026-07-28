@@ -1,0 +1,13 @@
+.editor { display: flex; flex-direction: column; gap: var(--space-2, 8px); }
+.textarea {
+  width: 100%;
+  padding: var(--space-2, 8px);
+  border: 1px solid var(--border, #ccc);
+  border-radius: var(--radius-sm, 6px);
+  background: var(--surface-1, #fff);
+  color: var(--fg, inherit);
+  font: inherit;
+  resize: vertical;
+  min-height: 5rem;
+}
+.actions { display: flex; gap: var(--space-2, 8px); justify-content: flex-end; }
