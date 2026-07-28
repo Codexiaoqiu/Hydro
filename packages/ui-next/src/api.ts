@@ -20,8 +20,6 @@ export { HydroClientError, request, useApi } from './hooks/use-api';
 export type { RequestBody, RequestOptions, UseApiResult } from './hooks/use-api';
 // Hooks
 export { useBuildUrl } from './hooks/use-build-url';
-export { useDisableNext } from './hooks/use-disable-next';
-export type { DisableNextState } from './hooks/use-disable-next';
 export { useJudgeStream } from './hooks/use-judge-stream';
 export type { JudgeStreamState, JudgeUpdate } from './hooks/use-judge-stream';
 export {
