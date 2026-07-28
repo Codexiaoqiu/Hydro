@@ -89,6 +89,28 @@ describe('App', () => {
         assert.strictEqual(body.langs['cc.cc17']?.display, SettingModel.langs['cc.cc17'].display);
     });
 
+    describe('SP0: renderer gate regression', () => {
+        it('GET / serves ui-next SPA shell', async () => {
+            const res = await agent.get('/').set('Accept', 'text/html');
+            assert.strictEqual(res.status, 200);
+            assert(res.text.includes('id="root"'));
+        });
+
+        it('GET /ranking serves ui-default nunjucks (not ui-next)', async () => {
+            const res = await agent.get('/ranking').set('Accept', 'text/html');
+            assert.strictEqual(res.status, 200);
+            assert(!res.text.includes('id="root"'));
+        });
+
+        it('registration POST returns verification code (not SPA shell)', async () => {
+            const res = await agent.post('/register')
+                .send({ mail: 'renderer-gate@example.com' });
+            assert.strictEqual(res.status, 302);
+            assert(!res.text.includes('id="root"'));
+            assert.match(res.headers.location, /^\/register\/[\w-]+$/);
+        });
+    });
+
     // TODO add more tests
 
     const results: Record<string, autocannon.Result> = {};
