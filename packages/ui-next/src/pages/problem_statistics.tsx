@@ -1,11 +1,13 @@
 import { STATUS, STATUS_SHORT_TEXTS } from '@hydrooj/common';
 import { usePageData, useUserContext } from '../context/page-data';
+import { useNavigate } from '../context/router';
 import { useBuildUrl } from '../hooks/use-build-url';
 import { Paginator } from '../components/primitives/Paginator';
 import { ProblemSidebar } from '../components/sidebar/ProblemSidebar';
 import { SubmissionStatusChart } from '../components/charts/SubmissionStatusChart';
 import { SubmissionScoreChart } from '../components/charts/SubmissionScoreChart';
 import { Link } from '../components/link';
+import { formatMemoryMB } from '../lib/memory';
 import styles from './problem_statistics.module.css';
 
 interface Rsdoc { _id: string, uid: number, time?: number, memory?: number, status: number, lang: string, length: number }
@@ -24,17 +26,25 @@ interface Args {
 
 const STATUS_OVERFLOW = new Set([STATUS.STATUS_TIME_LIMIT_EXCEEDED, STATUS.STATUS_MEMORY_LIMIT_EXCEEDED, STATUS.STATUS_OUTPUT_LIMIT_EXCEEDED]);
 
-function bytes(n: number) {
-  if (n < 1024) return `${n}B`;
-  if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)}KB`;
-  return `${(n / 1024 / 1024).toFixed(1)}MB`;
-}
-
 export default function ProblemStatistics() {
   const { args } = usePageData() as unknown as { args: Args };
   const { rsdocs, page, pcount, sort, direction, pdoc, udict, types } = args;
   const buildUrl = useBuildUrl();
+  const navigate = useNavigate();
   const user = useUserContext();
+
+  const handleSortSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const nextSort = String(formData.get('sort') || sort);
+    const nextDirection = String(formData.get('direction') || direction);
+    const url = buildUrl(
+      'problem_statistics',
+      { pid: String(pdoc.docId) },
+      { sort: nextSort, direction: nextDirection, page: '1' },
+    );
+    navigate(url);
+  };
 
   const statusCounts = rsdocs.reduce<Record<number, number>>((acc, r) => {
     acc[r.status] = (acc[r.status] || 0) + 1;
@@ -57,7 +67,7 @@ export default function ProblemStatistics() {
         </section>
 
         <section className={styles.filterRow}>
-          <form className={styles.filterForm} method="get">
+          <form className={styles.filterForm} method="get" onSubmit={handleSortSubmit}>
             <label>
               排序:
               <select
@@ -97,9 +107,9 @@ export default function ProblemStatistics() {
                     <td><Link href={buildUrl('record_detail', { rid: r._id })}>{STATUS_SHORT_TEXTS[r.status as STATUS]}</Link></td>
                     <td>{udict[r.uid]?.uname}</td>
                     <td>{r.time ? `${STATUS_OVERFLOW.has(r.status) ? '>=' : ''}${r.time}ms` : '-'}</td>
-                    <td>{r.memory ? `${STATUS_OVERFLOW.has(r.status) ? '>=' : ''}${bytes(r.memory)}` : '-'}</td>
+                    <td>{r.memory ? `${STATUS_OVERFLOW.has(r.status) ? '>=' : ''}${formatMemoryMB(r.memory)}` : '-'}</td>
                     <td>{r.lang}</td>
-                    <td>{bytes(r.length)}</td>
+                    <td>{formatMemoryMB(r.length)}</td>
                   </tr>
                 ))}
               </tbody>

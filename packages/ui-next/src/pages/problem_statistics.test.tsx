@@ -52,7 +52,7 @@ describe('problemStatistics', () => {
     }}>
       <ProblemStatistics />
     </Providers>);
-    expect(screen.getByText(/暂无提交/)).toBeInTheDocument();
+    expect(screen.getByTestId('empty-state')).toBeInTheDocument();
   });
 
   it('renders one row per rsdoc', () => {
