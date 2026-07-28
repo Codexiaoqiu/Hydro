@@ -1,0 +1,7 @@
+.tabs { display: flex; flex-direction: column; gap: var(--space-3, 12px); }
+.tabBar { display: flex; gap: var(--space-2, 8px); border-bottom: 1px solid var(--border, rgba(0,0,0,0.08)); }
+.tab { background: none; border: 0; padding: var(--space-2, 8px) var(--space-3, 12px); cursor: pointer; color: var(--fg-muted, #888); font: inherit; }
+.tabActive { color: var(--fg, inherit); border-bottom: 2px solid var(--accent, #5e6ad2); }
+.tabPanel { padding-top: var(--space-2, 8px); }
+.empty { color: var(--fg-muted, #888); text-align: center; padding: var(--space-4, 16px); }
+.problemList { list-style: disc; padding-left: var(--space-4, 16px); display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-1, 4px); }
