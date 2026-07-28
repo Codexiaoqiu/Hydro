@@ -1,0 +1,6 @@
+.layout { display: grid; grid-template-columns: 1fr 280px; gap: var(--space-4, 16px); padding: var(--space-4, 16px); }
+.main { display: flex; flex-direction: column; gap: var(--space-3, 12px); }
+.side { align-self: start; display: flex; flex-direction: column; gap: var(--space-3, 12px); }
+.side > * { padding: var(--space-3, 12px); border: 1px solid var(--border, rgba(0,0,0,0.08)); border-radius: var(--radius-md, 12px); background: var(--surface-1, #fff); }
+.tagBox h3 { font-family: var(--font-display, system-ui); font-size: var(--text-lg, 1.125rem); margin: 0 0 var(--space-2, 8px); }
+@media (max-width: 768px) { .layout { grid-template-columns: 1fr; } .side { display: none; } }
