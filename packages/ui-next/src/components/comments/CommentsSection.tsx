@@ -21,14 +21,13 @@ export interface CommentsSectionProps {
   udict: Record<number, { _id: number, uname: string, avatar?: string }>;
   kind: 'solution' | 'discussion';
   config: CommentsConfig;
-  /** Optional user injection for testing or when user context is unavailable. */
-  user?: ReturnType<typeof useUserContext>;
   /** Optional callback for parent paragraphs to provide custom submit logic. */
   onSubmit?: (content: string) => void | Promise<void>;
   onEdit?: (item: CommentItem, content: string) => void | Promise<void>;
   onDelete?: (item: CommentItem) => void | Promise<void>;
   onReply?: (parent: CommentItem, content: string) => void | Promise<void>;
   emptyText?: string;
+  submitText?: string;
 }
 
 /**
@@ -38,24 +37,20 @@ export interface CommentsSectionProps {
  * works for both problem_solution and discussion_detail without a fetch layer.
  */
 export function CommentsSection({
-  docs, udict, kind, config, user: userProp, onSubmit, onEdit, onDelete, onReply,
-  emptyText,
+  docs, udict, kind, config, onSubmit, onEdit, onDelete, onReply,
+  emptyText, submitText = '保存',
 }: CommentsSectionProps) {
-  // Use injected user if provided (testing / direct prop), otherwise fall back to context.
-  // Try context; if no PageDataProvider (e.g. in tests), fall back to undefined.
-  let userContext: ReturnType<typeof useUserContext> | undefined;
-  try { userContext = useUserContext(); } catch { /* no provider */ }
-  const user = userProp ?? userContext;
+  const user = useUserContext();
   const canPost = !!user?.hasPerm && user.hasPerm(config.postPerm);
   const editPermCheck = (item: CommentItem) => {
     if (!user) return false;
     if (user.hasPerm(config.editPerm ?? -1)) return true;
-    return user.own?.(item) && user.hasPerm(config.editSelfPerm);
+    return !!user.own?.(item) && user.hasPerm(config.editSelfPerm);
   };
   const deletePermCheck = (item: CommentItem) => {
     if (!user) return false;
     if (user.hasPerm(config.deletePerm ?? -1)) return true;
-    return user.own?.(item) && user.hasPerm(config.editSelfPerm);
+    return !!user.own?.(item) && user.hasPerm(config.editSelfPerm);
   };
   const fallbackEmpty = kind === 'solution' ? '暂无题解' : '暂无评论';
   return (
@@ -83,7 +78,7 @@ export function CommentsSection({
                 onReply={onReply}
                 editPermCheck={editPermCheck}
                 deletePermCheck={deletePermCheck}
-                user={user}
+                submitText={submitText}
               />
             </li>
           ))}

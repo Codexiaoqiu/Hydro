@@ -1,14 +1,13 @@
 import { useState } from 'react';
-import { MarkdownEditor } from '../primitives/MarkdownEditor';
-import { MarkdownPreview } from '../primitives/MarkdownPreview';
 import { useUserContext } from '../../context/page-data';
+import { MarkdownPreview } from '../primitives/MarkdownPreview';
+import { CommentEditor } from './CommentEditor';
 import styles from './CommentTree.module.css';
 
 export interface CommentItem {
   docId: string | number;
   owner: number;
   content: string;
-  vote?: number;
   reply?: CommentItem[];
 }
 
@@ -23,19 +22,16 @@ export interface CommentTreeProps {
   deletePermCheck: (item: CommentItem) => boolean;
   editPlaceholder?: string;
   replyPlaceholder?: string;
-  /** Optional user injection for testing or when user context is unavailable. */
-  user?: ReturnType<typeof useUserContext>;
+  submitText?: string;
 }
 
 export function CommentTree({
   item, replies, udict, onEdit, onDelete, onReply,
   editPermCheck, deletePermCheck,
   editPlaceholder = '编辑…', replyPlaceholder = '回复…',
-  user: userProp,
+  submitText = '保存',
 }: CommentTreeProps) {
-  let userContext: ReturnType<typeof useUserContext> | undefined;
-  try { userContext = useUserContext(); } catch { /* no provider */ }
-  const user = userProp ?? userContext;
+  const user = useUserContext();
   const [editing, setEditing] = useState(false);
   const [replying, setReplying] = useState(false);
   const owner = udict[item.owner];
@@ -58,11 +54,12 @@ export function CommentTree({
         )}
       </header>
       {editing && onEdit ? (
-        <MarkdownEditor
-          value={item.content}
-          onChange={() => { /* controlled by save button below */ }}
+        <CommentEditor
           placeholder={editPlaceholder}
-          onSave={async (next) => { await onEdit(item, next); setEditing(false); }}
+          initialValue={item.content}
+          submitText={submitText}
+          onSubmit={async (next) => { await onEdit(item, next); setEditing(false); }}
+          onCancel={() => setEditing(false)}
         />
       ) : (
         <div className={styles.body}>
@@ -84,7 +81,7 @@ export function CommentTree({
               deletePermCheck={deletePermCheck}
               editPlaceholder={editPlaceholder}
               replyPlaceholder={replyPlaceholder}
-              user={user}
+              submitText={submitText}
             />
           ))}
         </ul>
@@ -95,11 +92,11 @@ export function CommentTree({
         </button>
       )}
       {canReply && replying && onReply && (
-        <MarkdownEditor
-          value=""
-          onChange={() => {}}
+        <CommentEditor
           placeholder={replyPlaceholder}
-          onSave={async (next) => { await onReply(item, next); setReplying(false); }}
+          submitText="回复"
+          onSubmit={async (next) => { await onReply(item, next); setReplying(false); }}
+          onCancel={() => setReplying(false)}
         />
       )}
     </article>
