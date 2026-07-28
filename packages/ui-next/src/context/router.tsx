@@ -2,6 +2,7 @@
 
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useReducer, useRef } from 'react';
 import { endpointOrigins, endpoints, isInjected, routeMapStore } from '../globals';
+import { store } from '../registry/store';
 import { useSetPageData } from './page-data';
 
 interface InternalState {
@@ -31,7 +32,7 @@ export interface RouterState {
 }
 
 interface RouterNavigateContextValue {
-  navigate: (url: string) => Promise<void>;
+  navigate: (url: string) => Promise<boolean>;
 }
 
 const RouterStateContext = createContext<RouterState | null>(null);
@@ -84,6 +85,15 @@ export const RouterProvider: React.FC<React.PropsWithChildren> = ({ children }) 
           if (!res.ok) throw new Error(`Navigation failed: ${res.status} ${res.statusText}`);
           const body = await res.json();
           const pageName = res.headers.get('x-hydro-page') || '';
+          // SPA fallback: if the target page isn't registered in the client store,
+          // the server has decided this template belongs to ui-default. A full page
+          // load lets ui-default render it correctly. The initial-page entrypoint
+          // (fetchPage with init=true) does NOT go through navigate, so this can't
+          // cause an infinite reload loop on first paint.
+          if (pageName && !store.getDefault(`page:${pageName}` as `page:${string}`)) {
+            window.location.href = url;
+            return false;
+          }
           const template = res.headers.get('x-hydro-template') || '';
           console.log('[Hydro] data from', reqUrl, 'received:', body, 'pageName:', pageName);
 
@@ -150,13 +160,14 @@ export const RouterProvider: React.FC<React.PropsWithChildren> = ({ children }) 
     [state.status, state.error],
   );
 
-  const navigate = useCallback(async (url: string) => {
+  const navigate = useCallback(async (url: string): Promise<boolean> => {
     if (!isSameOrigin(url)) {
       window.location.href = url;
-      return;
+      return false;
     }
     const ok = await fetchPage(url);
     if (ok) history.pushState({ url }, '', url);
+    return ok;
   }, [fetchPage, isSameOrigin]);
 
   const navigateValue = useMemo<RouterNavigateContextValue>(() => ({ navigate }), [navigate]);
@@ -176,7 +187,7 @@ export function useRouterState(): RouterState {
   return ctx;
 }
 
-export function useNavigate(): (url: string) => Promise<void> {
+export function useNavigate(): (url: string) => Promise<boolean> {
   const ctx = useContext(RouterNavigateContext);
   if (!ctx) throw new Error('useNavigate must be used within RouterProvider');
   return ctx.navigate;
