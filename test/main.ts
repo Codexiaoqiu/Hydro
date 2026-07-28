@@ -111,6 +111,36 @@ describe('App', () => {
         });
     });
 
+    describe('SP1 broken-pages e2e', () => {
+        // SP1 closes the 4 H3 404 links surfaced in
+        // `.claude/reviews/ui-next-migration-coverage-2026-07-27.md`.
+        // Each migrated page must now serve the ui-next SPA shell
+        // (no fallback to ui-default nunjucks).
+        it('GET /p/:pid/solution returns ui-next shell (no fallback)', async () => {
+            const res = await agent.get('/p/1/solution').set('Accept', 'text/html');
+            assert.strictEqual(res.status, 200);
+            assert(res.text.includes('id="root"'));
+        });
+
+        it('GET /p/:pid/stat returns ui-next shell', async () => {
+            const res = await agent.get('/p/1/stat').set('Accept', 'text/html');
+            assert.strictEqual(res.status, 200);
+            assert(res.text.includes('id="root"'));
+        });
+
+        it('GET /user/:uid returns ui-next shell', async () => {
+            const res = await agent.get('/user/1').set('Accept', 'text/html');
+            assert.strictEqual(res.status, 200);
+            assert(res.text.includes('id="root"'));
+        });
+
+        it('GET /d/:did returns ui-next shell', async () => {
+            const res = await agent.get('/d/1').set('Accept', 'text/html');
+            assert.strictEqual(res.status, 200);
+            assert(res.text.includes('id="root"'));
+        });
+    });
+
     // TODO add more tests
 
     const results: Record<string, autocannon.Result> = {};
