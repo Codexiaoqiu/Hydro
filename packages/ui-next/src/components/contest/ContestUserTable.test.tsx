@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { ToastProvider } from '../primitives/Toast';
 import { canResumeContestUser } from '../../lib/contest-user';
+import { ToastProvider } from '../primitives/Toast';
 import { ContestUserTable } from './ContestUserTable';
 
 // Locales: en (Rank/UnRank/Resume/Delete) and zh_CN (计入排名/取消排名/补时/删除).
@@ -29,7 +29,7 @@ const baseTdoc = () => ({
   docId: 7, beginAt: toIso(0), endAt: toIso(contestEndMs), duration: 0,
 });
 
-describe('ContestUserTable', () => {
+describe('contestUserTable', () => {
   it('renders rows with attendee name from udict', () => {
     render(
       <ToastProvider>
@@ -74,7 +74,7 @@ describe('ContestUserTable', () => {
     expect(screen.getByRole('button', { name: RX_RANK })).toBeInTheDocument();
   });
 
-  it('Delete button fires operation=delete with row uid', async () => {
+  it('delete button fires operation=delete with row uid', async () => {
     const onChange = vi.fn();
     render(
       <ToastProvider>
@@ -91,13 +91,13 @@ describe('ContestUserTable', () => {
     await waitFor(() => expect(fetchMock).toHaveBeenCalled());
     const init = fetchMock.mock.calls[0][1] as any;
     expect(init.method).toBe('POST');
-    const body = (init.body as URLSearchParams);
+    const body = init.body as URLSearchParams;
     expect(body.get('operation')).toBe('delete');
     expect(body.get('uid')).toBe('1');
     expect(onChange).toHaveBeenCalled();
   });
 
-  it('Rank action sends operation=rank with the current uid', async () => {
+  it('rank action sends operation=rank with the current uid', async () => {
     render(
       <ToastProvider>
         <ContestUserTable
@@ -113,12 +113,12 @@ describe('ContestUserTable', () => {
     await waitFor(() => expect(fetchMock).toHaveBeenCalled());
     const init = fetchMock.mock.calls[0][1] as any;
     expect(init.method).toBe('POST');
-    const body = (init.body as URLSearchParams);
+    const body = init.body as URLSearchParams;
     expect(body.get('operation')).toBe('rank');
     expect(body.get('uid')).toBe('99');
   });
 
-  it('UnRank action sends operation=unrank (mirrors action label)', async () => {
+  it('unRank action sends operation=unrank (mirrors action label)', async () => {
     render(
       <ToastProvider>
         <ContestUserTable
@@ -134,7 +134,7 @@ describe('ContestUserTable', () => {
     await waitFor(() => expect(fetchMock).toHaveBeenCalled());
     const init = fetchMock.mock.calls[0][1] as any;
     expect(init.method).toBe('POST');
-    const body = (init.body as URLSearchParams);
+    const body = init.body as URLSearchParams;
     expect(body.get('operation')).toBe('unrank');
   });
 
@@ -190,7 +190,7 @@ describe('ContestUserTable', () => {
     expect(screen.queryByRole('button', { name: RX_RESUME })).toBeNull();
   });
 
-  it('Resume action sends operation=resume and triggers onChange', async () => {
+  it('resume action sends operation=resume and triggers onChange', async () => {
     const onChange = vi.fn();
     render(
       <ToastProvider>
@@ -207,7 +207,7 @@ describe('ContestUserTable', () => {
     await waitFor(() => expect(fetchMock).toHaveBeenCalled());
     const init = fetchMock.mock.calls[0][1] as any;
     expect(init.method).toBe('POST');
-    const body = (init.body as URLSearchParams);
+    const body = init.body as URLSearchParams;
     expect(body.get('operation')).toBe('resume');
     expect(body.get('uid')).toBe('5');
     expect(onChange).toHaveBeenCalled();

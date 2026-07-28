@@ -26,19 +26,19 @@ export interface ScratchpadState {
 }
 
 export type ScratchpadAction =
-  | { type: 'SET_CODE'; payload: string }
-  | { type: 'SET_LANG'; payload: string }
-  | { type: 'SET_INPUT'; payload: string }
+  | { type: 'SET_CODE', payload: string }
+  | { type: 'SET_LANG', payload: string }
+  | { type: 'SET_INPUT', payload: string }
   | { type: 'START_PRETEST' }
   | { type: 'CLEAR_OUTPUT' }
-  | { type: 'PUSH_PRETEST_LINE'; payload: string }
+  | { type: 'PUSH_PRETEST_LINE', payload: string }
   | { type: 'END_PRETEST' }
-  | { type: 'PRETEST_ERROR'; payload: string }
+  | { type: 'PRETEST_ERROR', payload: string }
   | { type: 'SUBMIT_START' }
   | { type: 'SUBMIT_END' }
-  | { type: 'TOGGLE_PANEL'; payload: 'pretest' | 'records' }
-  | { type: 'LOAD_RECORDS'; payload: ScratchpadRecord[] }
-  | { type: 'WS_STATUS'; payload: WsStatus };
+  | { type: 'TOGGLE_PANEL', payload: 'pretest' | 'records' }
+  | { type: 'LOAD_RECORDS', payload: ScratchpadRecord[] }
+  | { type: 'WS_STATUS', payload: WsStatus };
 
 export interface WSMessage {
   type: string;

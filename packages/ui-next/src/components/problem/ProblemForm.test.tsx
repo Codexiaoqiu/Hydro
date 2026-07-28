@@ -10,9 +10,9 @@ let ctrlEnterCommand: (() => void) | undefined;
 
 vi.mock('@monaco-editor/react', () => ({
   Editor: (props: {
-    value?: string,
-    onChange?: (v: string | undefined) => void,
-    onMount?: (editor: unknown, monaco: unknown) => void,
+    value?: string;
+    onChange?: (v: string | undefined) => void;
+    onMount?: (editor: unknown, monaco: unknown) => void;
   }) => {
     props.onMount?.({
       addAction: vi.fn(),
@@ -102,7 +102,6 @@ describe('problemForm', () => {
     fireEvent.click(screen.getByRole('button', { name: 'en' }));
     expect(screen.getByDisplayValue(/# English/)).toBeInTheDocument();
   });
-
 
   it('submits the form with Ctrl/Cmd+Enter from the markdown editor', async () => {
     renderForm({ pdoc: { docId: 1, pid: 'p1', title: '' } });

@@ -65,14 +65,14 @@ beforeEach(() => {
   window.localStorage.clear();
 });
 
-describe('ScratchpadPanel', () => {
+describe('scratchpadPanel', () => {
   it('renders both panes', () => {
     render(<ScratchpadPanel {...baseArgs} />);
     expect(screen.getByRole('complementary', { name: /problem statement/i })).toBeInTheDocument();
     expect(screen.getByRole('toolbar')).toBeInTheDocument();
   });
 
-  it('Alt+Q triggers onExit when confirm is accepted', () => {
+  it('alt+Q triggers onExit when confirm is accepted', () => {
     const onExit = vi.fn();
     window.confirm = vi.fn(() => true);
     render(<ScratchpadPanel {...baseArgs} onExit={onExit} />);

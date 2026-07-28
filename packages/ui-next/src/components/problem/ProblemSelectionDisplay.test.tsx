@@ -40,7 +40,7 @@ const renderToolbar = (props: Partial<React.ComponentProps<typeof ProblemSelecti
   return { onAfterAction, utils };
 };
 
-describe('ProblemSelectionDisplay (P1-A.2)', () => {
+describe('problemSelectionDisplay (P1-A.2)', () => {
   it('renders the selected count and the four batch action buttons', () => {
     renderToolbar();
     expect(screen.getByTestId('problem-selection')).toHaveTextContent('已选 2');
@@ -75,7 +75,7 @@ describe('ProblemSelectionDisplay (P1-A.2)', () => {
     expect(screen.queryByRole('button', { name: /打包/ })).toBeNull();
   });
 
-  it('POSTs operation=hide with the selected pids on click and notifies after success', async () => {
+  it('pOSTs operation=hide with the selected pids on click and notifies after success', async () => {
     const onAfterAction = vi.fn();
     fetchMock.mockResolvedValue(jsonResponse({}));
     render(
@@ -94,7 +94,7 @@ describe('ProblemSelectionDisplay (P1-A.2)', () => {
     await waitFor(() => expect(onAfterAction).toHaveBeenCalledTimes(1));
   });
 
-  it('POSTs operation=unhide when the unhide button is clicked', async () => {
+  it('pOSTs operation=unhide when the unhide button is clicked', async () => {
     const onAfterAction = vi.fn();
     fetchMock.mockResolvedValue(jsonResponse({}));
     render(

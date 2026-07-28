@@ -25,7 +25,7 @@ function errorResponse(status: number, body: unknown = { error: { message: `HTTP
 }
 const usersUrl = (domainId = 'system') => expect.stringContaining(`/d/${domainId}/api/users`);
 
-describe('UserSelectAutoComplete', () => {
+describe('userSelectAutoComplete', () => {
   it('renders chosen users as chips after UID hydration', async () => {
     fetchMock.mockResolvedValueOnce(jsonResponse([{ _id: 1, uname: 'a' }, { _id: 2, uname: 'b' }]));
     render(<UserSelectAutoComplete value={[1, 2]} onChange={() => {}} />);

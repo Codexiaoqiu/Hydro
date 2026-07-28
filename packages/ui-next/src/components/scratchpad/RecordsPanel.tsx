@@ -1,13 +1,13 @@
-import { useCallback, useEffect, useState } from 'react';
-import { Link } from '../link';
-import { useTranslate } from '../../lib/i18n';
 import { STATUS_TEXTS } from '@hydrooj/common';
-import { useRecordStream } from '../../hooks/use-record-stream';
+import { useCallback, useEffect, useState } from 'react';
 import type { RecordStreamRow } from '../../hooks/use-record-stream';
+import { useRecordStream } from '../../hooks/use-record-stream';
+import { useTranslate } from '../../lib/i18n';
+import { Link } from '../link';
 
 export type RecordRow = RecordStreamRow;
 
-export function RecordsPanel({ submissionsUrl, wsUrl, canViewRecord = true }: { submissionsUrl: string; wsUrl?: string; canViewRecord?: boolean }) {
+export function RecordsPanel({ submissionsUrl, wsUrl, canViewRecord = true }: { submissionsUrl: string, wsUrl?: string, canViewRecord?: boolean }) {
   const t = useTranslate();
   const [records, setRecords] = useState<RecordRow[] | null>(null);
   const appendRecord = useCallback((record: RecordRow) => {

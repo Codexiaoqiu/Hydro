@@ -9,21 +9,21 @@ describe('useScratchpadHotkeys', () => {
     });
   }
 
-  it('F9 triggers onRunPretest when canPretest', () => {
+  it('f9 triggers onRunPretest when canPretest', () => {
     const onRunPretest = vi.fn();
     renderHook(() => useScratchpadHotkeys({ onRunPretest, onSubmit: vi.fn(), onExit: vi.fn(), onTogglePretest: vi.fn(), onToggleRecords: vi.fn(), canPretest: true }));
     press('F9');
     expect(onRunPretest).toHaveBeenCalledOnce();
   });
 
-  it('F10 triggers onSubmit', () => {
+  it('f10 triggers onSubmit', () => {
     const onSubmit = vi.fn();
     renderHook(() => useScratchpadHotkeys({ onRunPretest: vi.fn(), onSubmit, onExit: vi.fn(), onTogglePretest: vi.fn(), onToggleRecords: vi.fn(), canPretest: false }));
     press('F10');
     expect(onSubmit).toHaveBeenCalledOnce();
   });
 
-  it('Alt+Q triggers onExit', () => {
+  it('alt+Q triggers onExit', () => {
     const onExit = vi.fn();
     renderHook(() => useScratchpadHotkeys({ onRunPretest: vi.fn(), onSubmit: vi.fn(), onExit, onTogglePretest: vi.fn(), onToggleRecords: vi.fn(), canPretest: false }));
     press('q', { altKey: true });

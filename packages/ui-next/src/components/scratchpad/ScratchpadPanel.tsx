@@ -1,29 +1,29 @@
 import { useMemo, useReducer, useState } from 'react';
 import { Group, Panel, Separator } from 'react-resizable-panels';
 import { useTranslate } from '../../lib/i18n';
+import styles from './Scratchpad.module.css';
 import { useScratchpad } from './ScratchpadContext';
 import { ScratchpadEditorPane } from './ScratchpadEditorPane';
 import { ScratchpadProblemPane } from './ScratchpadProblemPane';
 import { ScratchpadSettings } from './ScratchpadSettings';
-import { ScratchpadProvider } from './useScratchpadState';
 import { useScratchpadHotkeys } from './useScratchpadHotkeys';
 import { useScratchpadPersistence } from './useScratchpadPersistence';
-import styles from './Scratchpad.module.css';
+import { ScratchpadProvider } from './useScratchpadState';
 
 interface PdocMinimal {
   docId: number;
   pid?: string;
   title: string;
   content?: string | Record<string, string>;
-  config?: { type?: string; langs?: string[] } | string;
+  config?: { type?: string, langs?: string[] } | string;
   data?: unknown[];
   reference?: { domainId: string, pid: string | number };
 }
 
 export interface ScratchpadPanelProps {
   pdoc: PdocMinimal;
-  tdoc?: { docId?: string; rule?: string };
-  UserContext: { _id?: number; codeTemplate?: string; codeLang?: string; canViewRecord?: boolean };
+  tdoc?: { docId?: string, rule?: string };
+  UserContext: { _id?: number, codeTemplate?: string, codeLang?: string, canViewRecord?: boolean };
   pretestConnUrl: string;
   postSubmitUrl: string;
   getSubmissionsUrl: string;
@@ -35,7 +35,7 @@ export interface ScratchpadPanelProps {
   onExit: () => void;
 }
 
-type ScratchpadLayout = { problem: number; editor: number };
+interface ScratchpadLayout { problem: number, editor: number }
 
 const DEFAULT_LAYOUT: ScratchpadLayout = { problem: 45, editor: 55 };
 const LAYOUT_STORAGE_KEY = 'scratchpad/layout';
@@ -124,21 +124,21 @@ export function ScratchpadPanel(props: ScratchpadPanelProps) {
               <div className={styles.pageContent}>
                 {activePage === 'problem'
                   ? (
-                      <div
-                        id="scratchpad-problem-panel"
-                        role="tabpanel"
-                        aria-labelledby="scratchpad-problem-tab"
-                        className={styles.pagePanel}
-                      >
-                        <ScratchpadProblemPane
-                          pdoc={props.pdoc}
-                          contentText={props.contentText}
-                          contentLangs={props.contentLangs}
-                          preferredLang={props.preferredLang}
-                          mode={props.mode}
-                        />
-                      </div>
-                    )
+                    <div
+                      id="scratchpad-problem-panel"
+                      role="tabpanel"
+                      aria-labelledby="scratchpad-problem-tab"
+                      className={styles.pagePanel}
+                    >
+                      <ScratchpadProblemPane
+                        pdoc={props.pdoc}
+                        contentText={props.contentText}
+                        contentLangs={props.contentLangs}
+                        preferredLang={props.preferredLang}
+                        mode={props.mode}
+                      />
+                    </div>
+                  )
                   : <ScratchpadSettings />}
               </div>
             </div>

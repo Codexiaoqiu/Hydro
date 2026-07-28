@@ -1,12 +1,12 @@
-import { Link } from '../link';
 import { useTranslate } from '../../lib/i18n';
+import { Link } from '../link';
 import styles from './ContestManagementSidebar.module.css';
 
 export interface ContestManagementSidebarProps {
-  tdoc: { docId: number; title?: string };
+  tdoc: { docId: number, title?: string };
 }
 
-interface Entry { labelKey: string; route: string; }
+interface Entry { labelKey: string, route: string }
 const ENTRIES: Entry[] = [
   { labelKey: 'ContestMgmt.Edit', route: 'contest_edit' },
   { labelKey: 'ContestMgmt.Manage', route: 'contest_manage' },

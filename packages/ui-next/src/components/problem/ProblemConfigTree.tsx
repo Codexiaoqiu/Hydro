@@ -1,11 +1,11 @@
 import type { SubtaskConfig, TestCaseConfig } from '@hydrooj/common';
 import { useState } from 'react';
-import { Button } from '../primitives/Button';
-import { Input } from '../primitives/Input';
 import { useTranslate } from '../../lib/i18n';
 import { dumpProblemConfigYaml, parseProblemConfigYaml, type ProblemConfigYaml } from '../../lib/yaml-config';
-import { SubtaskSettings } from './SubtaskSettings';
+import { Button } from '../primitives/Button';
+import { Input } from '../primitives/Input';
 import styles from './ProblemConfigTree.module.css';
+import { SubtaskSettings } from './SubtaskSettings';
 
 export interface ProblemConfigTreeProps {
   config: ProblemConfigYaml;

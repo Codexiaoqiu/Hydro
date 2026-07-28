@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { CopyToDomainDialog } from './CopyToDomainDialog';
 import { ToastProvider } from '../primitives/Toast';
+import { CopyToDomainDialog } from './CopyToDomainDialog';
 
 // Locale is pinned to zh_CN by src/test/setup.ts. Action label uses the
 // existing 'Problem.Copy' key (复制 / Copy).
@@ -24,7 +24,7 @@ beforeEach(() => {
   (global as { fetch?: unknown }).fetch = fetchMock;
 });
 
-describe('CopyToDomainDialog (P2-B.2)', () => {
+describe('copyToDomainDialog (P2-B.2)', () => {
   it('does not render anything when open is false', () => {
     render(
       <ToastProvider>
@@ -47,7 +47,7 @@ describe('CopyToDomainDialog (P2-B.2)', () => {
     expect(screen.getByRole('button', { name: RX_CANCEL })).toBeTruthy();
   });
 
-  it('Copy button is disabled until a target is entered', () => {
+  it('copy button is disabled until a target is entered', () => {
     render(
       <ToastProvider>
         <CopyToDomainDialog open onClose={() => {}} onCopied={() => {}} pids={[1000]} />
@@ -56,7 +56,7 @@ describe('CopyToDomainDialog (P2-B.2)', () => {
     expect(screen.getByRole('button', { name: RX_COPY })).toBeDisabled();
   });
 
-  it('POSTs operation=copy with the pids and the entered target on confirm', async () => {
+  it('pOSTs operation=copy with the pids and the entered target on confirm', async () => {
     const onCopied = vi.fn();
     const onClose = vi.fn();
     // The first fetch call is the copy POST. The toast itself does not

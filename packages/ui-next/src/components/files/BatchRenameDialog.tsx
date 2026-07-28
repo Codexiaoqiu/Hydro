@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Button, Input, Modal } from '../primitives';
+import { previewRename, type RenameChange, type RenamePreview } from '../../lib/file-rename';
 import { useTranslate } from '../../lib/i18n';
-import { type RenameChange, type RenamePreview, previewRename } from '../../lib/file-rename';
+import { Button, Input, Modal } from '../primitives';
 import styles from './BatchRenameDialog.module.css';
 
 export interface BatchRenameDialogProps {
@@ -21,7 +21,7 @@ export interface BatchRenameDialogProps {
 function computePreview(
   selected: string[],
   existing: string[],
-  options: { prefix: string; suffix: string; find: string; replace: string; flags: string },
+  options: { prefix: string, suffix: string, find: string, replace: string, flags: string },
 ): RenamePreview {
   const find = options.find.trim();
   const flags = options.flags.trim();

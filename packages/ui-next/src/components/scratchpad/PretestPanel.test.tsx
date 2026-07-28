@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
-import { ScratchpadProvider } from './useScratchpadState';
 import { PretestPanel } from './PretestPanel';
+import { ScratchpadProvider } from './useScratchpadState';
 
 // Mock useTranslate to return English strings regardless of locale.
 // The global setup pins __hydro_locale to zh_CN, so without this
@@ -22,7 +22,7 @@ function wrap(ui: React.ReactNode) {
   return render(<ScratchpadProvider initialLang="cpp" initialCode="">{ui}</ScratchpadProvider>);
 }
 
-describe('PretestPanel', () => {
+describe('pretestPanel', () => {
   it('renders input textarea and empty output pre initially', () => {
     wrap(<PretestPanel />);
     // Use getByRole for the textarea (only textbox with "input" accessible name)

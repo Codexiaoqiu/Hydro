@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { ContestPrivateFiles } from './ContestPrivateFiles';
 
-describe('ContestPrivateFiles', () => {
+describe('contestPrivateFiles', () => {
   it('renders nothing when no files', () => {
     const { container } = render(<ContestPrivateFiles files={[]} urlForFile={(n) => `/f/${n}`} />);
     expect(container.querySelector('[data-testid="contest-private-files"]')).toBeNull();

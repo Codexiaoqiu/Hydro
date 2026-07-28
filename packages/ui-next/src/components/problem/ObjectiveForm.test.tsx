@@ -19,7 +19,7 @@ const optionalQuestions: ObjectiveQuestion[] = [
   { id: 'q1', type: 'single', label: 'Optional', options: ['A', 'B'] },
 ];
 
-describe('ObjectiveForm', () => {
+describe('objectiveForm', () => {
   it('renders a radio group for single-choice questions', () => {
     render(<ObjectiveForm questions={singleQuestions} onSubmit={() => {}} />);
     expect(screen.getAllByRole('radio')).toHaveLength(3);

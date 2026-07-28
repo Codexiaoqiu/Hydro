@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { Modal } from './Modal';
 
-describe('Modal', () => {
+describe('modal', () => {
   it('renders nothing when closed', () => {
     render(<Modal open={false} onClose={() => {}} title="x">body</Modal>);
     expect(screen.queryByRole('dialog')).toBeNull();

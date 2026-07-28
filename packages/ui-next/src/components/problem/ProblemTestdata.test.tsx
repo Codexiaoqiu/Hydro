@@ -1,11 +1,11 @@
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import type { ComponentProps } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { type PageData, PageDataProvider } from '../../context/page-data';
+import { PageDataProvider } from '../../context/page-data';
 import { RouterProvider } from '../../context/router';
-import { ToastProvider } from '../primitives';
 import { request } from '../../hooks/use-api';
 import * as downloadZip from '../../lib/download-zip';
+import { ToastProvider } from '../primitives';
 import { ProblemTestdata } from './ProblemTestdata';
 
 const fetchMock = vi.fn();
@@ -34,7 +34,7 @@ function renderComp(props: Partial<ComponentProps<typeof ProblemTestdata>> = {})
   );
 }
 
-describe('ProblemTestdata', () => {
+describe('problemTestdata', () => {
   it('renders file rows', () => {
     renderComp();
     expect(screen.getByText('1.in')).toBeInTheDocument();
@@ -132,6 +132,97 @@ describe('ProblemTestdata', () => {
     fireEvent.click(screen.getByRole('button', { name: /open 1\.in|预览 1\.in/i }));
     const dialog = await screen.findByRole('dialog');
     expect(within(dialog).queryByRole('button', { name: /保存|save/i })).not.toBeInTheDocument();
+  });
+
+  it('disables Create / Generate / Download ZIP when disabled (reference)', () => {
+    renderComp({ disabled: true });
+    // Existing row delete button is enabled-but-disabled-too; the three new
+    // gates cover the bulk-mutation surface area the brief cares about.
+    const buttons = screen.getAllByRole('button');
+    const labels = buttons.map((b) => (b.textContent || '').trim());
+    expect(labels.some((l) => /Create|新建/.test(l))).toBe(true);
+    expect(labels.some((l) => /Generate|生成/.test(l))).toBe(true);
+    expect(labels.some((l) => /Download ZIP|下载 ZIP/.test(l))).toBe(true);
+    const blocked = buttons.filter((b) =>
+      /Create|新建|Generate|生成|Download ZIP|下载 ZIP/i.test(b.textContent || ''));
+    for (const b of blocked) expect(b).toBeDisabled();
+  });
+
+  it('surfaces a toast (and keeps optimistic list) when get_links for the ZIP fails', async () => {
+    const postSpy = vi.spyOn(request, 'post').mockRejectedValue(new Error('boom'));
+    const buildSpy = vi.spyOn(downloadZip, 'buildDownloadZip');
+    renderComp();
+    fireEvent.click(screen.getByRole('button', { name: /下载 ZIP|download zip/i }));
+    await waitFor(() => expect(postSpy).toHaveBeenCalled());
+    expect(buildSpy).not.toHaveBeenCalled();
+    expect(screen.getByText('1.in')).toBeInTheDocument();
+    expect(screen.getByText('1.out')).toBeInTheDocument();
+    postSpy.mockRestore();
+    buildSpy.mockRestore();
+  });
+
+  it('batch-renames selected files via a rename_files request', async () => {
+    const postSpy = vi.spyOn(request, 'post').mockResolvedValue({} as never);
+    const onChange = vi.fn();
+    renderComp({ onChange });
+
+    // Select both files, then open the batch-rename dialog.
+    fireEvent.click(screen.getByRole('button', { name: /全选|select all/i }));
+    fireEvent.click(screen.getByRole('button', { name: /重命名|rename/i }));
+    const dialog = await screen.findByRole('dialog');
+
+    // find "1" -> "sample1": 1.in -> sample1.in, 1.out -> sample1.out
+    fireEvent.change(within(dialog).getByTestId('batch-rename-find'), { target: { value: '1' } });
+    fireEvent.change(within(dialog).getByTestId('batch-rename-replace'), { target: { value: 'sample1' } });
+    fireEvent.click(within(dialog).getByRole('button', { name: /预览|preview/i }));
+    fireEvent.click(within(dialog).getByTestId('batch-rename-confirm'));
+
+    await waitFor(() => expect(postSpy).toHaveBeenCalledWith('/p/P1/files', {
+      operation: 'rename_files',
+      type: 'testdata',
+      files: ['1.in', '1.out'],
+      newNames: ['sample1.in', 'sample1.out'],
+    }));
+    postSpy.mockRestore();
+  });
+
+  it('multi-deletes the current selection in one request', async () => {
+    const postSpy = vi.spyOn(request, 'post').mockResolvedValue({} as never);
+    renderComp();
+    fireEvent.click(screen.getByRole('button', { name: /全选|select all/i }));
+    fireEvent.click(screen.getByRole('button', { name: /删除所选|delete selected/i }));
+    await waitFor(() => expect(postSpy).toHaveBeenCalledWith('/p/P1/files', {
+      operation: 'delete_files',
+      type: 'testdata',
+      files: ['1.in', '1.out'],
+    }));
+    postSpy.mockRestore();
+  });
+
+  it('downloads a real ZIP of every file rather than only the first link', async () => {
+    const postSpy = vi.spyOn(request, 'post').mockResolvedValue({
+      links: { '1.in': 'https://s3/u1', '1.out': 'https://s3/u2' },
+    } as never);
+    const buildSpy = vi.spyOn(downloadZip, 'buildDownloadZip').mockResolvedValue({
+      blob: new Blob(['zip']), failures: [],
+    });
+    renderComp();
+    fireEvent.click(screen.getByRole('button', { name: /下载 ZIP|download zip/i }));
+    await waitFor(() => expect(buildSpy).toHaveBeenCalled());
+    const targets = buildSpy.mock.calls[0][0];
+    expect(targets).toEqual([
+      { filename: '1.in', url: 'https://s3/u1' },
+      { filename: '1.out', url: 'https://s3/u2' },
+    ]);
+    postSpy.mockRestore();
+    buildSpy.mockRestore();
+  });
+
+  it('opens a preview dialog when a file name is clicked', async () => {
+    renderComp({ files: [{ name: '1.in', size: 100 }] });
+    fireEvent.click(screen.getByRole('button', { name: /open 1\.in|预览 1\.in/i }));
+    const dialog = await screen.findByRole('dialog');
+    expect(within(dialog).getByRole('button', { name: /复制链接|copy link/i })).toBeInTheDocument();
   });
 
   it('disables Create / Generate / Download ZIP when disabled (reference)', () => {

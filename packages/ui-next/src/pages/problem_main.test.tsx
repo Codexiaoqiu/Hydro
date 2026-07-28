@@ -4,11 +4,11 @@ import { STATUS } from '@hydrooj/common';
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { ToastProvider } from '../components/primitives/Toast';
 import { type PageData, PageDataProvider } from '../context/page-data';
 import * as routerMod from '../context/router';
 import { RouterProvider } from '../context/router';
 import { routeMapStore } from '../globals';
-import { ToastProvider } from '../components/primitives/Toast';
 import { ThemeProvider } from '../theme/ThemeProvider';
 import ProblemMain from './problem_main';
 

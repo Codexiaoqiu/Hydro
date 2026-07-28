@@ -1,5 +1,4 @@
-import { renderHook } from '@testing-library/react';
-import { act } from '@testing-library/react';
+import { act, renderHook } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { ScratchpadProvider, useScratchpad } from './ScratchpadContext';
 

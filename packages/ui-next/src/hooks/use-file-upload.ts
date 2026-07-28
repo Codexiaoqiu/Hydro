@@ -10,9 +10,11 @@ export interface UploadEntry {
 export interface UseFileUploadArgs {
   url: string;
   type: string;
-  /** Called once when a batch reaches a terminal state (all entries settled).
+  /**
+   * Called once when a batch reaches a terminal state (all entries settled).
    *  Not invoked on unmount, on `cancel()`, or when the batch is superseded
-   *  by a new `upload()` call. */
+   *  by a new `upload()` call.
+   */
   onSettled?: (entries: UploadEntry[]) => void;
 }
 

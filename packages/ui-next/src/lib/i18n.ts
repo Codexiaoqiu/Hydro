@@ -17,6 +17,7 @@ export const zhCN: Catalog = {
   'BatchRenameDialog.Replace': '替换',
   'BatchRenameDialog.Title': '批量重命名',
 
+<<<<<<< Updated upstream
   'HomeMessages.Title': '站内消息',
   'HomeMessages.Empty': '暂无对话',
   'HomeMessages.SelectConversation': '选择左侧的对话以查看消息',
@@ -64,6 +65,8 @@ export const zhCN: Catalog = {
   'HomeSecurity.WebauthnFollowDevice': '请在设备上完成验证',
   'HomeSecurity.WebauthnSuccess': '认证器已注册',
 
+=======
+>>>>>>> Stashed changes
   'Common.Submit': '提交',
   'Common.Cancel': '取消',
   'Common.Save': '保存',
@@ -377,12 +380,16 @@ export const zhCN: Catalog = {
   'ProblemTestdata.Uploading': '上传中…',
   'ProblemTestdata.SelectAll': '全选',
   'ProblemTestdata.Rename': '重命名',
+<<<<<<< Updated upstream
   'ProblemTestdata.Delete': '删除',
   'ProblemTestdata.DeleteFileTitle': '删除此文件?',
   'ProblemTestdata.DeleteFileConfirm': '"{name}" 将从此题目的测试数据中移除。',
   'ProblemTestdata.DeleteSelected': '删除所选',
   'ProblemTestdata.DeleteSelectedTitle': '删除所选文件?',
   'ProblemTestdata.DeleteSelectedConfirm': '将移除 {count} 个文件:{files}',
+=======
+  'ProblemTestdata.DeleteSelected': '删除所选',
+>>>>>>> Stashed changes
   'ProblemTestdata.Select': '选择',
   'ProblemTestdata.Preview': '预览',
   'ProblemTestdata.ZipFailed': '{count} 个文件下载失败',
@@ -729,6 +736,7 @@ export const en: Catalog = {
   'BatchRenameDialog.Replace': 'Replace',
   'BatchRenameDialog.Title': 'Batch rename',
 
+<<<<<<< Updated upstream
   'HomeMessages.Title': 'Messages',
   'HomeMessages.Empty': 'No conversations',
   'HomeMessages.SelectConversation': 'Select a conversation on the left to read messages',
@@ -776,6 +784,8 @@ export const en: Catalog = {
   'HomeSettings.NoSettings': 'No editable settings for this category',
   'HomeSettings.Saved': 'Saved',
 
+=======
+>>>>>>> Stashed changes
   'Common.Submit': 'Submit',
   'Common.Cancel': 'Cancel',
   'Common.Save': 'Save',
@@ -1089,12 +1099,16 @@ export const en: Catalog = {
   'ProblemTestdata.Uploading': 'Uploading…',
   'ProblemTestdata.SelectAll': 'Select all',
   'ProblemTestdata.Rename': 'Rename',
+<<<<<<< Updated upstream
   'ProblemTestdata.Delete': 'Delete',
   'ProblemTestdata.DeleteFileTitle': 'Delete this file?',
   'ProblemTestdata.DeleteFileConfirm': '"{name}" will be removed from the problem\'s testdata.',
   'ProblemTestdata.DeleteSelected': 'Delete selected',
   'ProblemTestdata.DeleteSelectedTitle': 'Delete selected files?',
   'ProblemTestdata.DeleteSelectedConfirm': 'Will remove {count} file(s): {files}',
+=======
+  'ProblemTestdata.DeleteSelected': 'Delete selected',
+>>>>>>> Stashed changes
   'ProblemTestdata.Select': 'Select',
   'ProblemTestdata.Preview': 'Preview',
   'ProblemTestdata.ZipFailed': '{count} file(s) failed to download',

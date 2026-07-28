@@ -5,7 +5,7 @@ import { ProblemConfigBasicForm } from './ProblemConfigBasicForm';
 
 const cfg = { type: 'default' } as unknown as ProblemConfigYaml;
 
-describe('ProblemConfigBasicForm', () => {
+describe('problemConfigBasicForm', () => {
   it('renders the type select with current value', () => {
     render(<ProblemConfigBasicForm config={cfg} onChange={() => {}} />);
     // The first combobox is the problem type selector (the second is the

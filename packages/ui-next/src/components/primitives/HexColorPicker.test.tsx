@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { HexColorPicker } from './HexColorPicker';
 
-describe('HexColorPicker', () => {
+describe('hexColorPicker', () => {
   it('renders the current hex value', () => {
     render(<HexColorPicker value="#aabbcc" onChange={() => {}} />);
     const input = screen.getByRole('textbox', { name: /hex/i }) as HTMLInputElement;

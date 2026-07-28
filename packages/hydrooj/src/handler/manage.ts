@@ -16,8 +16,8 @@ import user from '../model/user';
 import {
     ConnectionHandler, Handler, param, requireSudo, Types,
 } from '../service/server';
-import { JudgeResultCallbackContext } from './judge';
 import { AdminUiHandler } from './admin-ui';
+import { JudgeResultCallbackContext } from './judge';
 
 const logger = new Logger('manage');
 

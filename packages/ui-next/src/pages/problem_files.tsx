@@ -18,20 +18,29 @@ interface Args {
    *   - `additional_file` — sorted additional-file list
    *   - `reference`       — set when this problem is a cross-domain reference
    * `pdoc` still carries `docId` / `pid` / `title` for addressing + display.
+<<<<<<< Updated upstream
    * `owner` / `maintainer` (when present) drive the PERM_EDIT_PROBLEM_SELF
    * half of `canEditProblem`; the global PERM_EDIT_PROBLEM bit wins otherwise.
+=======
+>>>>>>> Stashed changes
    */
   pdoc?: {
     docId: number;
     pid?: string;
     title?: string;
+<<<<<<< Updated upstream
     owner?: number;
     maintainer?: number[];
+=======
+>>>>>>> Stashed changes
   };
   testdata?: ProblemTestdataFile[];
   additional_file?: ProblemAdditionalFile[];
   reference?: { domainId: string, pid: string | number };
+<<<<<<< Updated upstream
   UserContext?: Record<string, unknown>;
+=======
+>>>>>>> Stashed changes
 }
 
 export default function ProblemFilesPage() {
@@ -84,6 +93,7 @@ export default function ProblemFilesPage() {
   }
 
   const isReference = !!args.reference;
+<<<<<<< Updated upstream
   // Mirror ui-default's perm gate: PERM_EDIT_PROBLEM (or SELF-ownership) is
   // required to mutate the testdata / additional files; references are always
   // read-only because the foreign domain owns them. canEditProblem already
@@ -93,6 +103,8 @@ export default function ProblemFilesPage() {
     args.UserContext as never,
     pdoc as { owner?: number, maintainer?: number[] },
   );
+=======
+>>>>>>> Stashed changes
   const pid = pdoc.pid ?? String(pdoc.docId);
 
   const onTestdataChange = (next: ProblemTestdataFile[]) => { setTestdata(next); recalibrate(); };
@@ -115,14 +127,22 @@ export default function ProblemFilesPage() {
       )}
 
       <Card variant="default" header={<h2 className={styles.sectionTitle}>{t('ProblemFiles.TestdataSection')}</h2>}>
+<<<<<<< Updated upstream
         <ProblemTestdata pid={pid} files={testdata} disabled={!canEdit} onChange={onTestdataChange} />
+=======
+        <ProblemTestdata pid={pid} files={testdata} disabled={isReference} onChange={onTestdataChange} />
+>>>>>>> Stashed changes
       </Card>
 
       <Card variant="default" header={<h2 className={styles.sectionTitle}>{t('ProblemFiles.AdditionalSection')}</h2>}>
         <ProblemAdditionalFiles
           pid={pid}
           files={files}
+<<<<<<< Updated upstream
           disabled={!canEdit}
+=======
+          disabled={isReference}
+>>>>>>> Stashed changes
           onChange={onAdditionalChange}
         />
       </Card>

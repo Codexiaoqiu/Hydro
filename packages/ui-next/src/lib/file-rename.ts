@@ -7,7 +7,7 @@ export interface RenamePreview {
   changes: RenameChange[];
   duplicates: string[];
   collisions: string[];
-  invalid: Array<{ name: string; reason: string }>;
+  invalid: Array<{ name: string, reason: string }>;
   /** Set when the find pattern is not a valid RegExp; changes is left empty. */
   error?: string;
 }
@@ -56,7 +56,7 @@ export function previewRename(
   }
 
   const changes: RenameChange[] = [];
-  const invalid: Array<{ name: string; reason: string }> = [];
+  const invalid: Array<{ name: string, reason: string }> = [];
   const newNames: string[] = [];
 
   for (const oldName of selected) {

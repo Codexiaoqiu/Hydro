@@ -14,17 +14,21 @@ class MockWS {
     this.url = url;
     MockWS.instances.push(this);
   }
+
   send(data: string) {
     this.sent.push(data);
   }
+
   close() {
     this.readyState = 3;
     this.onclose?.(new CloseEvent('close'));
   }
+
   fakeOpen() {
     this.readyState = 1;
     this.onopen?.(new Event('open'));
   }
+
   fakeMessage(data: unknown) {
     this.onmessage?.(new MessageEvent('message', { data: JSON.stringify(data) }));
   }

@@ -6,6 +6,7 @@ import { Menu } from '../components/sidebar/Menu';
 import { usePageData } from '../context/page-data';
 import { useTranslate } from '../lib/i18n';
 import { canRejudgeAny, isLoggedIn } from '../lib/perms';
+import { isTerminalStatus } from '../lib/record-terminal';
 
 interface Rdoc {
   _id: string;
@@ -34,20 +35,45 @@ interface Args {
   };
 }
 
-const STATUS_KEYS = [
-  'Record.Status.Accepted',
-  'Record.Status.WrongAnswer',
-  'Record.Status.TimeLimitExceeded',
-  'Record.Status.MemoryLimitExceeded',
-  'Record.Status.RuntimeError',
-  'Record.Status.SystemError',
-  'Record.Status.CompileError',
-  'Record.Status.PresentationError',
-];
+/**
+ * Maps every `@hydrooj/common` `STATUS.*` value to its i18n key.
+ *
+ *  Replaces the legacy `STATUS_KEYS[s]` array-index lookup. The old array
+ *  only covered 8 entries (0..7 by accident of array ordering) and mapped
+ *  the wrong label to statuses 5, 6 and 8+ — using STATUS values directly
+ *  avoids the array-index foot-gun and keeps coverage in lock-step with
+ *  the upstream enum.
+ *
+ *  Brief §C3: terminal-status coverage now includes 8 (SystemError),
+ *  9 (Canceled), 11 (Hacked), 32 (HackSuccessful) and 33 (HackUnsuccessful)
+ *  — see `isTerminalStatus` in `lib/record-terminal.ts`.
+ */
+const STATUS_LABEL_KEYS: Readonly<Record<number, string>> = {
+  [STATUS.STATUS_WAITING]: 'Record.Status.Pending',
+  [STATUS.STATUS_ACCEPTED]: 'Record.Status.Accepted',
+  [STATUS.STATUS_WRONG_ANSWER]: 'Record.Status.WrongAnswer',
+  [STATUS.STATUS_TIME_LIMIT_EXCEEDED]: 'Record.Status.TimeLimitExceeded',
+  [STATUS.STATUS_MEMORY_LIMIT_EXCEEDED]: 'Record.Status.MemoryLimitExceeded',
+  [STATUS.STATUS_OUTPUT_LIMIT_EXCEEDED]: 'Record.Status.RuntimeError',
+  [STATUS.STATUS_RUNTIME_ERROR]: 'Record.Status.RuntimeError',
+  [STATUS.STATUS_COMPILE_ERROR]: 'Record.Status.CompileError',
+  [STATUS.STATUS_SYSTEM_ERROR]: 'Record.Status.SystemError',
+  [STATUS.STATUS_CANCELED]: 'Record.Status.PresentationError',
+  [STATUS.STATUS_ETC]: 'Record.Status.PresentationError',
+  [STATUS.STATUS_HACKED]: 'Record.Status.PresentationError',
+  [STATUS.STATUS_JUDGING]: 'Record.Status.Pending',
+  [STATUS.STATUS_COMPILING]: 'Record.Status.Pending',
+  [STATUS.STATUS_FETCHED]: 'Record.Status.Pending',
+  [STATUS.STATUS_IGNORED]: 'Record.Status.PresentationError',
+  [STATUS.STATUS_FORMAT_ERROR]: 'Record.Status.PresentationError',
+  [STATUS.STATUS_HACK_SUCCESSFUL]: 'Record.Status.Accepted',
+  [STATUS.STATUS_HACK_UNSUCCESSFUL]: 'Record.Status.PresentationError',
+};
 
 function statusLabel(s: number | undefined, t: (k: string) => string): string {
   if (s === undefined) return t('Record.Status.Pending');
-  return STATUS_KEYS[s] ? t(STATUS_KEYS[s]) : `Status ${s}`;
+  const key = STATUS_LABEL_KEYS[s];
+  return key ? t(key) : `Status ${s}`;
 }
 
 function highlightFor(lang?: string): string {
@@ -55,6 +81,9 @@ function highlightFor(lang?: string): string {
   if (lang === '_' || lang === 'objective') return 'plaintext';
   return lang;
 }
+
+/** Wire-protocol tag shared with `ProblemGenerateTestdata`. */
+const IFRAME_STATUS_MESSAGE = 'hydro-record-status';
 
 export default function RecordDetailPage() {
   const { args } = usePageData() as unknown as { args: Args };
@@ -68,9 +97,19 @@ export default function RecordDetailPage() {
   // (reconnect storm).
   const liveStatusRef = useRef<number | undefined>(liveStatus);
 
+  // Detect iframe mode: when this page is opened inside ProblemGenerateTestdata's
+  // modal, `window.parent !== window`. We forward terminal status updates to
+  // the parent so the modal can close itself without polling.
+  const isIframe = typeof window !== 'undefined' && window.parent !== window;
+
+  // I7: postMessage fires at most once per (record, status). Without this,
+  // every status push — including the same value redundantly echoed over SSE —
+  // would re-notify the parent, which may already have torn down the modal.
+  const firedRef = useRef<number | null>(null);
+
   useEffect(() => {
     if (rev) return;
-    if (typeof liveStatusRef.current === 'number' && STATUS_KEYS[liveStatusRef.current]) return;
+    if (typeof liveStatusRef.current === 'number' && isTerminalStatus(liveStatusRef.current)) return;
     if (typeof EventSource === 'undefined') return;
     const es = new EventSource(`/record-detail-conn?domainId=${encodeURIComponent(String(rdoc.domainId ?? ''))}&rid=${encodeURIComponent(String(rdoc._id))}`);
     es.addEventListener('update', (ev) => {
@@ -87,13 +126,38 @@ export default function RecordDetailPage() {
             try { window.parent?.postMessage({ status: STATUS.STATUS_ACCEPTED }, '*'); } catch { /* parent gone */ }
           }
           // Terminal status — no more updates expected, close the stream.
-          if (STATUS_KEYS[data.status]) es.close();
+          if (isTerminalStatus(data.status)) es.close();
         }
         if (typeof data.score === 'number') setLiveScore(data.score);
       } catch { /* ignore */ }
     });
     return () => es.close();
   }, [rdoc._id, rdoc.domainId, rev]);
+
+  // Iframe mode: when the judge reaches a terminal status, forward it to the
+  // parent window using the shared `{ type: 'hydro-record-status', status }`
+  // protocol so the parent (e.g. ProblemGenerateTestdata) can close its
+  // modal and refresh its own data. Non-iframe pages skip this path entirely.
+  //
+  // firedRef guards against re-firing for the same status (re-judges may
+  // re-stream a terminal value across SSE reconnects).
+  useEffect(() => {
+    if (!isIframe) return;
+    if (!isTerminalStatus(liveStatus)) return;
+    if (typeof window === 'undefined') return;
+    if (firedRef.current === liveStatus) return;
+    firedRef.current = liveStatus;
+    try {
+      window.parent.postMessage(
+        { type: IFRAME_STATUS_MESSAGE, status: liveStatus },
+        '*',
+      );
+    } catch { /* ignore — parent may be gone, the modal will simply not close */ }
+  }, [isIframe, liveStatus]);
+
+  // Reset firedRef when navigating to a different record (the page is
+  // remounted on rid change, but guard defensively for in-place arg swaps).
+  useEffect(() => { firedRef.current = null; }, [rdoc._id]);
 
   const isAdmin = canRejudgeAny(UserContext);
   const isOwner = isLoggedIn(UserContext) && UserContext?._id === rdoc.uid;

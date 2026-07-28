@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { useTranslate } from '../../lib/i18n';
 import { request } from '../../hooks/use-api';
+import { useTranslate } from '../../lib/i18n';
 import { Button } from '../primitives/Button';
 import { MarkdownEditor } from '../primitives/MarkdownEditor';
 import { useToast } from '../primitives/Toast';
@@ -25,7 +25,7 @@ import styles from './ContestClarificationInlineForm.module.css';
  */
 export interface ContestClarificationInlineFormProps {
   /** The contest document (only `docId` and `pids` are needed). */
-  tdoc: { docId: number | string; pids: number[]; title?: string };
+  tdoc: { docId: number | string, pids: number[], title?: string };
   onSubmitted?: () => void;
 }
 

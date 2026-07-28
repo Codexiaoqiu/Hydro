@@ -1,6 +1,6 @@
 export interface DetectedSubtask {
   id: number;
-  cases: { input: string; output: string }[];
+  cases: { input: string, output: string }[];
   score: number;
 }
 
@@ -68,7 +68,7 @@ function clientSideDetect(files: string[]): DetectedSubtask[] {
   const inputExts = ['.in', '.IN', '.txt', '.TXT', '.in.txt', '.IN.TXT'];
   const outputExts = ['.out', '.OUT', '.ans', '.ANS', '.out.txt', '.OUT.TXT'];
 
-  const cases: { input: string; output: string; subtaskId: number }[] = [];
+  const cases: { input: string, output: string, subtaskId: number }[] = [];
 
   for (const file of files) {
     const lower = file.toLowerCase();

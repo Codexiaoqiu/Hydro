@@ -1,6 +1,6 @@
+import { useTranslate } from '../../lib/i18n';
 import { Ring } from '../charts/Ring';
 import { Button, Chip, Eyebrow } from '../primitives';
-import { useTranslate } from '../../lib/i18n';
 import styles from './ProblemHero.module.css';
 
 interface PdocLite {

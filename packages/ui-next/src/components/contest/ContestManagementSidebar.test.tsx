@@ -29,7 +29,7 @@ vi.mock('../link', () => ({
 
 const tdoc = { docId: 7, title: 'Test' } as any;
 
-describe('ContestManagementSidebar', () => {
+describe('contestManagementSidebar', () => {
   it('lists all six management entries', () => {
     render(<ContestManagementSidebar tdoc={tdoc} />);
     for (const label of ['Edit', 'Manage', 'Export', 'Attendees', 'Balloon', 'Clarifications']) {

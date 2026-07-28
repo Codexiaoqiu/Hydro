@@ -12,9 +12,9 @@ export interface ErrorPageArgs {
   };
 }
 
-export type ErrorPageProps = {
-  _pageData?: { name: string; template: string; url: string; args?: ErrorPageArgs };
-};
+export interface ErrorPageProps {
+  _pageData?: { name: string, template: string, url: string, args?: ErrorPageArgs };
+}
 
 function substitute(template: string, params: unknown[] = []): string {
   return template.replace(/\{(\d+)\}/g, (_, idx) => {

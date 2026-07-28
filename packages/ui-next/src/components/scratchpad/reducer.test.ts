@@ -15,7 +15,7 @@ describe('scratchpadReducer', () => {
     expect(s.wsStatus).toBe('idle');
   });
 
-  it('SET_CODE updates code', () => {
+  it('sET_CODE updates code', () => {
     const s = scratchpadReducer(initialScratchpadState('cpp', ''), {
       type: 'SET_CODE',
       payload: 'int main(){}',
@@ -23,7 +23,7 @@ describe('scratchpadReducer', () => {
     expect(s.code).toBe('int main(){}');
   });
 
-  it('SET_LANG updates lang', () => {
+  it('sET_LANG updates lang', () => {
     const s = scratchpadReducer(initialScratchpadState('cpp', ''), {
       type: 'SET_LANG',
       payload: 'py',
@@ -31,7 +31,7 @@ describe('scratchpadReducer', () => {
     expect(s.lang).toBe('py');
   });
 
-  it('START_PRETEST marks running=true and clears output', () => {
+  it('sTART_PRETEST marks running=true and clears output', () => {
     const prev = {
       ...initialScratchpadState('cpp', ''),
       pretest: { running: false, input: '1\n', output: ['old'], error: undefined },
@@ -42,7 +42,7 @@ describe('scratchpadReducer', () => {
     expect(s.pretest.error).toBeUndefined();
   });
 
-  it('CLEAR_OUTPUT clears output and error without touching running', () => {
+  it('cLEAR_OUTPUT clears output and error without touching running', () => {
     const prev = {
       ...initialScratchpadState('cpp', ''),
       pretest: { running: false, input: '1\n', output: ['old line'], error: 'some error' },
@@ -53,7 +53,7 @@ describe('scratchpadReducer', () => {
     expect(s.pretest.error).toBeUndefined();
   });
 
-  it('CLEAR_OUTPUT leaves running=true when pretest is in flight', () => {
+  it('cLEAR_OUTPUT leaves running=true when pretest is in flight', () => {
     const prev = {
       ...initialScratchpadState('cpp', ''),
       pretest: { running: true, input: '1\n', output: ['partial'], error: undefined },
@@ -64,46 +64,46 @@ describe('scratchpadReducer', () => {
     expect(s.pretest.error).toBeUndefined();
   });
 
-  it('PUSH_PRETEST_LINE appends one line', () => {
+  it('pUSH_PRETEST_LINE appends one line', () => {
     const prev = { ...initialScratchpadState('cpp', ''), pretest: { running: true, input: '', output: ['a'], error: undefined } };
     const s = scratchpadReducer(prev, { type: 'PUSH_PRETEST_LINE', payload: 'b' });
     expect(s.pretest.output).toEqual(['a', 'b']);
   });
 
-  it('END_PRETEST marks running=false', () => {
+  it('eND_PRETEST marks running=false', () => {
     const prev = { ...initialScratchpadState('cpp', ''), pretest: { running: true, input: '', output: ['x'], error: undefined } };
     const s = scratchpadReducer(prev, { type: 'END_PRETEST' });
     expect(s.pretest.running).toBe(false);
   });
 
-  it('PRETEST_ERROR sets error and ends pretest', () => {
+  it('pRETEST_ERROR sets error and ends pretest', () => {
     const prev = { ...initialScratchpadState('cpp', ''), pretest: { running: true, input: '', output: [], error: undefined } };
     const s = scratchpadReducer(prev, { type: 'PRETEST_ERROR', payload: 'compile fail' });
     expect(s.pretest.running).toBe(false);
     expect(s.pretest.error).toBe('compile fail');
   });
 
-  it('SUBMIT_START / SUBMIT_END toggles submitting', () => {
+  it('sUBMIT_START / SUBMIT_END toggles submitting', () => {
     let s = scratchpadReducer(initialScratchpadState('cpp', ''), { type: 'SUBMIT_START' });
     expect(s.submitting).toBe(true);
     s = scratchpadReducer(s, { type: 'SUBMIT_END' });
     expect(s.submitting).toBe(false);
   });
 
-  it('TOGGLE_PANEL flips the named panel visibility', () => {
+  it('tOGGLE_PANEL flips the named panel visibility', () => {
     let s = scratchpadReducer(initialScratchpadState('cpp', ''), { type: 'TOGGLE_PANEL', payload: 'pretest' });
     expect(s.showPretestPanel).toBe(false);
     s = scratchpadReducer(s, { type: 'TOGGLE_PANEL', payload: 'records' });
     expect(s.showRecordsPanel).toBe(true);
   });
 
-  it('LOAD_RECORDS replaces records array', () => {
+  it('lOAD_RECORDS replaces records array', () => {
     const records = [{ _id: 'r1', status: 1, lang: 'cpp', time: 1 }];
     const s = scratchpadReducer(initialScratchpadState('cpp', ''), { type: 'LOAD_RECORDS', payload: records });
     expect(s.records).toEqual(records);
   });
 
-  it('WS_STATUS updates wsStatus', () => {
+  it('wS_STATUS updates wsStatus', () => {
     const s = scratchpadReducer(initialScratchpadState('cpp', ''), { type: 'WS_STATUS', payload: 'open' });
     expect(s.wsStatus).toBe('open');
   });

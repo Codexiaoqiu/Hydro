@@ -1,16 +1,16 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Button } from '../components/primitives/Button';
 import { ContestBackLink } from '../components/contest/ContestBackLink';
 import { ContestManagementSidebar } from '../components/contest/ContestManagementSidebar';
 import { ContestUserAddDialog } from '../components/contest/ContestUserAddDialog';
 import {
-  ContestUserTable,
   type ContestUserRow,
+  ContestUserTable,
 } from '../components/contest/ContestUserTable';
+import { Button } from '../components/primitives/Button';
 import { usePageData } from '../context/page-data';
 import { useJsonPoll } from '../hooks/use-json-poll';
-import { useTranslate } from '../lib/i18n';
 import { isOngoing } from '../lib/contest-status';
+import { useTranslate } from '../lib/i18n';
 import styles from './contest_user.module.css';
 
 interface Args {
@@ -22,13 +22,13 @@ interface Args {
     duration?: number;
   };
   tsdocs?: ContestUserRow[];
-  udict?: Record<string, { _id: number; uname: string }>;
+  udict?: Record<string, { _id: number, uname: string }>;
   UserContext?: { domainId?: string };
 }
 
 interface Polled {
   tsdocs: ContestUserRow[];
-  udict: Record<string, { _id: number; uname: string }>;
+  udict: Record<string, { _id: number, uname: string }>;
 }
 
 /**

@@ -33,7 +33,7 @@ vi.mock('../components/link', () => ({
   useBuildUrl: () => (_name: string, _params?: Record<string, string>) => '#',
 }));
 
-describe('ContestPrintPage', () => {
+describe('contestPrintPage', () => {
   it('renders the ContestBackLink targeting contest_detail with the resolved tid', () => {
     vi.mocked(usePageData).mockReturnValue({
       args: { tdoc: { docId: '60a000000000000000000007', title: 'Printable Contest', allowPrint: true }, isAdmin: false },

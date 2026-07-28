@@ -8,8 +8,10 @@ import styles from './contest_print.module.css';
 
 export interface ContestPrintPageArgs {
   tdoc?: { docId: number | string, title?: string, allowPrint?: boolean };
-  /** Server flags the admin wiring via the template, mirroring ui-default's
-   *  `data-is-admin` attribute on `printKioskContainer`. */
+  /**
+   * Server flags the admin wiring via the template, mirroring ui-default's
+   *  `data-is-admin` attribute on `printKioskContainer`.
+   */
   isAdmin?: boolean;
 }
 
@@ -33,7 +35,7 @@ export default function ContestPrintPage() {
             <ContestBackLink tdoc={args.tdoc} />
             <PrintKiosk tdoc={args.tdoc} isAdmin={!!args.isAdmin} />
           </main>
-          <ContestManagementSidebar tdoc={args.tdoc as { docId: number; title?: string }} />
+          <ContestManagementSidebar tdoc={args.tdoc as { docId: number, title?: string }} />
         </div>
       </div>
     </ToastProvider>

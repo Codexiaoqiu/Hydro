@@ -1,10 +1,10 @@
+import * as yaml from 'js-yaml';
 import { useRef, useState } from 'react';
+import { useTranslate } from '../../lib/i18n';
+import { Button } from '../primitives/Button';
 import { HexColorPicker } from '../primitives/HexColorPicker';
 import { Modal } from '../primitives/Modal';
-import { Button } from '../primitives/Button';
-import { useTranslate } from '../../lib/i18n';
 import { useToast } from '../primitives/Toast';
-import * as yaml from 'js-yaml';
 import styles from './ContestBalloonSetColor.module.css';
 
 const HEX_RE = /^#[0-9a-fA-F]{6}$/;
@@ -16,7 +16,7 @@ export interface ContestBalloonSetColorProps {
   /** Every problem id that needs a balloon color. */
   pids: number[];
   /** Initial color/name map keyed by pid; merged with defaults. */
-  initial?: Record<number, { color: string; name: string }>;
+  initial?: Record<number, { color: string, name: string }>;
   /** Modal close-button label (localized). */
   closeLabel?: string;
 }

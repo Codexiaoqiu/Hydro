@@ -20,7 +20,7 @@ function renderWithProvider(ui: React.ReactElement) {
 
 const tdoc = { docId: 7, pids: [1, 2] } as any;
 
-describe('ContestClarificationInlineForm', () => {
+describe('contestClarificationInlineForm', () => {
   // Reply mode tests removed: ContestClarificationInlineForm no longer
   // supports a `reply` mode (mirror ui-default — only the ask form lives
   // on /contest/:tid/problems). Reply/broadcast forms live on

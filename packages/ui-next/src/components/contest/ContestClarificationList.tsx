@@ -1,8 +1,8 @@
 import { useState } from 'react';
+import { formatDateTime, objectIdTime } from '../../lib/datetime';
+import { useTranslate } from '../../lib/i18n';
 import { Button } from '../primitives/Button';
 import { MarkdownPreview } from '../primitives/MarkdownPreview';
-import { useTranslate } from '../../lib/i18n';
-import { formatDateTime, objectIdTime } from '../../lib/datetime';
 import styles from './ContestClarificationList.module.css';
 
 export interface ClarItem {
@@ -10,14 +10,14 @@ export interface ClarItem {
   subject: number;
   owner: number;
   content: string;
-  reply?: Array<{ owner: number; content: string }>;
+  reply?: Array<{ owner: number, content: string }>;
 }
 
 export interface ContestClarificationListProps {
   items: ClarItem[];
   pids: number[];
-  pdict: Record<number, { docId?: number; title?: string }>;
-  udict: Record<string, { _id: number; uname: string }>;
+  pdict: Record<number, { docId?: number, title?: string }>;
+  udict: Record<string, { _id: number, uname: string }>;
   /** Viewer's uid; Reply is hidden on items owned by this user. Defaults to 0. */
   currentUid?: number;
   onReply: (did: string) => void;
@@ -27,7 +27,7 @@ export interface ContestClarificationListProps {
 // stable string form so `0` and `-1` never collide by accident.
 const SUBJECT_KEYS: Record<string, string> = {
   '-1': 'ContestClarification.SubjectTechnical',
-  '0': 'ContestClarification.SubjectGeneral',
+  0: 'ContestClarification.SubjectGeneral',
 };
 
 // Port of `getAlphabeticId` from ui-default: 0 -> A, 25 -> Z, 26 -> AA, 27 -> AB, ...
@@ -44,7 +44,7 @@ function pidToLetters(index: number): string {
 function renderSubject(
   it: ClarItem,
   pids: number[],
-  pdict: Record<number, { docId?: number; title?: string }>,
+  pdict: Record<number, { docId?: number, title?: string }>,
   t: (key: string, args?: Record<string, unknown>) => string,
 ): string {
   // Problem subject (idx>=1): show "A. <title>" using alphabetic id.

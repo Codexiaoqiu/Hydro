@@ -1,6 +1,6 @@
 import { registerPage } from './page';
-import type { PageLoader, SlotName } from './types';
 import { store } from './store';
+import type { PageLoader, SlotName } from './types';
 
 /**
  * Loader for a scratchpad extension component. Used by the page registry

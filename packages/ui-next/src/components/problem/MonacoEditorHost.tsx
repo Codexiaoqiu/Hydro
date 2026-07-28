@@ -1,7 +1,7 @@
-import Editor from '@monaco-editor/react';
 import type { OnChange } from '@monaco-editor/react';
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import Editor from '@monaco-editor/react';
 import * as yaml from 'js-yaml';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { validateProblemConfigYaml } from '../../lib/yaml-config';
 
 // Real Monaco editor host. Lazy-loaded by `ProblemConfigEditor` so that the

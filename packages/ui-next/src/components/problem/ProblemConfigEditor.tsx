@@ -1,4 +1,3 @@
-import type { ReactNode } from 'react';
 import { lazy, Suspense } from 'react';
 import { parseProblemConfigYaml } from '../../lib/yaml-config';
 import styles from './ProblemConfigEditor.module.css';

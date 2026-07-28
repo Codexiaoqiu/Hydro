@@ -1,5 +1,5 @@
 /* @vitest-environment happy-dom */
-import { fireEvent, render, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import ContestProblemListPage from './contest_problemlist';
 
@@ -222,7 +222,7 @@ describe('contest_problemlist page', () => {
     };
     const psdict = {
       101: { rid: '60b001', score: 100, status: 1 }, // STATUS_ACCEPTED
-      102: { rid: '60b002', score: 0, status: 4 },   // STATUS_MEMORY_LIMIT_EXCEEDED → fail
+      102: { rid: '60b002', score: 0, status: 4 }, // STATUS_MEMORY_LIMIT_EXCEEDED → fail
     };
     render(
       <ContestProblemListPage
@@ -324,7 +324,6 @@ describe('contest_problemlist page', () => {
     );
     expect(screen.getByTestId('clar-inline-ask')).toBeInTheDocument();
   });
-
 
   it('renders private files when tdoc.privateFiles is present (P2-A.4)', () => {
     const tdoc = {

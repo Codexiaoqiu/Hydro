@@ -1,5 +1,5 @@
 /* @vitest-environment happy-dom */
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ToastProvider } from '../primitives/Toast';
 import { ContestClarificationForm } from './ContestClarificationForm';
@@ -28,7 +28,7 @@ beforeEach(() => {
 
 const tdoc = { docId: 7, pids: [1, 2] } as any;
 
-describe('ContestClarificationForm', () => {
+describe('contestClarificationForm', () => {
   it('hides subject in reply mode', () => {
     renderWithProvider(<ContestClarificationForm mode="reply" tdoc={tdoc} onSubmitted={() => {}} />);
     expect(screen.queryByTestId('clar-subject-select')).toBeNull();

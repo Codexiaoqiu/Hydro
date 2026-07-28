@@ -35,7 +35,7 @@ beforeEach(() => {
   });
 });
 
-describe('ProblemConfigPage', () => {
+describe('problemConfigPage', () => {
   it('renders the three tabs', () => {
     renderWith({ pdoc: { docId: 1 }, testdata: ['1.in', '1.out'], config: 'type: default\n' });
     expect(screen.getByRole('tab', { name: /编辑器|editor/i })).toBeInTheDocument();
@@ -61,19 +61,19 @@ describe('ProblemConfigPage', () => {
   });
 
   // ---- I-3 parity (Save with confirm on invalid schema) ----
-  it('Save button is enabled even when validation fails (I-3)', () => {
+  it('save button is enabled even when validation fails (I-3)', () => {
     renderWith({ pdoc: { docId: 1 }, testdata: ['1.in', '1.out'], config: 'type: default\nmulti_pass: 25\n' });
     const saveBtn = screen.getByRole('button', { name: /保存|save/i });
     expect(saveBtn).not.toBeDisabled();
   });
 
-  it('Save with invalid schema opens a confirm dialog (I-3)', () => {
+  it('save with invalid schema opens a confirm dialog (I-3)', () => {
     renderWith({ pdoc: { docId: 1 }, testdata: ['1.in', '1.out'], config: 'type: default\nmulti_pass: 25\n' });
     fireEvent.click(screen.getByRole('button', { name: /保存|save/i }));
     expect(screen.getByRole('alertdialog')).toBeInTheDocument();
   });
 
-  it('Confirming the dialog proceeds to upload (I-3)', async () => {
+  it('confirming the dialog proceeds to upload (I-3)', async () => {
     renderWith({ pdoc: { docId: 1 }, testdata: ['1.in', '1.out'], config: 'type: default\nmulti_pass: 25\n' });
     fireEvent.click(screen.getByRole('button', { name: /保存|save/i }));
     fireEvent.click(screen.getByRole('button', { name: /save anyway/i }));

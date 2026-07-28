@@ -10,7 +10,7 @@ beforeEach(() => {
   (window as any).prompt = vi.fn(() => 'new.in');
 });
 
-describe('ProblemCreateTestdata', () => {
+describe('problemCreateTestdata', () => {
   it('prompts and uploads empty file', async () => {
     const onCreated = vi.fn();
     render(<ProblemCreateTestdata pid="P1" onCreated={onCreated} />);

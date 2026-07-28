@@ -11,12 +11,12 @@ import { useTranslate } from '../lib/i18n';
 import { detectSubtasks } from '../lib/testdata-detect';
 import {
   dumpProblemConfigYaml, migrateCasesToSubtasks, parseProblemConfigYaml,
-  validateProblemConfigYaml, type ProblemConfigYaml,
-} from '../lib/yaml-config';
+  type ProblemConfigYaml,
+  validateProblemConfigYaml } from '../lib/yaml-config';
 import styles from './problem_config.module.css';
 
 interface Args {
-  pdoc?: { docId: number; pid?: string };
+  pdoc?: { docId: number, pid?: string };
   testdata?: string[];
   config?: string;
 }
@@ -48,7 +48,7 @@ export default function ProblemConfigPage() {
 
   const validation = useMemo(() => validateProblemConfigYaml(parsed), [parsed]);
   const validationOk = validation.ok;
-  const rawErrors: ReadonlyArray<{ instancePath?: string; message?: string }> = validationOk
+  const rawErrors: ReadonlyArray<{ instancePath?: string, message?: string }> = validationOk
     ? []
     : (validation as Extract<typeof validation, { ok: false }>).errors ?? [];
 

@@ -1,11 +1,11 @@
 import { useState } from 'react';
+import { request } from '../../hooks/use-api';
+import { useTranslate } from '../../lib/i18n';
 import { Button } from '../primitives/Button';
 import { Checkbox } from '../primitives/Checkbox';
 import { Modal } from '../primitives/Modal';
-import { UserSelectAutoComplete } from '../primitives/UserSelectAutoComplete';
-import { useTranslate } from '../../lib/i18n';
-import { request } from '../../hooks/use-api';
 import { useToast } from '../primitives/Toast';
+import { UserSelectAutoComplete } from '../primitives/UserSelectAutoComplete';
 import styles from './ContestUserAddDialog.module.css';
 
 export interface ContestUserAddDialogProps {
@@ -41,14 +41,18 @@ export function ContestUserAddDialog({ open, onClose, onAdded, domainId }: Conte
   };
 
   return (
-    <Modal open={open} onClose={onClose} title={t('ContestUser.AddAttendees')} footer={
-      <>
-        <Button variant="ghost" onClick={onClose} disabled={busy}>{t('ContestUser.Cancel')}</Button>
-        <Button variant="primary" onClick={add} disabled={uids.length === 0 || busy}>
-          {busy ? t('ContestUser.Adding') : t('ContestUser.Add')}
-        </Button>
-      </>
-    }>
+    <Modal
+      open={open}
+      onClose={onClose}
+      title={t('ContestUser.AddAttendees')}
+      footer={
+        <>
+          <Button variant="ghost" onClick={onClose} disabled={busy}>{t('ContestUser.Cancel')}</Button>
+          <Button variant="primary" onClick={add} disabled={uids.length === 0 || busy}>
+            {busy ? t('ContestUser.Adding') : t('ContestUser.Add')}
+          </Button>
+        </>
+      }>
       <div className={styles.body}>
         <label className={styles.label}>{t('ContestUser.Users')}</label>
         <UserSelectAutoComplete value={uids} onChange={setUids} domainId={domainId} />

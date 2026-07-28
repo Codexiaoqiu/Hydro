@@ -12,7 +12,7 @@ vi.mock('../link', () => ({
   useBuildUrl: () => (_name: string, _params?: Record<string, string>) => '#',
 }));
 
-describe('ContestBackLink', () => {
+describe('contestBackLink', () => {
   it('renders a link to contest_detail with the resolved tid', () => {
     render(<ContestBackLink tdoc={{ docId: 42 }} />);
     const link = screen.getByTestId('link-contest_detail');

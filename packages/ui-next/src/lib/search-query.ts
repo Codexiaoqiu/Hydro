@@ -5,7 +5,7 @@ export interface SearchQuery {
   text?: string;
 }
 
-const FILTER_RE = /(^|\s)(category|difficulty|namespace):(?:"((?:\\.|[^"])*)"|'((?:\\.|[^'])*)'|([^\s]+))/g;
+const FILTER_RE = /(^|\s)(category|difficulty|namespace):(?:"((?:\\.|[^"])*)"|'((?:\\.|[^'])*)'|(\S+))/g;
 
 function unescape(value: string): string {
   return value.replace(/\\([\\"'])/g, '$1');

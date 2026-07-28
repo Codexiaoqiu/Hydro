@@ -1,5 +1,5 @@
-import { createContext, useContext } from 'react';
 import type { Dispatch } from 'react';
+import { createContext, useContext } from 'react';
 import type { ScratchpadAction, ScratchpadState } from './types';
 
 export interface ScratchpadContextValue {

@@ -2,8 +2,8 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ToastProvider } from '../components/primitives/Toast';
-import ContestBalloonPage from './contest_balloon';
 import { usePageData } from '../context/page-data';
+import ContestBalloonPage from './contest_balloon';
 
 vi.mock('../context/page-data', () => ({
   usePageData: vi.fn(),
@@ -71,7 +71,7 @@ const baseArgs = {
   },
 };
 
-describe('ContestBalloonPage', () => {
+describe('contestBalloonPage', () => {
   beforeEach(() => {
     isOngoingMock.mockReturnValue(true);
     useBalloonPollMock.mockReturnValue({

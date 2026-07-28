@@ -20,7 +20,7 @@ const cfgWithTwoSubtasks = {
   ],
 } as unknown as ProblemConfigYaml;
 
-describe('ProblemConfigTree', () => {
+describe('problemConfigTree', () => {
   it('renders each subtask as a row', () => {
     render(<ProblemConfigTree config={cfg} testdata={['1.in', '1.out']} onChange={() => {}} onAutoDetect={() => {}} />);
     // Accept either localized or English form.

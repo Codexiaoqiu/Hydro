@@ -3,9 +3,9 @@
  */
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import ProblemHackPage from './problem_hack';
-import { type PageData, PageDataProvider } from '../context/page-data';
 import { ToastProvider } from '../components/primitives';
+import { type PageData, PageDataProvider } from '../context/page-data';
+import ProblemHackPage from './problem_hack';
 
 Object.defineProperty(window, 'location', {
   value: new URL('http://localhost/p/42/hack/sourceRid?tid=tid1'),

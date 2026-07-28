@@ -1,19 +1,19 @@
 import { useState } from 'react';
-import { Button } from '../components/primitives/Button';
 import { ContestBackLink } from '../components/contest/ContestBackLink';
-import { ContestManagementSidebar } from '../components/contest/ContestManagementSidebar';
 import { ContestBalloonSetColor } from '../components/contest/ContestBalloonSetColor';
 import {
-  ContestBalloonTable,
-  type BalloonDoc,
   type BalloonColor,
+  type BalloonDoc,
+  ContestBalloonTable,
   type PdocLite,
   type UdicLite,
 } from '../components/contest/ContestBalloonTable';
+import { ContestManagementSidebar } from '../components/contest/ContestManagementSidebar';
+import { Button } from '../components/primitives/Button';
 import { usePageData } from '../context/page-data';
 import { useBalloonPoll } from '../hooks/use-balloon-poll';
-import { useTranslate } from '../lib/i18n';
 import { isOngoing } from '../lib/contest-status';
+import { useTranslate } from '../lib/i18n';
 import styles from './contest_balloon.module.css';
 
 interface Args {

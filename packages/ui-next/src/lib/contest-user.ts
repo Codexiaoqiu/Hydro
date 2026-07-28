@@ -18,8 +18,8 @@
  * consumption, so the duration branch is satisfied.
  */
 export function canResumeContestUser(
-  tdoc: { endAt: string; duration?: number },
-  tsdoc: { startAt?: string; endAt?: string },
+  tdoc: { endAt: string, duration?: number },
+  tsdoc: { startAt?: string, endAt?: string },
   now: number,
 ): boolean {
   if (!tsdoc?.endAt) return false;

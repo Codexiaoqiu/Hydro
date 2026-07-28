@@ -1,11 +1,11 @@
-import { Button } from '../primitives';
 import { useFileSelection } from '../../hooks/use-file-selection';
 import { useTranslate } from '../../lib/i18n';
+import { Button } from '../primitives';
 import styles from './FileSelectionToolbar.module.css';
 
 export interface FileSelectionToolbarProps {
   available: string[];
-  primaryAction?: { label: string; onSelect: (selected: string[]) => void };
+  primaryAction?: { label: string, onSelect: (selected: string[]) => void };
 }
 
 /**

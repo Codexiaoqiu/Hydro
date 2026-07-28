@@ -57,7 +57,7 @@ export async function buildDownloadZip(
 
   const files: Zippable = {};
   const failures: DownloadFailure[] = [];
-  const settled: Array<PromiseSettledResult<{ filename: string, data: Uint8Array }>> = new Array(targets.length);
+  const settled: Array<PromiseSettledResult<{ filename: string, data: Uint8Array }>> = Array.from({ length: targets.length });
 
   let next = 0;
   const workers = Array.from(

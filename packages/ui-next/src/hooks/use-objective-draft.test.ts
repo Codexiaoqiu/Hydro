@@ -1,6 +1,7 @@
 /* @vitest-environment happy-dom */
 import { renderHook, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { useObjectiveDraft } from './use-objective-draft';
 
 // In-memory mock for idb-keyval so tests don't need real IndexedDB.
 const stores = new Map<string, Map<string, string>>();
@@ -16,8 +17,6 @@ vi.mock('idb-keyval', () => ({
     return Promise.resolve();
   },
 }));
-
-import { useObjectiveDraft } from './use-objective-draft';
 
 const STORAGE_KEY = '1/42/_';
 

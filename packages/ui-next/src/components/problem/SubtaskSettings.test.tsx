@@ -4,7 +4,7 @@ import { SubtaskSettings } from './SubtaskSettings';
 
 const subtask = { type: 'sum' as const, score: 100, cases: [] };
 
-describe('SubtaskSettings', () => {
+describe('subtaskSettings', () => {
   it('does not render when open is false', () => {
     render(
       <SubtaskSettings open={false} subtask={subtask} index={0} onApply={() => {}} onCancel={() => {}} />,

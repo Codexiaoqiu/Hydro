@@ -1,33 +1,33 @@
-import { useMemo, useState } from 'react';
 import { getScoreColor, STATUS, STATUS_SHORT_TEXTS } from '@hydrooj/common';
+import { useMemo } from 'react';
 import { Ring } from '../components/charts/Ring';
-import { Alert } from '../components/primitives/Alert';
 import { ContestBackLink } from '../components/contest/ContestBackLink';
 import { ContestClarificationInlineForm } from '../components/contest/ContestClarificationInlineForm';
 import { ContestDetailHeader } from '../components/contest/ContestDetailHeader';
+import { ContestDetailSidebar } from '../components/contest/ContestDetailSidebar';
 import { ContestPrivateFiles } from '../components/contest/ContestPrivateFiles';
 import { ContestSubmissionList } from '../components/contest/ContestSubmissionList';
 import { ContestTimer } from '../components/contest/ContestTimer';
-import { ContestDetailSidebar } from '../components/contest/ContestDetailSidebar';
+import { Link } from '../components/link';
+import { Alert } from '../components/primitives/Alert';
+import { usePageData } from '../context/page-data';
+import { useBuildUrl } from '../hooks/use-build-url';
 import { isDone, isOngoing, renderDuration } from '../lib/contest-status';
 import { useTranslate } from '../lib/i18n';
-import { usePageData } from '../context/page-data';
-import { Link } from '../components/link';
-import { useBuildUrl } from '../hooks/use-build-url';
 import type { SerializedContestStatusDoc, SerializedTdoc, SerializedUserDict } from '../sections/types';
 import styles from './contest_problemlist.module.css';
 
-export type ContestProblemListPageArgs = {
+export interface ContestProblemListPageArgs {
   tdoc?: SerializedTdoc & {
     owner?: number;
     allowPrint?: boolean;
     _code?: string;
-    privateFiles?: Array<{ name: string; size: number }>;
+    privateFiles?: Array<{ name: string, size: number }>;
   };
   tsdoc?: SerializedContestStatusDoc | null;
-  pdict?: Record<number, { docId: number; pid: string; title: string }>;
-  psdict?: Record<number, { rid?: string; score?: number; status?: number }>;
-  rdict?: Record<string, { _id: string; status?: number }>;
+  pdict?: Record<number, { docId: number, pid: string, title: string }>;
+  psdict?: Record<number, { rid?: string, score?: number, status?: number }>;
+  rdict?: Record<string, { _id: string, status?: number }>;
   rdocs?: Array<{
     _id: string;
     pid: number;
@@ -44,15 +44,15 @@ export type ContestProblemListPageArgs = {
     subject?: number;
     content: string;
     owner?: number;
-    reply?: Array<{ _id?: string; content: string }>;
+    reply?: Array<{ _id?: string, content: string }>;
   }>;
   showScore?: boolean;
   canViewRecord?: boolean;
-};
+}
 
-export type ContestProblemListPageProps = {
-  _pageData?: { name: string; template: string; url: string; args?: ContestProblemListPageArgs };
-};
+export interface ContestProblemListPageProps {
+  _pageData?: { name: string, template: string, url: string, args?: ContestProblemListPageArgs };
+}
 
 /** Status code → CSS modifier used by the status cell. Mirrors common's STATUS_CODES. */
 function statusModifier(status: number | undefined): 'accept' | 'fail' | 'progress' | 'ignored' | 'pending' {
@@ -150,7 +150,7 @@ export default function ContestProblemListPage({ _pageData }: ContestProblemList
   }, [pids]);
 
   const userCtx = (args as Record<string, unknown>).UserContext as
-    | { _id?: number; perm?: string; hasPerm?: (p: string) => boolean; own?: (d: { owner?: number | string }) => boolean }
+    | { _id?: number, perm?: string, hasPerm?: (p: string) => boolean, own?: (d: { owner?: number | string }) => boolean }
     | undefined;
   const currentUserPerms = {
     _id: userCtx?._id ?? 0,
@@ -221,7 +221,7 @@ export default function ContestProblemListPage({ _pageData }: ContestProblemList
                           : `Problem #${pid}`}
                       </td>
                       {showScore && (
-                        <td className={styles.scoreCell}>{score != null ? score : '—'}</td>
+                        <td className={styles.scoreCell}>{score ?? '—'}</td>
                       )}
                       {canViewRecord && (
                         <td>

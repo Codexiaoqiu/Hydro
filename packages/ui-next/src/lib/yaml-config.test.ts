@@ -175,7 +175,7 @@ describe('yaml-config', () => {
       type: 'objective',
       filename: 'a',
       time: '1s',
-      answers: { '1': [['A'], 1] },
+      answers: { 1: [['A'], 1] },
     } as any);
     expect(out.type).toBe('objective');
     expect(out.answers).toBeDefined();

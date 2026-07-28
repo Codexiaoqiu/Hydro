@@ -200,7 +200,10 @@ export function ProblemAdditionalFiles({ pid, files, disabled, onChange }: Props
           uploadUrl={endpoint}
           type={TYPE}
           size={files.find((f) => f.name === preview)?.size}
+<<<<<<< Updated upstream
           readOnly={disabled}
+=======
+>>>>>>> Stashed changes
           onClose={() => setPreview(null)}
           onSaved={() => onChange(files)}
         />

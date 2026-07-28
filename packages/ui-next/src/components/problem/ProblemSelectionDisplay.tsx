@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { request } from '../../hooks/use-api';
 import { detectLocale, useTranslate } from '../../lib/i18n';
 import { Button } from '../primitives/Button';
-import { Modal } from '../primitives/Modal';
 import { useToast } from '../primitives/Toast';
 import { CopyToDomainDialog } from './CopyToDomainDialog';
 import styles from './ProblemSelectionDisplay.module.css';

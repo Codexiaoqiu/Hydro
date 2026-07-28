@@ -1,7 +1,7 @@
 /* @vitest-environment happy-dom */
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
 import * as yaml from 'js-yaml';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ToastProvider } from '../primitives/Toast';
 import { ContestBalloonSetColor } from './ContestBalloonSetColor';
 
@@ -17,7 +17,7 @@ beforeEach(() => {
   });
 });
 
-describe('ContestBalloonSetColor', () => {
+describe('contestBalloonSetColor', () => {
   it('renders one editor row per pid when open', () => {
     render(
       <ToastProvider>

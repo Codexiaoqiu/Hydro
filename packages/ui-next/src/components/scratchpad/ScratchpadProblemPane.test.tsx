@@ -20,7 +20,7 @@ beforeEach(() => {
   routeMapStore._routeMap = { problem_detail: '/p/:pid' };
 });
 
-describe('ScratchpadProblemPane', () => {
+describe('scratchpadProblemPane', () => {
   it('renders title and content', () => {
     wrap(
       <ScratchpadProblemPane

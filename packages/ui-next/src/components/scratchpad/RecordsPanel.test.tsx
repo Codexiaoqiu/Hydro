@@ -39,7 +39,7 @@ afterEach(() => {
   routeMapStore._routeMap = {};
 });
 
-describe('RecordsPanel', () => {
+describe('recordsPanel', () => {
   it('shows empty state when fetch returns no records', async () => {
     (globalThis.fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
       ok: true,

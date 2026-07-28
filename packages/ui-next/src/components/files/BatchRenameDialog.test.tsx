@@ -84,7 +84,7 @@ describe('batchRenameDialog', () => {
     expect(screen.getByTestId('batch-rename-confirm')).not.toBeDisabled();
     fireEvent.click(screen.getByTestId('batch-rename-confirm'));
     await waitFor(() => expect(onConfirm).toHaveBeenCalledTimes(1));
-    const changes = onConfirm.mock.calls[0][0] as Array<{ oldName: string; newName: string }>;
+    const changes = onConfirm.mock.calls[0][0] as Array<{ oldName: string, newName: string }>;
     expect(changes).toEqual([
       { oldName: 'a.txt', newName: 'new_a.txt' },
       { oldName: 'b.txt', newName: 'new_b.txt' },

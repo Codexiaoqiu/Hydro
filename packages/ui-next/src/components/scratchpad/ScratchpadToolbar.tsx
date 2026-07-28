@@ -1,8 +1,8 @@
-import { useScratchpad } from './ScratchpadContext';
 import { useTranslate } from '../../lib/i18n';
+import { useScratchpad } from './ScratchpadContext';
 
 interface PdocMinimal {
-  config?: { type?: string; langs?: string[] } | string;
+  config?: { type?: string, langs?: string[] } | string;
 }
 
 export interface ScratchpadToolbarProps {

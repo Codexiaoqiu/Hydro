@@ -1,15 +1,16 @@
+import * as yaml from 'js-yaml';
 import { useMemo, useState } from 'react';
 import { flushSync } from 'react-dom';
 import { Link } from '../components/link';
 import { Button, Card } from '../components/primitives';
-import type { LangMeta } from '../components/problem/problem-language';
 import CodeEditor from '../components/problem/CodeEditor';
 import CodeFileUpload from '../components/problem/CodeFileUpload';
 import {
-  ObjectiveForm,
   type ObjectiveAnswers,
+  ObjectiveForm,
   type ObjectiveQuestion,
 } from '../components/problem/ObjectiveForm';
+import type { LangMeta } from '../components/problem/problem-language';
 import ProblemLanguageSelect from '../components/problem/ProblemLanguageSelect';
 import SubmitHint from '../components/problem/SubmitHint';
 import {
@@ -20,15 +21,14 @@ import { usePageData } from '../context/page-data';
 import { useBuildUrl } from '../hooks/use-build-url';
 import { useObjectiveDraft } from '../hooks/use-objective-draft';
 import { useTranslate } from '../lib/i18n';
-import * as yaml from 'js-yaml';
 import styles from './problem_submit.module.css';
 
-type ObjectiveConfig = {
+interface ObjectiveConfig {
   type: 'objective';
   subType?: 'text' | 'single' | 'multiple' | string;
   choices?: ObjectiveQuestion[];
   [k: string]: unknown;
-};
+}
 
 function isObjectiveConfig(
   cfg: Args['pdoc']['config'],
@@ -53,11 +53,13 @@ interface Args {
   mode?: 'normal' | 'contest' | 'view' | 'correction';
 }
 
-/** Owns the controlled `code` value so that `<form key={formKey}>` resets it
+/**
+ * Owns the controlled `code` value so that `<form key={formKey}>` resets it
  *  on problem switch. Mounted as a child of the form so React tears it down
  *  when the form remounts; the controlled `<input type="hidden" name="code">`
  *  is rendered as a sibling inside the same form so native form submission
- *  still receives the latest value. */
+ *  still receives the latest value.
+ */
 function CodeEditorField({ codeLanguage, ariaLabel }: { codeLanguage: string, ariaLabel?: string }) {
   const [code, setCode] = useState('');
   return (

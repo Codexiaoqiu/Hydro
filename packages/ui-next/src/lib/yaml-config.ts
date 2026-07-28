@@ -1,4 +1,4 @@
-import { ProblemType, type CompilableSource, type ProblemConfigFile } from '@hydrooj/common';
+import { type ProblemConfigFile, ProblemType } from '@hydrooj/common';
 import Ajv, { type ErrorObject } from 'ajv';
 import addFormats from 'ajv-formats';
 import * as yaml from 'js-yaml';
@@ -242,7 +242,7 @@ export function dumpProblemConfigYaml(cfg: ProblemConfigYaml): string {
 
 export function validateProblemConfigYaml(
   cfg: unknown,
-): { ok: true } | { ok: false; errors: ErrorObject[] } {
+): { ok: true } | { ok: false, errors: ErrorObject[] } {
   const ok = validate(cfg);
   return ok ? { ok: true } : { ok: false, errors: validate.errors ?? [] };
 }

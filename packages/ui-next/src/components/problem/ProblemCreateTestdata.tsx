@@ -1,8 +1,7 @@
 import { useState } from 'react';
-import { Button } from '../primitives/Button';
-import { useTranslate } from '../../lib/i18n';
 import { request } from '../../hooks/use-api';
-import styles from './ProblemCreateTestdata.module.css';
+import { useTranslate } from '../../lib/i18n';
+import { Button } from '../primitives/Button';
 
 export interface ProblemCreateTestdataProps {
   pid: string;

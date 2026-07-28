@@ -1,10 +1,9 @@
 /* @vitest-environment happy-dom */
-import { describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
-import { pickPreferredLang, readContentText } from './problem_detail';
-import ProblemDetailPage from './problem_detail';
-import { type PageData, PageDataProvider } from '../context/page-data';
+import { describe, expect, it, vi } from 'vitest';
 import { ToastProvider } from '../components/primitives';
+import { type PageData, PageDataProvider } from '../context/page-data';
+import ProblemDetailPage, { pickPreferredLang, readContentText } from './problem_detail';
 
 Object.defineProperty(window, 'location', {
   value: new URL('http://localhost/p/1?mode=scratchpad'),
@@ -38,9 +37,9 @@ vi.mock('../components/scratchpad/ScratchpadPanel', () => {
               if (window.confirm('Unsaved changes. Continue?') !== false) {
                 props.onExit();
               }
-            }
-          }, 'Exit')
-        )
+            },
+          }, 'Exit'),
+        ),
       ),
   };
 });

@@ -34,7 +34,7 @@ vi.mock('../context/page-data', () => ({
   useUiContext: () => ({ domainId: 'system', domain: null }),
 }));
 
-describe('ContestClarificationPage', () => {
+describe('contestClarificationPage', () => {
   it('renders Broadcast button and list', () => {
     vi.mocked(usePageData).mockReturnValue({
       args: { tdoc: { docId: 7, pids: [1] }, tcdocs: [], pdict: {}, udict: {} },

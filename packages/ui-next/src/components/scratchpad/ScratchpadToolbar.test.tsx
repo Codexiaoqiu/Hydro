@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
-import { ScratchpadProvider } from './useScratchpadState';
 import { ScratchpadToolbar } from './ScratchpadToolbar';
+import { ScratchpadProvider } from './useScratchpadState';
 
 // Mock useTranslate to return English strings regardless of locale.
 // The global setup pins __hydro_locale to zh_CN, so without this
@@ -35,7 +35,7 @@ function wrap(ui: React.ReactNode) {
   return render(<ScratchpadProvider initialLang="cpp" initialCode="">{ui}</ScratchpadProvider>);
 }
 
-describe('ScratchpadToolbar', () => {
+describe('scratchpadToolbar', () => {
   it('renders Run Pretest, Submit, and Exit buttons', () => {
     wrap(<ScratchpadToolbar {...baseArgs} />);
     expect(screen.getByRole('button', { name: /run pretest/i })).toBeInTheDocument();

@@ -1,5 +1,5 @@
-import { useEffect, useRef } from 'react';
 import { get, set } from 'idb-keyval';
+import { useEffect, useRef } from 'react';
 
 export interface UseScratchpadPersistenceArgs {
   problemKey: string;

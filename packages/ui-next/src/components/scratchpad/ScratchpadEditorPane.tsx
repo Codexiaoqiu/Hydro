@@ -1,22 +1,22 @@
-import { useEffect, useMemo, useState } from 'react';
 import Editor from '@monaco-editor/react';
-import { useScratchpad } from './ScratchpadContext';
-import { usePretestSession } from './usePretestSession';
+import { useEffect, useMemo, useState } from 'react';
 import { PretestPanel } from './PretestPanel';
 import { RecordsPanel } from './RecordsPanel';
-import { ScratchpadSlot } from './ScratchpadSlot';
+import styles from './Scratchpad.module.css';
+import { useScratchpad } from './ScratchpadContext';
 import {
+  DEFAULT_SCRATCHPAD_SETTINGS,
   readScratchpadSettings,
   SCRATCHPAD_SETTINGS_CHANGE_EVENT,
-  DEFAULT_SCRATCHPAD_SETTINGS,
   type ScratchpadEditorTheme,
   type ScratchpadSettingsValue,
 } from './ScratchpadSettings';
+import { ScratchpadSlot } from './ScratchpadSlot';
 import { ScratchpadToolbar } from './ScratchpadToolbar';
-import styles from './Scratchpad.module.css';
+import { usePretestSession } from './usePretestSession';
 
 interface PdocMinimal {
-  config?: { type?: string; langs?: Array<string | { key?: string; display?: string; validAs?: Record<string, string>; pretest?: string | false; remote_judge?: boolean }> } | string;
+  config?: { type?: string, langs?: Array<string | { key?: string, display?: string, validAs?: Record<string, string>, pretest?: string | false, remote_judge?: boolean }> } | string;
 }
 
 function availableLanguages(pdoc: PdocMinimal) {
@@ -41,7 +41,7 @@ export interface ScratchpadEditorPaneProps {
   getSubmissionsUrl: string;
   problemId: number;
   tdoc?: { docId?: string };
-  UserContext: { _id?: number; canViewRecord?: boolean; codeLang?: string; };
+  UserContext: { _id?: number, canViewRecord?: boolean, codeLang?: string };
   onExit: () => void;
   rid: string | null;
   setRid: (rid: string | null) => void;

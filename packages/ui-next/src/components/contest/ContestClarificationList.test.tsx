@@ -17,13 +17,13 @@ const pdict = {
 };
 const udict = { 1: { _id: 1, uname: 'alice' }, 2: { _id: 2, uname: 'jury' } };
 
-describe('ContestClarificationList', () => {
+describe('contestClarificationList', () => {
   it('renders content (no reply)', () => {
     render(<ContestClarificationList items={items as any} pids={pids} pdict={pdict as any} udict={udict as any} onReply={() => {}} />);
     expect(screen.getByText('Question?')).toBeInTheDocument();
     expect(screen.getByText('Broadcast message')).toBeInTheDocument();
   });
-  it('Reply button invokes onReply with did', () => {
+  it('reply button invokes onReply with did', () => {
     const onReply = vi.fn();
     render(<ContestClarificationList items={items as any} pids={pids} pdict={pdict as any} udict={udict as any} onReply={onReply} />);
     // Only the contestant-authored item has a Reply button — the broadcast has
@@ -47,7 +47,7 @@ describe('ContestClarificationList', () => {
         items={ownItem as any}
         pids={pids}
         pdict={pdict as any}
-        udict={{ ...udict, '5': { _id: 5, uname: 'me' } } as any}
+        udict={{ ...udict, 5: { _id: 5, uname: 'me' } } as any}
         onReply={() => {}}
         currentUid={5}
       />,
@@ -62,7 +62,7 @@ describe('ContestClarificationList', () => {
         items={otherItem as any}
         pids={pids}
         pdict={pdict as any}
-        udict={{ ...udict, '7': { _id: 7, uname: 'bob' } } as any}
+        udict={{ ...udict, 7: { _id: 7, uname: 'bob' } } as any}
         onReply={() => {}}
         currentUid={5}
       />,

@@ -1,8 +1,8 @@
 import { useState } from 'react';
+import { request } from '../../hooks/use-api';
+import { useTranslate } from '../../lib/i18n';
 import { Button } from '../primitives/Button';
 import { MarkdownEditor } from '../primitives/MarkdownEditor';
-import { useTranslate } from '../../lib/i18n';
-import { request } from '../../hooks/use-api';
 import { useToast } from '../primitives/Toast';
 import styles from './ContestClarificationForm.module.css';
 
@@ -23,10 +23,10 @@ import styles from './ContestClarificationForm.module.css';
  */
 export interface ContestClarificationFormProps {
   mode: 'reply' | 'broadcast';
-  tdoc: { docId: number; pids: number[]; title?: string };
+  tdoc: { docId: number, pids: number[], title?: string };
   /** Required when mode === 'reply'. */
   did?: string;
-  onSubmitted: (payload?: { did?: string; subject?: number; content?: string }) => void;
+  onSubmitted: (payload?: { did?: string, subject?: number, content?: string }) => void;
 }
 
 export function ContestClarificationForm({ mode, tdoc, did, onSubmitted }: ContestClarificationFormProps) {
@@ -34,7 +34,7 @@ export function ContestClarificationForm({ mode, tdoc, did, onSubmitted }: Conte
   const SUBJECT_KEYS = ['-1', '0'];
   const SUBJECT_LABEL_KEYS: Record<string, string> = {
     '-1': 'ContestClarification.SubjectTechnical',
-    '0': 'ContestClarification.SubjectGeneral',
+    0: 'ContestClarification.SubjectGeneral',
   };
   const [subject, setSubject] = useState('-1');
   const [content, setContent] = useState('');

@@ -37,7 +37,7 @@ const balloon: any = {
   2: { color: '#3b82f6', name: 'Blue' },
 };
 
-describe('ContestBalloonTable', () => {
+describe('contestBalloonTable', () => {
   it('renders one row per bdoc with alphabetic problem id derived from pids', () => {
     render(
       <ToastProvider>
@@ -94,7 +94,7 @@ describe('ContestBalloonTable', () => {
     expect(within(sentCell as HTMLElement).getByText(/admin/)).toBeInTheDocument();
   });
 
-  it('Send button triggers a POST with operation=done and balloon id', async () => {
+  it('send button triggers a POST with operation=done and balloon id', async () => {
     const onSend = vi.fn();
     render(
       <ToastProvider>
@@ -115,7 +115,7 @@ describe('ContestBalloonTable', () => {
     expect(calledInit.body).toEqual(expect.stringContaining('operation=done'));
   });
 
-  it('Send button is disabled while a request is in flight and never double-posts', async () => {
+  it('send button is disabled while a request is in flight and never double-posts', async () => {
     let resolvePost: ((v: any) => void) | null = null;
     fetchMock.mockImplementationOnce(() => new Promise((resolve) => {
       resolvePost = resolve;

@@ -1,5 +1,5 @@
-import { useScratchpad } from './ScratchpadContext';
 import { useTranslate } from '../../lib/i18n';
+import { useScratchpad } from './ScratchpadContext';
 
 export function PretestPanel() {
   const { state, dispatch } = useScratchpad();

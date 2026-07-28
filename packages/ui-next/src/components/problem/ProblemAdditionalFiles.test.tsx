@@ -76,6 +76,10 @@ describe('problemAdditionalFiles', () => {
     const dialog = await screen.findByRole('dialog');
     fireEvent.change(within(dialog).getByTestId('batch-rename-find'), { target: { value: 'a' } });
     fireEvent.change(within(dialog).getByTestId('batch-rename-replace'), { target: { value: 'z' } });
+<<<<<<< Updated upstream
+=======
+    fireEvent.click(within(dialog).getByRole('button', { name: /预览|preview/i }));
+>>>>>>> Stashed changes
     fireEvent.click(within(dialog).getByTestId('batch-rename-confirm'));
     await waitFor(() => expect(postSpy).toHaveBeenCalledWith('/p/p1/files', {
       operation: 'rename_files',

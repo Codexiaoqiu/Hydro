@@ -218,7 +218,7 @@ describe('contestDetailSidebar', () => {
     expect(screen.queryByRole('link', { name: /打印|^Print$/i })).not.toBeInTheDocument();
   });
 
-  it('Print link points to contest_print route with the resolved tid', () => {
+  it('print link points to contest_print route with the resolved tid', () => {
     render(
       <ContestDetailSidebar
         tdoc={tdoc({ allowPrint: true, docId: '60a000000000000000000abc' })}

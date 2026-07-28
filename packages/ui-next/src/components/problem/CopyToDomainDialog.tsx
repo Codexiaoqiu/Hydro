@@ -89,18 +89,23 @@ export function CopyToDomainDialog({
   const targetLabel = locale === 'zh_CN' ? '目标域' : 'Target domain';
 
   return (
-    <Modal open={open} onClose={onClose} title={t('Problem.Copy')} width={420} footer={
-      <>
-        <Button variant="ghost" onClick={onClose} disabled={busy}>{t('Common.Cancel')}</Button>
-        <Button
-          variant="primary"
-          onClick={submit}
-          disabled={target.trim().length === 0 || busy}
-        >
-          {t('Problem.Copy')}
-        </Button>
-      </>
-    }>
+    <Modal
+      open={open}
+      onClose={onClose}
+      title={t('Problem.Copy')}
+      width={420}
+      footer={
+        <>
+          <Button variant="ghost" onClick={onClose} disabled={busy}>{t('Common.Cancel')}</Button>
+          <Button
+            variant="primary"
+            onClick={submit}
+            disabled={target.trim().length === 0 || busy}
+          >
+            {t('Problem.Copy')}
+          </Button>
+        </>
+      }>
       <Input
         label={targetLabel}
         value={target}

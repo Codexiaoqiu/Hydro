@@ -55,7 +55,7 @@ function editorPane() {
   );
 }
 
-describe('ScratchpadSettings', () => {
+describe('scratchpadSettings', () => {
   beforeEach(() => {
     localStorage.clear();
     document.documentElement.dataset.theme = 'light';

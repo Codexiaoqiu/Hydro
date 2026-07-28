@@ -59,8 +59,10 @@ export interface FilePreviewDialogProps {
   /** File category passed as `type` in the upload FormData. */
   type?: string;
   size?: number;
-  /** When true the Save button is hidden and edits are inert. Used when the
-   *  current viewer lacks edit permission (e.g. cross-domain references). */
+  /**
+   * When true the Save button is hidden and edits are inert. Used when the
+   *  current viewer lacks edit permission (e.g. cross-domain references).
+   */
   readOnly?: boolean;
   onClose: () => void;
   /** Called after an edited text file is saved back via `upload_file`. */

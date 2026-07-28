@@ -1,18 +1,18 @@
 import { useState } from 'react';
-import { Button } from '../components/primitives/Button';
 import { ContestBackLink } from '../components/contest/ContestBackLink';
-import { ContestClarificationList, type ClarItem } from '../components/contest/ContestClarificationList';
 import { ContestClarificationForm } from '../components/contest/ContestClarificationForm';
+import { type ClarItem, ContestClarificationList } from '../components/contest/ContestClarificationList';
 import { ContestManagementSidebar } from '../components/contest/ContestManagementSidebar';
+import { Button } from '../components/primitives/Button';
 import { usePageData } from '../context/page-data';
 import { useTranslate } from '../lib/i18n';
 import styles from './contest_clarification.module.css';
 
 interface Args {
-  tdoc?: { docId: number; pids: number[]; title?: string };
+  tdoc?: { docId: number, pids: number[], title?: string };
   tcdocs?: ClarItem[];
-  pdict?: Record<number, { docId?: number; title?: string }>;
-  udict?: Record<string, { _id: number; uname: string }>;
+  pdict?: Record<number, { docId?: number, title?: string }>;
+  udict?: Record<string, { _id: number, uname: string }>;
   UserContext?: { _id?: number };
 }
 
@@ -50,7 +50,7 @@ export default function ContestClarificationPage() {
     }
   };
 
-  const onBroadcastSubmitted = (payload?: { subject?: number; content?: string }) => {
+  const onBroadcastSubmitted = (payload?: { subject?: number, content?: string }) => {
     setBroadcastOpen(false);
     if (payload?.content) {
       const newItem: ClarItem = {
@@ -64,7 +64,7 @@ export default function ContestClarificationPage() {
     }
   };
 
-  const onAskSubmitted = (payload?: { subject?: number; content?: string }) => {
+  const onAskSubmitted = (payload?: { subject?: number, content?: string }) => {
     // Dead branch retained as a no-op so the type union still compiles if
     // callers are added later. The ContestClarificationForm no longer
     // accepts mode='ask', so this handler will not fire under current UI.

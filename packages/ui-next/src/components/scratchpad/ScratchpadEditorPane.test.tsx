@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
-import { ScratchpadProvider } from './useScratchpadState';
 import { ScratchpadEditorPane } from './ScratchpadEditorPane';
+import { ScratchpadProvider } from './useScratchpadState';
 
 // Mock @monaco-editor/react so Editor doesn't try to load Monaco from CDN in happy-dom.
 vi.mock('@monaco-editor/react', () => ({
@@ -34,7 +34,7 @@ function wrap(ui: React.ReactNode) {
   return render(<ScratchpadProvider initialLang="cpp" initialCode="">{ui}</ScratchpadProvider>);
 }
 
-describe('ScratchpadEditorPane', () => {
+describe('scratchpadEditorPane', () => {
   it('renders toolbar', () => {
     wrap(
       <ScratchpadEditorPane

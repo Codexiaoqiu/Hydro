@@ -1,13 +1,13 @@
+import { useTranslate } from '../../lib/i18n';
 import { Article } from '../article/Article';
 import { Link } from '../link';
 import { Alert } from '../primitives';
-import { useTranslate } from '../../lib/i18n';
 
 interface PdocMinimal {
   docId: number;
   pid?: string;
   title: string;
-  config?: { type?: string; langs?: string[] } | string;
+  config?: { type?: string, langs?: string[] } | string;
   data?: unknown[];
   reference?: { domainId: string, pid: string | number };
 }

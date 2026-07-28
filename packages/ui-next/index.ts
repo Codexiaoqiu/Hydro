@@ -9,8 +9,8 @@ import {
     Context, Handler, Logger,
     NotFoundError, param, size, SystemModel as system, Types,
 } from 'hydrooj';
-import { THEME_INIT_SCRIPT } from './src/theme/theme-init';
 import { NEXT_TEMPLATES } from './src/pages/manifest';
+import { THEME_INIT_SCRIPT } from './src/theme/theme-init';
 
 const logger = new Logger('ui-next');
 

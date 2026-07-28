@@ -29,30 +29,32 @@ import { STATUS } from '@hydrooj/common';
  * whether the verdict is AC, WA, or any of the verifier-side failures.
  */
 const TERMINAL_STATUSES: ReadonlySet<number> = new Set<number>([
-  STATUS.STATUS_ACCEPTED,                 //  1
-  STATUS.STATUS_WRONG_ANSWER,             //  2
-  STATUS.STATUS_TIME_LIMIT_EXCEEDED,      //  3
-  STATUS.STATUS_MEMORY_LIMIT_EXCEEDED,    //  4
-  STATUS.STATUS_OUTPUT_LIMIT_EXCEEDED,    //  5
-  STATUS.STATUS_RUNTIME_ERROR,            //  6
-  STATUS.STATUS_COMPILE_ERROR,            //  7
-  STATUS.STATUS_SYSTEM_ERROR,             //  8
-  STATUS.STATUS_CANCELED,                 //  9
-  STATUS.STATUS_ETC,                      // 10
-  STATUS.STATUS_HACKED,                   // 11
-  STATUS.STATUS_IGNORED,                  // 30
-  STATUS.STATUS_FORMAT_ERROR,             // 31
-  STATUS.STATUS_HACK_SUCCESSFUL,          // 32
-  STATUS.STATUS_HACK_UNSUCCESSFUL,        // 33
+  STATUS.STATUS_ACCEPTED, //  1
+  STATUS.STATUS_WRONG_ANSWER, //  2
+  STATUS.STATUS_TIME_LIMIT_EXCEEDED, //  3
+  STATUS.STATUS_MEMORY_LIMIT_EXCEEDED, //  4
+  STATUS.STATUS_OUTPUT_LIMIT_EXCEEDED, //  5
+  STATUS.STATUS_RUNTIME_ERROR, //  6
+  STATUS.STATUS_COMPILE_ERROR, //  7
+  STATUS.STATUS_SYSTEM_ERROR, //  8
+  STATUS.STATUS_CANCELED, //  9
+  STATUS.STATUS_ETC, // 10
+  STATUS.STATUS_HACKED, // 11
+  STATUS.STATUS_IGNORED, // 30
+  STATUS.STATUS_FORMAT_ERROR, // 31
+  STATUS.STATUS_HACK_SUCCESSFUL, // 32
+  STATUS.STATUS_HACK_UNSUCCESSFUL, // 33
 ]);
 
-/** Statuses that explicitly mean "still running" — must never be reported as
- *  terminal even by accident. */
+/**
+ * Statuses that explicitly mean "still running" — must never be reported as
+ *  terminal even by accident.
+ */
 const IN_PROGRESS_STATUSES: ReadonlySet<number> = new Set<number>([
-  STATUS.STATUS_WAITING,    //  0
-  STATUS.STATUS_JUDGING,    // 20
-  STATUS.STATUS_COMPILING,  // 21
-  STATUS.STATUS_FETCHED,    // 22
+  STATUS.STATUS_WAITING, //  0
+  STATUS.STATUS_JUDGING, // 20
+  STATUS.STATUS_COMPILING, // 21
+  STATUS.STATUS_FETCHED, // 22
 ]);
 
 /**

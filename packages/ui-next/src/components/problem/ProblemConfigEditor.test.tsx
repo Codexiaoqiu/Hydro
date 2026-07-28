@@ -1,8 +1,8 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { ProblemConfigEditor } from './ProblemConfigEditor';
 
-describe('ProblemConfigEditor', () => {
+describe('problemConfigEditor', () => {
   it('renders a textarea fallback when Monaco is not loaded', () => {
     // happy-dom: there is no real layout engine and Monaco's lazy chunk
     // sometimes refuses to render; the fallback is always shown for SSR.

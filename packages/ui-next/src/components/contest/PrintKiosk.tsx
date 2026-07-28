@@ -18,7 +18,7 @@ export interface PrintTask {
 }
 
 export interface PrintUserDict {
-  [id: number]: { uname: string; school?: string; displayName?: string };
+  [id: number]: { uname: string, school?: string, displayName?: string };
 }
 
 export interface PrintKioskProps {
@@ -89,7 +89,7 @@ export function PrintKiosk({ tdoc, isAdmin, endpoint, pollIntervalMs = 5000 }: P
   const [tasks, setTasks] = useState<PrintTask[]>([]);
   const [udict, setUdict] = useState<PrintUserDict>({});
   const [isKioskActive, setIsKioskActive] = useState(false);
-  const [pendingUpload, setPendingUpload] = useState<{ file: File; text: string } | null>(null);
+  const [pendingUpload, setPendingUpload] = useState<{ file: File, text: string } | null>(null);
   const [printingTaskId, setPrintingTaskId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -278,7 +278,7 @@ export function PrintKiosk({ tdoc, isAdmin, endpoint, pollIntervalMs = 5000 }: P
                   <a href={`/user/${task.owner}`}>{udict[task.owner]?.uname ?? `#${task.owner}`}</a>
                 </td>
                 <td>{task.title}</td>
-                <td>{new Date(parseInt(task._id.slice(0, 8), 16) * 1000).toLocaleString()}</td>
+                <td>{new Date(Number.parseInt(task._id.slice(0, 8), 16) * 1000).toLocaleString()}</td>
                 <td>{task.status}</td>
                 {isAdmin && (
                   <td>

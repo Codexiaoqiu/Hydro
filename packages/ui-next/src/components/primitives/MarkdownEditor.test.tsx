@@ -9,9 +9,9 @@ const trigger = vi.fn();
 
 vi.mock('@monaco-editor/react', () => ({
   Editor: (props: {
-    value?: string,
-    onChange?: (v: string | undefined) => void,
-    onMount?: (editor: unknown, monaco: unknown) => void,
+    value?: string;
+    onChange?: (v: string | undefined) => void;
+    onMount?: (editor: unknown, monaco: unknown) => void;
   }) => {
     props.onMount?.({
       addAction: vi.fn(),

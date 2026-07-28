@@ -1,7 +1,7 @@
+import type { SubtaskConfig } from '@hydrooj/common';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
-import type { SubtaskConfig } from '@hydrooj/common';
 import { Button } from '../primitives/Button';
 import { Input } from '../primitives/Input';
 import styles from './SubtaskSettings.module.css';

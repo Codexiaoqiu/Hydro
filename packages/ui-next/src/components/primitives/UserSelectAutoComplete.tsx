@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import styles from './UserSelectAutoComplete.module.css';
 
-export interface UserSummary { _id: number; uname: string; avatar?: string }
+export interface UserSummary { _id: number, uname: string, avatar?: string }
 
 export interface UserSelectAutoCompleteProps {
   /** Currently selected UIDs (multi-select). */

@@ -2,7 +2,7 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ToastProvider } from '../primitives/Toast';
-import { PrintKiosk, type PrintTask, type PrintKioskProps } from './PrintKiosk';
+import { PrintKiosk, type PrintKioskProps, type PrintTask } from './PrintKiosk';
 
 const requestPost = vi.fn();
 const requestPostFile = vi.fn();
@@ -57,7 +57,7 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe('PrintKiosk', () => {
+describe('printKiosk', () => {
   it('polls print tasks on mount via get_print_task', async () => {
     const task = makeTask({ owner: 2 });
     requestPost.mockResolvedValueOnce({

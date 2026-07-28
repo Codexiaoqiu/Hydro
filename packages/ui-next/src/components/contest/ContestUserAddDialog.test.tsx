@@ -54,8 +54,8 @@ function findAddUserPost(): [unknown, RequestInit] {
   return [call![0], call![1] as RequestInit];
 }
 
-describe('ContestUserAddDialog', () => {
-  it('Add button is disabled when no user selected', () => {
+describe('contestUserAddDialog', () => {
+  it('add button is disabled when no user selected', () => {
     render(
       <ToastProvider>
         <ContestUserAddDialog open onClose={() => {}} onAdded={() => {}} />
@@ -127,7 +127,7 @@ describe('ContestUserAddDialog', () => {
     expect(onAdded).not.toHaveBeenCalled();
   });
 
-  it('Cancel button calls onClose without any POST', () => {
+  it('cancel button calls onClose without any POST', () => {
     const onClose = vi.fn();
     render(
       <ToastProvider>

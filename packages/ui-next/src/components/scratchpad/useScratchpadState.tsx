@@ -1,8 +1,8 @@
-import { useMemo, useReducer } from 'react';
 import type { PropsWithChildren } from 'react';
-import { ScratchpadContext } from './ScratchpadContext';
-import type { ScratchpadContextValue } from './ScratchpadContext';
+import { useMemo, useReducer } from 'react';
 import { initialScratchpadState, scratchpadReducer } from './reducer';
+import type { ScratchpadContextValue } from './ScratchpadContext';
+import { ScratchpadContext } from './ScratchpadContext';
 
 export interface ScratchpadProviderProps {
   initialLang: string;

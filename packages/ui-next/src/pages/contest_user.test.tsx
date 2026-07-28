@@ -1,8 +1,8 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { ToastProvider } from '../components/primitives/Toast';
-import ContestUserPage from './contest_user';
 import { usePageData } from '../context/page-data';
+import ContestUserPage from './contest_user';
 
 // Locked reload: the page must NEVER call window.location.reload().
 const reloadSpy = vi.fn();
@@ -68,7 +68,7 @@ const baseArgs = (over: any = {}) => ({
   ...over,
 });
 
-describe('ContestUserPage', () => {
+describe('contestUserPage', () => {
   it('shows loading state when tdoc is missing', () => {
     setup({ ...baseArgs(), tdoc: undefined });
     expect(screen.getByText(/loading|加载/i)).toBeInTheDocument();

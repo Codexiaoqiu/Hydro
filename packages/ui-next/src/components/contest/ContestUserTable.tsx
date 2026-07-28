@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Button } from '../primitives/Button';
-import { useTranslate } from '../../lib/i18n';
 import { request } from '../../hooks/use-api';
-import { useToast } from '../primitives/Toast';
 import { canResumeContestUser } from '../../lib/contest-user';
 import { formatDateTime } from '../../lib/datetime';
+import { useTranslate } from '../../lib/i18n';
+import { Button } from '../primitives/Button';
+import { useToast } from '../primitives/Toast';
 import styles from './ContestUserTable.module.css';
 
 export interface ContestUserRow {
@@ -15,17 +15,23 @@ export interface ContestUserRow {
 }
 
 export interface ContestUserTableProps {
-  /** Server-authoritative rows. Component keeps a local copy for optimistic
-   *  updates and rolls back on failure. */
+  /**
+   * Server-authoritative rows. Component keeps a local copy for optimistic
+   *  updates and rolls back on failure.
+   */
   rows: ContestUserRow[];
-  udict: Record<string, { _id: number; uname: string }>;
-  tdoc: { docId: number; beginAt: string; endAt: string; duration?: number };
-  /** Pinned clock (ms). Lets tests assert boundary conditions deterministically;
-   *  in production the page reads `useJsonPoll` and forwards a fresh value. */
+  udict: Record<string, { _id: number, uname: string }>;
+  tdoc: { docId: number, beginAt: string, endAt: string, duration?: number };
+  /**
+   * Pinned clock (ms). Lets tests assert boundary conditions deterministically;
+   *  in production the page reads `useJsonPoll` and forwards a fresh value.
+   */
   nowMs: number;
-  /** Fires AFTER a successful mutation so the parent can JSON-calibrate by
+  /**
+   * Fires AFTER a successful mutation so the parent can JSON-calibrate by
    *  refetching (e.g. via `useJsonPoll.refresh`). The page must NOT call
-   *  `window.location.reload()`. */
+   *  `window.location.reload()`.
+   */
   onChange?: () => void;
 }
 

@@ -1,5 +1,5 @@
-import { useEffect, useRef } from 'react';
 import type { Dispatch } from 'react';
+import { useEffect, useRef } from 'react';
 import type { ScratchpadAction, WSMessage } from './types';
 
 export interface UsePretestSessionArgs {

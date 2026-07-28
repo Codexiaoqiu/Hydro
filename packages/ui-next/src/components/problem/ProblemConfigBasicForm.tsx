@@ -1,6 +1,6 @@
-import { Input } from '../primitives/Input';
 import { useTranslate } from '../../lib/i18n';
 import { dumpProblemConfigYaml, parseProblemConfigYaml, type ProblemConfigYaml } from '../../lib/yaml-config';
+import { Input } from '../primitives/Input';
 import styles from './ProblemConfigBasicForm.module.css';
 
 export interface ProblemConfigBasicFormProps {

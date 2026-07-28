@@ -5,8 +5,8 @@ import {
 import { ContestBackLink } from '../components/contest/ContestBackLink';
 import { Link } from '../components/link';
 import { Select } from '../components/primitives/Select';
-import { useBuildUrl } from '../hooks/use-build-url';
 import { usePageData } from '../context/page-data';
+import { useBuildUrl } from '../hooks/use-build-url';
 import { useJsonPoll } from '../hooks/use-json-poll';
 import { useTranslate } from '../lib/i18n';
 import type { SerializedPdoc, SerializedTdoc, SerializedUser, SerializedUserDict } from '../sections/types';
@@ -33,8 +33,8 @@ export interface ScoreboardGroup {
  */
 export type ScoreboardAvailableViews = Record<string, string>;
 
-export type ContestScoreboardPageArgs = {
-  tdoc?: SerializedTdoc & { owner?: number; unlocked?: boolean };
+export interface ContestScoreboardPageArgs {
+  tdoc?: SerializedTdoc & { owner?: number, unlocked?: boolean };
   tsdoc?: { attend?: 0 | 1 } | null;
   rows?: ScoreboardCell[][];
   udict?: SerializedUserDict;
@@ -52,11 +52,11 @@ export type ContestScoreboardPageArgs = {
    * avoid leaking record ids that the viewer cannot open.
    */
   canViewRecord?: boolean;
-};
+}
 
-export type ContestScoreboardPageProps = {
-  _pageData?: { name: string; template: string; url: string; args?: ContestScoreboardPageArgs };
-};
+export interface ContestScoreboardPageProps {
+  _pageData?: { name: string, template: string, url: string, args?: ContestScoreboardPageArgs };
+}
 
 type FilterKey = 'all' | 'star' | 'rank' | string;
 
@@ -140,7 +140,7 @@ export default function ContestScoreboardPage({ _pageData }: ContestScoreboardPa
   const rankColIdx = colIndex.rank;
 
   const userCtx = (args as Record<string, unknown>)?.UserContext as
-    | { _id?: number; own?: (d: { owner?: number | string }) => boolean }
+    | { _id?: number, own?: (d: { owner?: number | string }) => boolean }
     | undefined;
   const currentUid = userCtx?._id ?? 0;
 
@@ -154,7 +154,7 @@ export default function ContestScoreboardPage({ _pageData }: ContestScoreboardPa
     let cancelled = false;
     (async () => {
       try {
-        if (!dbRef.current) dbRef.current = await openStarDb();
+        dbRef.current ||= await openStarDb();
         const data = await readStars(dbRef.current, storageId);
         if (!cancelled) setStars(data);
       } catch {
@@ -446,7 +446,7 @@ export default function ContestScoreboardPage({ _pageData }: ContestScoreboardPa
                       if (cell.type === 'records' && Array.isArray(cell.raw)) {
                         return (
                           <td key={ci} className={tdCls}>
-                            {(cell.raw as Array<{ raw?: string; value: string | number; score?: number }>).map((r, k) => {
+                            {(cell.raw as Array<{ raw?: string, value: string | number, score?: number }>).map((r, k) => {
                               const color = getScoreColor(r.score ?? Number(r.value));
                               const inner = (
                                 <span style={{ color, fontWeight: 600 }}>{String(r.value)}</span>

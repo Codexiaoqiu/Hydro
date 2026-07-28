@@ -18,7 +18,7 @@ const rdocs = [
   { _id: '60b04', pid: 102, status: 1, lang: 'py', time: 60 },
 ];
 
-describe('ContestSubmissionList', () => {
+describe('contestSubmissionList', () => {
   it('renders empty state when no records', () => {
     render(<ContestSubmissionList rdocs={[]} />);
     expect(screen.getByText(/暂无提交|No submissions/i)).toBeInTheDocument();

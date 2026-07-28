@@ -1,6 +1,6 @@
+import Editor from '@monaco-editor/react';
 import type { ChangeEvent } from 'react';
 import { useCallback } from 'react';
-import Editor from '@monaco-editor/react';
 
 // TODO: 接入真正的 Monaco / CodeMirror
 //

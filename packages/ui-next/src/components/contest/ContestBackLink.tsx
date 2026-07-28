@@ -1,5 +1,5 @@
-import { Link } from '../link';
 import { useTranslate } from '../../lib/i18n';
+import { Link } from '../link';
 import styles from './ContestBackLink.module.css';
 
 export interface ContestBackLinkProps {

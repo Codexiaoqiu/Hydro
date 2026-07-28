@@ -4,22 +4,22 @@ import {
 import { ContestBackLink } from '../components/contest/ContestBackLink';
 import { Link } from '../components/link';
 import { useToast } from '../components/primitives/Toast';
-import { request } from '../hooks/use-api';
 import { usePageData } from '../context/page-data';
+import { request } from '../hooks/use-api';
 import { useTranslate } from '../lib/i18n';
 import type { SerializedPdoc, SerializedTdoc } from '../sections/types';
 import styles from './contest_manage.module.css';
 
-export type ContestManagePageArgs = {
-  tdoc?: SerializedTdoc & { owner?: number; score?: Record<string, number> };
+export interface ContestManagePageArgs {
+  tdoc?: SerializedTdoc & { owner?: number, score?: Record<string, number> };
   pdict?: Record<string, SerializedPdoc>;
-  files?: Array<{ name: string; size: number }>;
-  privateFiles?: Array<{ name: string; size: number }>;
-};
+  files?: Array<{ name: string, size: number }>;
+  privateFiles?: Array<{ name: string, size: number }>;
+}
 
-export type ContestManagePageProps = {
-  _pageData?: { name: string; template: string; url: string; args?: ContestManagePageArgs };
-};
+export interface ContestManagePageProps {
+  _pageData?: { name: string, template: string, url: string, args?: ContestManagePageArgs };
+}
 
 const DEFAULT_SCORE = 100;
 
@@ -43,7 +43,7 @@ export default function ContestManagePage({ _pageData }: ContestManagePageProps 
   const pids = tdoc.pids ?? [];
   const scoreMap: Record<string, number> = { ...(tdoc.score ?? {}) };
   pids.forEach((pid) => {
-    if (scoreMap[String(pid)] == null) scoreMap[String(pid)] = DEFAULT_SCORE;
+    scoreMap[String(pid)] ??= DEFAULT_SCORE;
   });
 
   return (
@@ -227,7 +227,7 @@ function ScoreRow({ pid, title, initialScore, onSaved, onError, onSuccess }: Sco
 interface FilePanelProps {
   title: string;
   type: 'public' | 'private';
-  files: Array<{ name: string; size: number }>;
+  files: Array<{ name: string, size: number }>;
 }
 
 function FilePanel({ title, type, files }: FilePanelProps) {
