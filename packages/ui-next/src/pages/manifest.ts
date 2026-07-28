@@ -37,6 +37,7 @@ export const NEXT_PAGES = {
   problem_edit: ['problem_edit.html'],
   problem_import: ['problem_import.html'],
   problem_detail: ['problem_detail.html'],
+  problem_statistics: ['problem_statistics.html'],
   problem_submit: ['problem_submit.html'],
   problem_files: ['problem_files.html'],
   problem_config: ['problem_config.html'],

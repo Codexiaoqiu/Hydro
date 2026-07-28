@@ -1,0 +1,14 @@
+.layout { display: grid; grid-template-columns: 1fr 280px; gap: var(--space-4, 16px); padding: var(--space-4, 16px); }
+.main { display: flex; flex-direction: column; gap: var(--space-3, 12px); }
+.chartRow { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3, 12px); }
+.chartCell h3 { font-family: var(--font-display, system-ui); font-size: var(--text-md, 1rem); margin: 0 0 var(--space-2, 8px); }
+.filterRow { padding: var(--space-2, 8px); }
+.filterForm { display: flex; gap: var(--space-2, 8px); align-items: center; }
+.sortSelect { padding: var(--space-1, 4px) var(--space-2, 8px); border: 1px solid var(--border, #ccc); border-radius: var(--radius-sm, 6px); background: var(--surface-2, transparent); }
+.submit { padding: var(--space-1, 4px) var(--space-3, 12px); border: 1px solid var(--border, #ccc); border-radius: var(--radius-sm, 6px); background: var(--surface-2, transparent); cursor: pointer; }
+.table { display: flex; flex-direction: column; gap: var(--space-2, 8px); }
+.tableEl { width: 100%; border-collapse: collapse; }
+.tableEl th, .tableEl td { padding: var(--space-1, 4px) var(--space-2, 8px); border-bottom: 1px solid var(--border, rgba(0,0,0,0.08)); text-align: left; }
+.empty { color: var(--fg-muted, #888); text-align: center; padding: var(--space-4, 16px); }
+.side { align-self: start; }
+@media (max-width: 768px) { .layout { grid-template-columns: 1fr; } .chartRow { grid-template-columns: 1fr; } .side { display: none; } }

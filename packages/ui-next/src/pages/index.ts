@@ -30,6 +30,7 @@ registerPage('problem_create', () => import('./problem_create'));
 registerPage('problem_edit', () => import('./problem_edit'));
 registerPage('problem_import', () => import('./problem_import'));
 registerPage('problem_detail', () => import('./problem_detail'));
+registerPage('problem_statistics', () => import('./problem_statistics'));
 registerPage('problem_submit', () => import('./problem_submit'));
 registerPage('problem_files', () => import('./problem_files'));
 registerPage('problem_config', () => import('./problem_config'));
