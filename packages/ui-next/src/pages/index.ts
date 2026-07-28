@@ -17,6 +17,7 @@ registerPage('contest_edit', () => import('./contest_edit'));
 registerPage('contest_print', () => import('./contest_print'));
 registerPage('problem_main', () => import('./problem_main'));
 registerPage('problem_solution', () => import('./problem_solution'));
+registerPage('discussion_detail', () => import('./discussion_detail'));
 registerPage('user_login', () => import('./user_login'), { layout: 'auth' });
 registerPage('user_register', () => import('./user_register'), { layout: 'auth' });
 registerPage('user_register_with_code', () => import('./user_register_with_code'), { layout: 'auth' });

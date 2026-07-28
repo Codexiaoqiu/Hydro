@@ -1,0 +1,11 @@
+.layout { display: grid; grid-template-columns: 1fr 280px; gap: var(--space-4, 16px); padding: var(--space-4, 16px); }
+.main { display: flex; flex-direction: column; gap: var(--space-3, 12px); }
+.topic { padding: var(--space-3, 12px); border: 1px solid var(--border, rgba(0,0,0,0.08)); border-radius: var(--radius-md, 12px); background: var(--surface-1, #fff); }
+.crumbs { list-style: none; padding: 0; margin: 0 0 var(--space-2, 8px); display: flex; flex-direction: column; gap: var(--space-1, 4px); }
+.crumbs h1 { font-family: var(--font-display, system-ui); font-size: var(--text-xl, 1.25rem); margin: 0; }
+.content { line-height: 1.6; }
+.head { padding: var(--space-2, 8px); border-bottom: 1px solid var(--border, rgba(0,0,0,0.08)); }
+.head h2 { font-family: var(--font-display, system-ui); font-size: var(--text-lg, 1.125rem); margin: 0; }
+.side { align-self: start; }
+.authorCard { padding: var(--space-3, 12px); border: 1px solid var(--border, rgba(0,0,0,0.08)); border-radius: var(--radius-md, 12px); background: var(--surface-1, #fff); }
+@media (max-width: 768px) { .layout { grid-template-columns: 1fr; } .side { display: none; } }
