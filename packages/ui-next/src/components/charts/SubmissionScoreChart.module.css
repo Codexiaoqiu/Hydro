@@ -1,0 +1,8 @@
+.chart {
+  height: 220px;
+  padding: var(--space-2, 8px);
+  background: var(--surface-1, #fff);
+  border: 1px solid var(--border, rgba(0,0,0,0.08));
+  border-radius: var(--radius-md, 8px);
+}
+.empty { color: var(--fg-muted, #888); text-align: center; padding: var(--space-4, 16px); }
