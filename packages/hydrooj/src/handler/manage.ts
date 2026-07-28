@@ -17,6 +17,7 @@ import {
     ConnectionHandler, Handler, param, requireSudo, Types,
 } from '../service/server';
 import { JudgeResultCallbackContext } from './judge';
+import { AdminUiHandler } from './admin-ui';
 
 const logger = new Logger('manage');
 
@@ -360,5 +361,6 @@ export async function apply(ctx) {
     ctx.Route('manage_config', '/manage/config', SystemConfigHandler);
     ctx.Route('manage_user_import', '/manage/userimport', SystemUserImportHandler);
     ctx.Route('manage_user_priv', '/manage/userpriv', SystemUserPrivHandler);
+    ctx.Route('admin_ui', '/admin/ui', AdminUiHandler, PRIV.PRIV_EDIT_SYSTEM);
     ctx.Connection('manage_check', '/manage/check-conn', SystemCheckConnHandler);
 }

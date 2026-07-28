@@ -7,7 +7,7 @@ import { createServer, type Plugin } from 'vite';
 import { serializer } from '@hydrooj/framework';
 import {
     Context, Handler, Logger,
-    NotFoundError, param, size, Types,
+    NotFoundError, param, size, SystemModel as system, Types,
 } from 'hydrooj';
 import { THEME_INIT_SCRIPT } from './src/theme/theme-init';
 import { NEXT_TEMPLATES } from './src/pages/manifest';
@@ -255,6 +255,18 @@ export async function apply(ctx: Context) {
     // Whether the 'next' renderer is currently allowed to serve any templates.
     // Mutable so a `system/setting` listener can hot-toggle ui-next on/off.
     let enabled = true;
+    ctx.on('system/setting', (args: Record<string, unknown>) => {
+        if (!('ui_next' in args)) return;
+        // Re-read the system value rather than trusting the payload
+        // so we always reflect the current persisted state.
+        try {
+            const v = system.get('ui_next' as never);
+            enabled = v !== false;
+        } catch {
+            // 'ui_next' not yet in SystemKeys (e.g. legacy boot): default to enabled.
+            enabled = true;
+        }
+    });
 
     if (process.env.DEV) {
         const vite = await createServer({
