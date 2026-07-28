@@ -81,6 +81,10 @@ function createRegistryStore() {
     return state.defaults[name] as SlotValue<N> | undefined;
   }
 
+  function keys(): string[] {
+    return Object.keys(state.defaults);
+  }
+
   return {
     subscribe,
     getVersion,
@@ -88,6 +92,7 @@ function createRegistryStore() {
     getInterceptors,
     setDefault,
     getDefault,
+    keys,
   };
 }
 
