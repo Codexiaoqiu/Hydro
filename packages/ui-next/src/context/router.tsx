@@ -31,6 +31,11 @@ export interface RouterState {
   error: Error | null;
 }
 
+interface FetchPageResult {
+  ok: boolean;
+  pageName: string;
+}
+
 interface RouterNavigateContextValue {
   navigate: (url: string) => Promise<boolean>;
 }
@@ -53,7 +58,7 @@ export const RouterProvider: React.FC<React.PropsWithChildren> = ({ children }) 
   }, []);
 
   const fetchPage = useCallback(
-    async (url: string, init = false) => {
+    async (url: string, init = false): Promise<FetchPageResult> => {
       abortRef.current?.abort();
       const gen = ++genRef.current;
       const controller = new AbortController();
@@ -80,24 +85,15 @@ export const RouterProvider: React.FC<React.PropsWithChildren> = ({ children }) 
           });
           if (res.redirected) {
             window.location.href = res.url;
-            return false;
+            return { ok: false, pageName: '' };
           }
           if (!res.ok) throw new Error(`Navigation failed: ${res.status} ${res.statusText}`);
           const body = await res.json();
           const pageName = res.headers.get('x-hydro-page') || '';
-          // SPA fallback: if the target page isn't registered in the client store,
-          // the server has decided this template belongs to ui-default. A full page
-          // load lets ui-default render it correctly. The initial-page entrypoint
-          // (fetchPage with init=true) does NOT go through navigate, so this can't
-          // cause an infinite reload loop on first paint.
-          if (pageName && !store.getDefault(`page:${pageName}` as `page:${string}`)) {
-            window.location.href = url;
-            return false;
-          }
           const template = res.headers.get('x-hydro-template') || '';
           console.log('[Hydro] data from', reqUrl, 'received:', body, 'pageName:', pageName);
 
-          if (gen !== genRef.current) return false;
+          if (gen !== genRef.current) return { ok: false, pageName: '' };
 
           if (init && body.routeMap && typeof body.routeMap === 'object') {
             routeMapStore.set(body.routeMap);
@@ -110,28 +106,28 @@ export const RouterProvider: React.FC<React.PropsWithChildren> = ({ children }) 
             url,
           }));
           dispatch({ type: 'FETCH_SUCCESS' });
-          return true;
+          return { ok: true, pageName };
         } catch (e) {
           if (e instanceof DOMException && e.name === 'AbortError') {
             dispatch({ type: 'FETCH_ABORT' });
             console.log('[Hydro] navigation to', url, 'aborted');
-            return false;
+            return { ok: false, pageName: '' };
           }
           lastError = e instanceof Error ? e : new Error(String(e));
           console.warn('[Hydro] endpoint', ep, 'failed:', lastError.message);
           if (controller.signal.aborted) {
             // User-initiated abort propagated through AbortSignal.any
             dispatch({ type: 'FETCH_ABORT' });
-            return false;
+            return { ok: false, pageName: '' };
           }
         }
       }
 
       console.error('[Hydro] all endpoints failed:', lastError);
-      if (gen !== genRef.current) return false;
+      if (gen !== genRef.current) return { ok: false, pageName: '' };
       dispatch({ type: 'FETCH_ERROR', error: lastError! });
       window.location.href = url;
-      return false;
+      return { ok: false, pageName: '' };
     },
     [setData],
   );
@@ -165,9 +161,14 @@ export const RouterProvider: React.FC<React.PropsWithChildren> = ({ children }) 
       window.location.href = url;
       return false;
     }
-    const ok = await fetchPage(url);
-    if (ok) history.pushState({ url }, '', url);
-    return ok;
+    const result = await fetchPage(url);
+    if (!result.ok) return false;
+    if (result.pageName && !store.getDefault(`page:${result.pageName}` as `page:${string}`)) {
+      window.location.href = url;
+      return false;
+    }
+    history.pushState({ url }, '', url);
+    return true;
   }, [fetchPage, isSameOrigin]);
 
   const navigateValue = useMemo<RouterNavigateContextValue>(() => ({ navigate }), [navigate]);
