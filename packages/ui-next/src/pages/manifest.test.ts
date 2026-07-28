@@ -21,6 +21,7 @@ describe('nEXT_PAGES manifest', () => {
     expect(NEXT_TEMPLATES).toContain('bsod.html');
     expect(NEXT_TEMPLATES).toContain('contest_edit.html'); // contest_create shares
     expect(NEXT_TEMPLATES).toContain('problem_edit.html'); // problem_create shares
+    expect(NEXT_TEMPLATES).toContain('problem_solution.html');
   });
 
   it('nEXT_TEMPLATES never includes email / pjax / partial templates', () => {

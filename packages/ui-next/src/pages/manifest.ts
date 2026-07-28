@@ -23,6 +23,7 @@ export const NEXT_PAGES = {
   contest_edit: ['contest_edit.html'],
   contest_print: ['contest_print.html'],
   problem_main: ['problem_main.html'],
+  problem_solution: ['problem_solution.html'],
   user_login: ['user_login.html'],
   user_register: ['user_register.html'],
   user_register_with_code: ['user_register_with_code.html'],
