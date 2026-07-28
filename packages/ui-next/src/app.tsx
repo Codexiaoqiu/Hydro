@@ -44,9 +44,19 @@ const App = defineSlot('app:root', () => {
 
   if (!entry) {
     return (
-      <div>
-        Page not found: <code>{name}</code>
-      </div>
+      <DefaultLayout>
+        <div style={{ padding: 32 }}>
+          <h2>This page does not have a new-UI implementation yet</h2>
+          <p>
+            The server has decided this route belongs to ui-next,
+            but the client has no registered page <code>{name}</code>.
+          </p>
+          <p>
+            This is a manifest drift or stale build artifact. Please return to the{' '}
+            <a href="/">homepage</a>.
+          </p>
+        </div>
+      </DefaultLayout>
     );
   }
 
