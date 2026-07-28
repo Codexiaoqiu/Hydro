@@ -10,11 +10,12 @@ export interface ProfileTabsProps {
   buildHref?: (name: string, params?: Record<string, unknown>) => string;
 }
 
-export function ProfileTabs({ bio, acceptedProblems = [], buildHref }: ProfileTabsProps) {
+export function ProfileTabs({ bio, acceptedProblems = [], pluginTabs = [], buildHref }: ProfileTabsProps) {
   const [active, setActive] = useState<'bio' | 'accepted' | string>('bio');
   const tabs = [
     { key: 'bio', label: '简介' },
     ...(acceptedProblems.length ? [{ key: 'accepted', label: '通过的题目' }] : []),
+    ...pluginTabs.map((t) => ({ key: t.key, label: t.label })),
   ];
   return (
     <div className={styles.tabs}>
@@ -47,6 +48,9 @@ export function ProfileTabs({ bio, acceptedProblems = [], buildHref }: ProfileTa
             ))}
           </ul>
         )}
+        {pluginTabs.map((t) => active === t.key ? (
+          <div key={t.key}>{t.render()}</div>
+        ) : null)}
       </div>
     </div>
   );

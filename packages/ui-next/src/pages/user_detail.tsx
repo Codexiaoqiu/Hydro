@@ -1,10 +1,10 @@
+import { PERM } from '@hydrooj/common';
 import { usePageData, useUserContext } from '../context/page-data';
 import { useBuildUrl } from '../hooks/use-build-url';
 import { ProfileHeader } from '../components/profile/ProfileHeader';
 import { ProfileTabs } from '../components/profile/ProfileTabs';
 import { UserStat } from '../components/profile/UserStat';
 import { TagCloud } from '../components/primitives/TagCloud';
-import { store } from '../registry/store';
 import styles from './user_detail.module.css';
 
 interface Pdoc { docId: number, title: string, pid?: string, tag?: string[] }
@@ -24,8 +24,9 @@ export default function UserDetail() {
   const { isSelfProfile, udoc, sdoc, pdocs, tags } = args;
   const user = useUserContext();
   const buildUrl = useBuildUrl();
-  const canViewPrivate = !!user?.hasPerm?.(/* PERM_VIEW_USER_PRIVATE_INFO */ 1 << 16);
-  const pluginTabs = store.getInterceptors('user_detail:tabs' as any); // SP1+ 后期可改 slot,目前恒空
+  const canViewPrivate = !!user?.hasPerm?.(PERM.PERM_VIEW_USER_PRIVATE_INFO);
+  // SP1+ 扩展点:当前为占位,后续可接入 slot 注册由插件提供额外 tab
+  const pluginTabs: Array<{ key: string, label: string, render: () => React.ReactNode }> = [];
 
   return (
     <div className={styles.layout}>
@@ -52,11 +53,7 @@ export default function UserDetail() {
         {tags.length > 0 && (
           <section className={styles.tagBox}>
             <h3>题目标签</h3>
-            <TagCloud>
-              {tags.map(([name, count]) => (
-                <span key={name}>· {name} <small>({count})</small></span>
-              ))}
-            </TagCloud>
+            <TagCloud tags={tags.map(([name, count]) => `${name} (${count})`)} />
           </section>
         )}
       </aside>
