@@ -10,6 +10,7 @@ import {
     NotFoundError, param, size, Types,
 } from 'hydrooj';
 import { THEME_INIT_SCRIPT } from './src/theme/theme-init';
+import { NEXT_TEMPLATES } from './src/pages/manifest';
 
 const logger = new Logger('ui-next');
 
@@ -251,6 +252,9 @@ export async function buildPlugins() {
 
 export async function apply(ctx: Context) {
     if (process.env.HYDRO_CLI) return;
+    // Whether the 'next' renderer is currently allowed to serve any templates.
+    // Mutable so a `system/setting` listener can hot-toggle ui-next on/off.
+    let enabled = true;
 
     if (process.env.DEV) {
         const vite = await createServer({
@@ -285,9 +289,9 @@ export async function apply(ctx: Context) {
         const html = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf-8');
         ctx.server.registerRenderer('next', {
             name: 'next',
-            accept: [],
+            get accept() { return enabled ? NEXT_TEMPLATES : []; },
             output: 'html',
-            asFallback: true,
+            asFallback: false,
             priority: 100,
             async render(_name, args, context) {
                 const handler = context.handler;
@@ -314,9 +318,9 @@ export async function apply(ctx: Context) {
         ctx.Route('ui_next_constants', '/plugins/:version/:name', UiNextConstantHandler);
         ctx.server.registerRenderer('next', {
             name: 'next',
-            accept: [],
+            get accept() { return enabled ? NEXT_TEMPLATES : []; },
             output: 'html',
-            asFallback: true,
+            asFallback: false,
             priority: 100,
             async render(_name, args, context) {
                 const indexHtml = path.join(__dirname, 'public', 'index.html');
