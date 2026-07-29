@@ -24,6 +24,7 @@ describe('nEXT_PAGES manifest', () => {
     expect(NEXT_TEMPLATES).toContain('problem_solution.html');
     expect(NEXT_TEMPLATES).toContain('problem_statistics.html');
     expect(NEXT_TEMPLATES).toContain('discussion_detail.html');
+    expect(NEXT_TEMPLATES).toContain('discussion_main_or_node.html');
     expect(NEXT_TEMPLATES).toContain('user_detail.html');
   });
 
