@@ -1,6 +1,7 @@
 /* @vitest-environment happy-dom */
 import { render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { buildPermissionPayload, deriveInitialPermission } from './contest-permission';
 import { ContestForm } from './ContestForm';
 
 // Mock the router/i18n/api hooks and the autocomplete primitives so the
@@ -64,6 +65,11 @@ vi.mock('../primitives', async () => {
     ),
     ProblemSelectAutoComplete: () => <div data-testid="problem-select" />,
     RateLimitAlert: () => null,
+    UserSelectAutoComplete: ({ value, onChange, placeholder }: any) => (
+      <div data-testid="user-select" data-value={value?.join(',')} data-placeholder={placeholder}>
+        <span>UserSelectAutoComplete</span>
+      </div>
+    ),
   };
 });
 
@@ -136,5 +142,56 @@ describe('contestForm', () => {
     const beginMs = new Date(`${beginAtDate.value}T${beginAtTime.value}:00`).getTime();
     const endMs = new Date(`${endAtInput.value.replace(' ', 'T')}:00`).getTime();
     expect(endMs - beginMs).toBe(2 * 3600 * 1000);
+  });
+
+  it('edit page prefills permission invite when _code is set', () => {
+    render(
+      <ContestForm
+        pageName="contest_edit"
+        tid="64f0d4a5b1c2d3e4f5a6b7c1"
+        tdoc={{
+          docId: '64f0d4a5b1c2d3e4f5a6b7c1',
+          title: 'invite-only',
+          _code: 'abcd' as any,
+          assign: [],
+        }}
+      />,
+    );
+    const select = screen.getByLabelText(/ContestForm\.Permission/);
+    expect((select as HTMLSelectElement).value).toBe('invite');
+    expect(screen.getByLabelText(/ContestForm\.InviteCode/)).toBeInTheDocument();
+  });
+
+  it('edit page prefills permission assign when assign is non-empty', () => {
+    render(
+      <ContestForm
+        pageName="contest_edit"
+        tid="64f0d4a5b1c2d3e4f5a6b7c1"
+        tdoc={{
+          docId: '64f0d4a5b1c2d3e4f5a6b7c1',
+          title: 'assigned',
+          assign: [1, 2],
+        }}
+      />,
+    );
+    const select = screen.getByLabelText(/ContestForm\.Permission/);
+    expect((select as HTMLSelectElement).value).toBe('assign');
+  });
+
+  it('public mode hides invite and assign inputs', () => {
+    render(<ContestForm pageName="contest_create" />);
+    expect(screen.queryByLabelText(/ContestForm\.InviteCode/)).toBeNull();
+    expect(screen.queryByLabelText(/ContestForm\.Assign/)).toBeNull();
+  });
+
+  it('pure helpers behave as documented', () => {
+    expect(deriveInitialPermission({})).toBe('public');
+    expect(deriveInitialPermission({ _code: 'x' })).toBe('invite');
+    expect(deriveInitialPermission({ assign: [1] })).toBe('assign');
+
+    const fd = new URLSearchParams();
+    buildPermissionPayload(fd, 'public', { _code: 'leak', assign: [9] });
+    expect(fd.get('code')).toBeNull();
+    expect(fd.get('assign')).toBeNull();
   });
 });

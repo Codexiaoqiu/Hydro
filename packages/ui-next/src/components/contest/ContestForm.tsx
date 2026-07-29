@@ -9,8 +9,14 @@ import {
   Alert, Button, Checkbox, ConfirmDialog, Input, type LanguageOption,
   LanguageSelectAutoComplete,
   MarkdownEditor, ProblemSelectAutoComplete, RateLimitAlert,
+  UserSelectAutoComplete,
 } from '../primitives';
 import styles from './ContestForm.module.css';
+import {
+  buildPermissionPayload,
+  deriveInitialPermission,
+  type ContestPermission,
+} from './contest-permission';
 
 interface ContestDoc {
   docId?: string;
@@ -144,6 +150,14 @@ export function ContestForm({ pageName, tdoc, tid, UserContext, languages = [], 
   const [error, setError] = useState<HydroClientError | null>(null);
   const canEditProblems = canEditSystem(UserContext);
 
+  const [permission, setPermission] = useState<ContestPermission>(
+    () => deriveInitialPermission(tdoc as any),
+  );
+  const [inviteCode, setInviteCode] = useState<string>(tdoc?._code ?? '');
+  const [assignees, setAssignees] = useState<number[]>(
+    () => (Array.isArray(tdoc?.assign) ? (tdoc!.assign as any[]).map((v) => Number(v)) : []),
+  );
+
   const set = <K extends keyof FormState>(key: K, value: FormState[K]) =>
     setForm((s) => ({ ...s, [key]: value }));
 
@@ -195,6 +209,12 @@ export function ContestForm({ pageName, tdoc, tid, UserContext, languages = [], 
       if (form.maintainer) fd.set('maintainer', form.maintainer);
       if (flags.showLock && form.lock) fd.set('lock', form.lock);
       if (flags.showContestDuration && form.contestDuration) fd.set('contestDuration', form.contestDuration);
+      // Mode-key isolation: invite mode keeps none of assign; assign mode keeps none of code.
+      buildPermissionPayload(
+        fd,
+        permission,
+        { _code: inviteCode, assign: assignees },
+      );
 
       const url = isEdit ? `/contest/${tid}/edit` : '/contest/create';
       const res = await request.post<{ tid?: string }>(url, fd);
@@ -247,6 +267,12 @@ export function ContestForm({ pageName, tdoc, tid, UserContext, languages = [], 
       if (form.maintainer) fd.set('maintainer', form.maintainer);
       if (flags.showLock && form.lock) fd.set('lock', form.lock);
       if (flags.showContestDuration && form.contestDuration) fd.set('contestDuration', form.contestDuration);
+      // Mode-key isolation: invite mode keeps none of assign; assign mode keeps none of code.
+      buildPermissionPayload(
+        fd,
+        permission,
+        { _code: inviteCode, assign: assignees },
+      );
 
       const res = await request.post<{ tid?: string }>('/contest/create', fd);
       navigate(res?.tid ? buildUrl('contest_detail', { tid: res.tid }) : buildUrl('contest_main'));
@@ -342,6 +368,53 @@ export function ContestForm({ pageName, tdoc, tid, UserContext, languages = [], 
       <section className={styles.section}>
         <h2 className={styles.sectionTitle}>{t('ContestForm.SectionPermission')}</h2>
         <div className={styles.fields}>
+          <div className={styles.field}>
+            <label className={styles.label} htmlFor="contest-permission">
+              {t('ContestForm.Permission')}
+            </label>
+            <select
+              id="contest-permission"
+              name="_permission"
+              className={styles.select}
+              value={permission}
+              onChange={(e) => setPermission(e.currentTarget.value as ContestPermission)}
+            >
+              <option value="public">{t('ContestForm.PermissionPublic')}</option>
+              <option value="invite">{t('ContestForm.PermissionInvite')}</option>
+              <option value="assign">{t('ContestForm.PermissionAssign')}</option>
+            </select>
+          </div>
+
+          {permission === 'invite' && (
+            <div className={styles.field}>
+              <label className={styles.label} htmlFor="contest-invite-code">
+                {t('ContestForm.InviteCode')}
+              </label>
+              <Input
+                id="contest-invite-code"
+                name="code"
+                type="text"
+                value={inviteCode}
+                onChange={(e) => setInviteCode(e.currentTarget.value)}
+                placeholder={t('ContestForm.InviteCodePlaceholder')}
+              />
+            </div>
+          )}
+
+          {permission === 'assign' && (
+            <div className={styles.field}>
+              <label className={styles.label} htmlFor="contest-assign">
+                {t('ContestForm.Assign')}
+              </label>
+              <UserSelectAutoComplete
+                value={assignees}
+                onChange={setAssignees}
+                domainId={domainId}
+                placeholder={t('ContestForm.AssignPlaceholder')}
+              />
+            </div>
+          )}
+
           <Input
             label={t('ContestForm.Maintainer')}
             name="maintainer"
