@@ -1,6 +1,7 @@
 /* @vitest-environment happy-dom */
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
+import { TYPE_CONTEST, TYPE_PROBLEM } from '../../lib/document-types';
 import { DiscussionSidebar } from './DiscussionSidebar';
 
 vi.mock('../link', () => ({
@@ -37,6 +38,32 @@ describe('discussionSidebar', () => {
     const user = { _id: 1, hasPriv: () => true, hasPerm: (p: number) => p === 1 };
     render(<DiscussionSidebar vnode={vnode as any} udict={{}} user={user as any} buildHref={buildHref} />);
     expect(screen.getByText(/发起讨论|Create a Discussion/)).toBeInTheDocument();
+  });
+
+  it('returns null for vnode with TYPE_PROBLEM (canonical 10)', () => {
+    // C2 fix: The primitive owns the generic-node branch only. Real problem/
+    // contest vnodes are handled by the page-level caller (ProblemSidebar /
+    // minimal contest card). When the type-guard matches, render nothing.
+    expect(TYPE_PROBLEM).toBe(10);
+    const vnode = { _id: 'n1', id: 42, docId: 42, title: 'P-42', type: TYPE_PROBLEM };
+    const { container } = render(
+      <DiscussionSidebar vnode={vnode as any} udict={{}} user={null} buildHref={buildHref} />,
+    );
+    expect(container.firstChild).toBeNull();
+    expect(screen.queryByText('P-42')).toBeNull();
+  });
+
+  it('returns null for vnode with TYPE_CONTEST (canonical 30)', () => {
+    // Same guarantee as above but for contests. Both branches MUST use the
+    // canonical constant — a literal `1` / `2` regression would silently
+    // re-render the generic card and the test would catch it.
+    expect(TYPE_CONTEST).toBe(30);
+    const vnode = { _id: 'cid', id: 'cid', title: 'Contest-X', type: TYPE_CONTEST };
+    const { container } = render(
+      <DiscussionSidebar vnode={vnode as any} udict={{}} user={null} buildHref={buildHref} />,
+    );
+    expect(container.firstChild).toBeNull();
+    expect(screen.queryByText('Contest-X')).toBeNull();
   });
 
   it('LoginToCreate places redirect on the query string, not as a path param', () => {

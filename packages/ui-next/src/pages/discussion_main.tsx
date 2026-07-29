@@ -8,6 +8,7 @@ import { Card } from '../components/primitives/Card';
 import { ProblemSidebar } from '../components/sidebar/ProblemSidebar';
 import { usePageData, useUserContext } from '../context/page-data';
 import { useBuildUrl } from '../hooks/use-build-url';
+import { TYPE_CONTEST, TYPE_PROBLEM } from '../lib/document-types';
 import { useTranslate } from '../lib/i18n';
 import styles from './discussion_main.module.css';
 
@@ -50,9 +51,6 @@ interface Args {
   vnodes: Vnode[];
 }
 
-const TYPE_PROBLEM = 1;
-const TYPE_CONTEST = 2;
-
 export default function DiscussionMain() {
   const { args } = usePageData() as unknown as { args: Args };
   const {
@@ -66,9 +64,11 @@ export default function DiscussionMain() {
   const title = isMain ? t('Discussion') : (vnode.title || t('Discussion'));
 
   // Build pagination URL using the LOGICAL route identifier for the vnode type.
+  // Constants mirror `packages/hydrooj/src/model/document.ts:22-31`
+  // (TYPE_PROBLEM=10, TYPE_CONTEST=30, TYPE_DISCUSSION_NODE=20).
   // - problem nodes use `docId` (numeric, also exposed as `pid`)
   // - contest nodes use `id` (an ObjectId) as a string
-  // - generic nodes (TYPE_DISCUSSION_NODE = 4 / training) use `_id` / `id` as a string
+  // - generic nodes use `_id` / `id` as a string
   const buildPageHref = (p: number) => {
     if (isMain) return buildUrl('discussion_main', {}, { page: String(p) });
     if (vnode?.type === TYPE_PROBLEM) {

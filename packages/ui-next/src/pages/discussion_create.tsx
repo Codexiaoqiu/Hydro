@@ -2,6 +2,7 @@ import { DiscussionForm } from '../components/discussion/DiscussionForm';
 import { Card } from '../components/primitives/Card';
 import { usePageData } from '../context/page-data';
 import { useBuildUrl } from '../hooks/use-build-url';
+import { TYPE_CONTEST, TYPE_PROBLEM } from '../lib/document-types';
 import { useTranslate } from '../lib/i18n';
 import styles from './discussion_create.module.css';
 
@@ -17,9 +18,6 @@ interface Args {
   vnode: VnodeLite;
 }
 
-const TYPE_PROBLEM = 1;
-const TYPE_CONTEST = 2;
-
 export default function DiscussionCreate() {
   const { args } = usePageData() as unknown as { args: Args };
   const { vnode } = args;
@@ -29,9 +27,11 @@ export default function DiscussionCreate() {
   // Derive the target route params from the vnode — matches the backend
   // DiscussionCreateHandler registered on `/discuss/:type/:name/create`
   // (packages/hydrooj/src/handler/discussion.ts:434).
-  // - problem nodes (TYPE_PROBLEM = 1): name is the numeric docId
-  // - contest nodes (TYPE_CONTEST = 2): name is the stringified ObjectId
-  // - generic / discussion nodes (TYPE_DISCUSSION_NODE = 4 etc.): name is _id/id
+  // The TYPE_* constants mirror `packages/hydrooj/src/model/document.ts:22-31`
+  // (TYPE_PROBLEM=10, TYPE_CONTEST=30, TYPE_DISCUSSION_NODE=20).
+  // - problem nodes (TYPE_PROBLEM = 10): name is the numeric docId
+  // - contest nodes (TYPE_CONTEST = 30): name is the stringified ObjectId
+  // - generic / discussion nodes (TYPE_DISCUSSION_NODE = 20): name is _id/id
   let createType: string;
   let createName: string;
   if (vnode?.type === TYPE_PROBLEM) {

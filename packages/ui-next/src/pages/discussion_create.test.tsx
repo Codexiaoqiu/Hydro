@@ -6,6 +6,7 @@ import { ToastProvider } from '../components/primitives/Toast';
 import { type PageData, PageDataProvider } from '../context/page-data';
 import { RouterProvider } from '../context/router';
 import { routeMapStore } from '../globals';
+import { TYPE_CONTEST, TYPE_PROBLEM } from '../lib/document-types';
 import { ThemeProvider } from '../theme/ThemeProvider';
 import DiscussionCreate from './discussion_create';
 
@@ -124,7 +125,10 @@ describe('discussionCreate', () => {
     }
   });
 
-  it('derives type=problem and name=docId when vnode.type is TYPE_PROBLEM', async () => {
+  it('derives type=problem and name=docId when vnode.type is TYPE_PROBLEM (canonical 10)', async () => {
+    // Uses the symbolic constant so the test fails if anyone re-introduces
+    // a wrong literal `type: 1`.
+    expect(TYPE_PROBLEM).toBe(10);
     const user = userEvent.setup();
     const submitSpy = vi.fn();
     const realCreate = HTMLFormElement.prototype.submit;
@@ -132,7 +136,7 @@ describe('discussionCreate', () => {
     try {
       render(<Providers args={{
         path: [['discussion_main', 'discussion_main']],
-        vnode: { _id: 'mongoobjid42', id: 42, docId: 42, title: 'P-42', type: 1 },
+        vnode: { _id: 'mongoobjid42', id: 42, docId: 42, title: 'P-42', type: TYPE_PROBLEM },
       }}>
         <DiscussionCreate />
       </Providers>);
@@ -142,12 +146,15 @@ describe('discussionCreate', () => {
       const action = submitSpy.mock.calls[0]?.[0] as string | undefined;
       expect(action).toBeDefined();
       expect(action).toMatch(/\/discuss\/problem\/42\/create$/);
+      // Regression: must NOT fall through to /discuss/node/... .
+      expect(action).not.toMatch(/\/discuss\/node\//);
     } finally {
       HTMLFormElement.prototype.submit = realCreate;
     }
   });
 
-  it('derives type=contest and name=id when vnode.type is TYPE_CONTEST', async () => {
+  it('derives type=contest and name=id when vnode.type is TYPE_CONTEST (canonical 30)', async () => {
+    expect(TYPE_CONTEST).toBe(30);
     const user = userEvent.setup();
     const submitSpy = vi.fn();
     const realCreate = HTMLFormElement.prototype.submit;
@@ -155,7 +162,7 @@ describe('discussionCreate', () => {
     try {
       render(<Providers args={{
         path: [['discussion_main', 'discussion_main']],
-        vnode: { _id: 'cid', id: 'cid', title: 'Contest-X', type: 2 },
+        vnode: { _id: 'cid', id: 'cid', title: 'Contest-X', type: TYPE_CONTEST },
       }}>
         <DiscussionCreate />
       </Providers>);
@@ -165,6 +172,7 @@ describe('discussionCreate', () => {
       const action = submitSpy.mock.calls[0]?.[0] as string | undefined;
       expect(action).toBeDefined();
       expect(action).toMatch(/\/discuss\/contest\/cid\/create$/);
+      expect(action).not.toMatch(/\/discuss\/node\//);
     } finally {
       HTMLFormElement.prototype.submit = realCreate;
     }

@@ -1,10 +1,8 @@
+import { TYPE_CONTEST, TYPE_PROBLEM } from '../../lib/document-types';
 import { Link } from '../link';
 import { Button } from '../primitives/Button';
 import { Card } from '../primitives/Card';
 import styles from './DiscussionSidebar.module.css';
-
-const TYPE_PROBLEM = 1;
-const TYPE_CONTEST = 2;
 
 export interface DiscussionSidebarVnode {
   _id?: string;

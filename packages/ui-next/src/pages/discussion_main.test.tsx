@@ -5,6 +5,7 @@ import { ToastProvider } from '../components/primitives/Toast';
 import { type PageData, PageDataProvider } from '../context/page-data';
 import { RouterProvider } from '../context/router';
 import { routeMapStore } from '../globals';
+import { TYPE_CONTEST, TYPE_PROBLEM } from '../lib/document-types';
 import { ThemeProvider } from '../theme/ThemeProvider';
 import DiscussionMain from './discussion_main';
 
@@ -55,10 +56,12 @@ describe('discussionMain', () => {
 
   it('renders empty state when ddocs is empty (main)', () => {
     render(
-      <Providers name="discussion_main" args={{
-        page_name: 'discussion_main',
-        ddocs: [], dpcount: 1, page: 1, udict: {}, vndict: {}, vnode: {}, vnodes: [],
-      }}
+      <Providers
+        name="discussion_main"
+        args={{
+          page_name: 'discussion_main',
+          ddocs: [], dpcount: 1, page: 1, udict: {}, vndict: {}, vnode: {}, vnodes: [],
+        }}
       >
         <DiscussionMain />
       </Providers>,
@@ -68,16 +71,18 @@ describe('discussionMain', () => {
 
   it('renders list items and node sidebar when vnode present (node)', () => {
     render(
-      <Providers name="discussion_node" args={{
-        page_name: 'discussion_node',
-        ddocs: [
-          { _id: '1', docId: '1', title: 'topic', nReply: 1, views: 5, owner: 1, parentType: 4, parentId: 'n1', updateAt: 0 },
-        ],
-        dpcount: 1, page: 1, udict: { 1: { _id: 1, uname: 'a' } },
-        vndict: { '4': { n1: { title: 'Help', type: 4 } } },
-        vnode: { _id: 'n1', title: 'Help', type: 4 },
-        vnodes: [{ docId: 'n1', title: 'Help', content: 'Help' }],
-      }}
+      <Providers
+        name="discussion_node"
+        args={{
+          page_name: 'discussion_node',
+          ddocs: [
+            { _id: '1', docId: '1', title: 'topic', nReply: 1, views: 5, owner: 1, parentType: 4, parentId: 'n1', updateAt: 0 },
+          ],
+          dpcount: 1, page: 1, udict: { 1: { _id: 1, uname: 'a' } },
+          vndict: { 4: { n1: { title: 'Help', type: 4 } } },
+          vnode: { _id: 'n1', title: 'Help', type: 4 },
+          vnodes: [{ docId: 'n1', title: 'Help', content: 'Help' }],
+        }}
       >
         <DiscussionMain />
       </Providers>,
@@ -88,13 +93,15 @@ describe('discussionMain', () => {
 
   it('renders discussion_nodes widget for main', () => {
     render(
-      <Providers name="discussion_main" args={{
-        page_name: 'discussion_main',
-        ddocs: [], dpcount: 1, page: 1, udict: {}, vndict: {}, vnode: {}, vnodes: [
-          { docId: 'n1', title: 'Help', content: 'Help' },
-          { docId: 'n2', title: 'General', content: 'General' },
-        ],
-      }}
+      <Providers
+        name="discussion_main"
+        args={{
+          page_name: 'discussion_main',
+          ddocs: [], dpcount: 1, page: 1, udict: {}, vndict: {}, vnode: {}, vnodes: [
+            { docId: 'n1', title: 'Help', content: 'Help' },
+            { docId: 'n2', title: 'General', content: 'General' },
+          ],
+        }}
       >
         <DiscussionMain />
       </Providers>,
@@ -106,6 +113,8 @@ describe('discussionMain', () => {
   it('renders ProblemSidebar for problem-node pages and pagination uses logical docId', () => {
     // Problem nodes: vnode.id is the numeric docId; _id is the Mongo ObjectId.
     // Pagination must use `discuss/problem/<docId>`, not /discuss/node/<mongoId>.
+    // Uses canonical TYPE_PROBLEM (10) — fails if the comparison literal drifts.
+    expect(TYPE_PROBLEM).toBe(10);
     routeMapStore.set({
       ...baseRouteMap,
       problem_detail: '/p/:pid',
@@ -116,16 +125,18 @@ describe('discussionMain', () => {
       problem_statistics: '/p/:pid/statistics',
     } as any);
     render(
-      <Providers name="discussion_node" args={{
-        page_name: 'discussion_node',
-        ddocs: [
-          { _id: 'a', docId: 'a', title: 'topic-A', nReply: 0, views: 0, owner: 1, parentType: 1, parentId: 42, updateAt: 0 },
-        ],
-        dpcount: 3, page: 1, udict: { 1: { _id: 1, uname: 'a' } },
-        vndict: { '1': { '42': { title: 'P-42', type: 1, docId: 42 } } },
-        vnode: { _id: 'mongoobjid42', id: 42, docId: 42, pid: 'P42', title: 'P-42', type: 1 },
-        vnodes: [],
-      }}
+      <Providers
+        name="discussion_node"
+        args={{
+          page_name: 'discussion_node',
+          ddocs: [
+            { _id: 'a', docId: 'a', title: 'topic-A', nReply: 0, views: 0, owner: 1, parentType: TYPE_PROBLEM, parentId: 42, updateAt: 0 },
+          ],
+          dpcount: 3, page: 1, udict: { 1: { _id: 1, uname: 'a' } },
+          vndict: { [TYPE_PROBLEM]: { 42: { title: 'P-42', type: TYPE_PROBLEM, docId: 42 } } },
+          vnode: { _id: 'mongoobjid42', id: 42, docId: 42, pid: 'P42', title: 'P-42', type: TYPE_PROBLEM },
+          vnodes: [],
+        }}
       >
         <DiscussionMain />
       </Providers>,
@@ -145,17 +156,21 @@ describe('discussionMain', () => {
   it('renders a (non-null) sidebar for contest-node pages', () => {
     // I3 fix: contest-node branch should render a sidebar, not the generic
     // DiscussionSidebar (which returns null for TYPE_CONTEST).
+    // Uses canonical TYPE_CONTEST (30) — fails if the comparison literal drifts.
+    expect(TYPE_CONTEST).toBe(30);
     render(
-      <Providers name="discussion_node" args={{
-        page_name: 'discussion_node',
-        ddocs: [
-          { _id: 'c', docId: 'c', title: 'topic-C', nReply: 0, views: 0, owner: 1, parentType: 2, parentId: '64f0d4a5b1c2d3e4f5a6b7c9', updateAt: 0 },
-        ],
-        dpcount: 1, page: 1, udict: { 1: { _id: 1, uname: 'a' } },
-        vndict: { '2': { '64f0d4a5b1c2d3e4f5a6b7c9': { title: 'Contest-X', type: 2 } } },
-        vnode: { _id: '64f0d4a5b1c2d3e4f5a6b7c9', id: '64f0d4a5b1c2d3e4f5a6b7c9', title: 'Contest-X', type: 2 },
-        vnodes: [],
-      }}
+      <Providers
+        name="discussion_node"
+        args={{
+          page_name: 'discussion_node',
+          ddocs: [
+            { _id: 'c', docId: 'c', title: 'topic-C', nReply: 0, views: 0, owner: 1, parentType: TYPE_CONTEST, parentId: '64f0d4a5b1c2d3e4f5a6b7c9', updateAt: 0 },
+          ],
+          dpcount: 1, page: 1, udict: { 1: { _id: 1, uname: 'a' } },
+          vndict: { [TYPE_CONTEST]: { '64f0d4a5b1c2d3e4f5a6b7c9': { title: 'Contest-X', type: TYPE_CONTEST } } },
+          vnode: { _id: '64f0d4a5b1c2d3e4f5a6b7c9', id: '64f0d4a5b1c2d3e4f5a6b7c9', title: 'Contest-X', type: TYPE_CONTEST },
+          vnodes: [],
+        }}
       >
         <DiscussionMain />
       </Providers>,
@@ -171,12 +186,14 @@ describe('discussionMain', () => {
 
   it('renders a creation entry point when discussion_main is empty', () => {
     render(
-      <Providers name="discussion_main" args={{
-        page_name: 'discussion_main',
-        ddocs: [], dpcount: 1, page: 1, udict: {}, vndict: {}, vnode: {}, vnodes: [
-          { docId: 'nhelp', title: 'Help', content: 'Help' },
-        ],
-      }}
+      <Providers
+        name="discussion_main"
+        args={{
+          page_name: 'discussion_main',
+          ddocs: [], dpcount: 1, page: 1, udict: {}, vndict: {}, vnode: {}, vnodes: [
+            { docId: 'nhelp', title: 'Help', content: 'Help' },
+          ],
+        }}
       >
         <DiscussionMain />
       </Providers>,
@@ -202,18 +219,20 @@ describe('discussionMain', () => {
     } as any);
     // Multiple pages so Paginator emits a `?page=` href.
     render(
-      <Providers name="discussion_node" args={{
-        page_name: 'discussion_node',
-        ddocs: [
-          { _id: 'a', docId: 'a', title: 't1', nReply: 0, views: 0, owner: 1, parentType: 1, parentId: 42, updateAt: 0 },
-          { _id: 'b', docId: 'b', title: 't2', nReply: 0, views: 0, owner: 1, parentType: 1, parentId: 42, updateAt: 0 },
-          { _id: 'c', docId: 'c', title: 't3', nReply: 0, views: 0, owner: 1, parentType: 1, parentId: 42, updateAt: 0 },
-        ],
-        dpcount: 5, page: 1, udict: { 1: { _id: 1, uname: 'a' } },
-        vndict: { '1': { '42': { title: 'P-42', type: 1, docId: 42 } } },
-        vnode: { _id: 'mongoobjid42', id: 42, docId: 42, pid: 'P42', title: 'P-42', type: 1 },
-        vnodes: [],
-      }}
+      <Providers
+        name="discussion_node"
+        args={{
+          page_name: 'discussion_node',
+          ddocs: [
+            { _id: 'a', docId: 'a', title: 't1', nReply: 0, views: 0, owner: 1, parentType: TYPE_PROBLEM, parentId: 42, updateAt: 0 },
+            { _id: 'b', docId: 'b', title: 't2', nReply: 0, views: 0, owner: 1, parentType: TYPE_PROBLEM, parentId: 42, updateAt: 0 },
+            { _id: 'c', docId: 'c', title: 't3', nReply: 0, views: 0, owner: 1, parentType: TYPE_PROBLEM, parentId: 42, updateAt: 0 },
+          ],
+          dpcount: 5, page: 1, udict: { 1: { _id: 1, uname: 'a' } },
+          vndict: { [TYPE_PROBLEM]: { 42: { title: 'P-42', type: TYPE_PROBLEM, docId: 42 } } },
+          vnode: { _id: 'mongoobjid42', id: 42, docId: 42, pid: 'P42', title: 'P-42', type: TYPE_PROBLEM },
+          vnodes: [],
+        }}
       >
         <DiscussionMain />
       </Providers>,
@@ -238,18 +257,20 @@ describe('discussionMain', () => {
     // I1 fix: generic nodes use `node/<id>` (which is _id for TYPE_DISCUSSION_NODE).
     // The link must not contain the literal field name "_id" parsed as a key.
     render(
-      <Providers name="discussion_node" args={{
-        page_name: 'discussion_node',
-        ddocs: [
-          { _id: 'g', docId: 'g', title: 'g1', nReply: 0, views: 0, owner: 1, parentType: 4, parentId: 'help', updateAt: 0 },
-          { _id: 'h', docId: 'h', title: 'g2', nReply: 0, views: 0, owner: 1, parentType: 4, parentId: 'help', updateAt: 0 },
-          { _id: 'i', docId: 'i', title: 'g3', nReply: 0, views: 0, owner: 1, parentType: 4, parentId: 'help', updateAt: 0 },
-        ],
-        dpcount: 5, page: 1, udict: { 1: { _id: 1, uname: 'a' } },
-        vndict: { '4': { help: { title: 'Help', type: 4 } } },
-        vnode: { _id: 'help', title: 'Help', type: 4 },
-        vnodes: [],
-      }}
+      <Providers
+        name="discussion_node"
+        args={{
+          page_name: 'discussion_node',
+          ddocs: [
+            { _id: 'g', docId: 'g', title: 'g1', nReply: 0, views: 0, owner: 1, parentType: 4, parentId: 'help', updateAt: 0 },
+            { _id: 'h', docId: 'h', title: 'g2', nReply: 0, views: 0, owner: 1, parentType: 4, parentId: 'help', updateAt: 0 },
+            { _id: 'i', docId: 'i', title: 'g3', nReply: 0, views: 0, owner: 1, parentType: 4, parentId: 'help', updateAt: 0 },
+          ],
+          dpcount: 5, page: 1, udict: { 1: { _id: 1, uname: 'a' } },
+          vndict: { 4: { help: { title: 'Help', type: 4 } } },
+          vnode: { _id: 'help', title: 'Help', type: 4 },
+          vnodes: [],
+        }}
       >
         <DiscussionMain />
       </Providers>,
