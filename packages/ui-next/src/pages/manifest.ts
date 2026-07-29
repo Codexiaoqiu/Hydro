@@ -27,6 +27,7 @@ export const NEXT_PAGES = {
   discussion_detail: ['discussion_detail.html'],
   discussion_main: ['discussion_main_or_node.html'], // shared with discussion_node
   discussion_node: ['discussion_main_or_node.html'],
+  discussion_create: ['discussion_create.html'],
   user_detail: ['user_detail.html'],
   user_login: ['user_login.html'],
   user_register: ['user_register.html'],
