@@ -65,7 +65,15 @@ export default function UserSudoPage() {
       }
       setAuthnChallenge(verified.challenge);
     } catch (err) {
-      if (err instanceof HydroClientError) setError(err);
+      if (err instanceof HydroClientError) {
+        setError(err);
+      } else {
+        setError(new HydroClientError({
+          name: 'WebAuthnError',
+          code: 0,
+          message: err instanceof Error ? err.message : 'WebAuthn setup failed',
+        }));
+      }
     }
   };
 
