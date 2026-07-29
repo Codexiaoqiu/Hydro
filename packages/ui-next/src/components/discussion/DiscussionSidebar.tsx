@@ -1,6 +1,6 @@
-import { Card } from '../primitives/Card';
-import { Button } from '../primitives/Button';
 import { Link } from '../link';
+import { Button } from '../primitives/Button';
+import { Card } from '../primitives/Card';
 import styles from './DiscussionSidebar.module.css';
 
 const TYPE_PROBLEM = 1;
@@ -24,9 +24,21 @@ export interface DiscussionSidebarUser {
 
 export interface DiscussionSidebarProps {
   vnode: DiscussionSidebarVnode;
-  udict: Record<number, { _id: number; uname?: string; avatar?: string }>;
+  udict: Record<number, { _id: number, uname?: string, avatar?: string }>;
   user: DiscussionSidebarUser | null;
-  buildHref: (name: string, params?: Record<string, unknown>) => string;
+  /**
+   * Route-resolver signature matching `useBuildUrl`:
+   *   (name, params?, searchParams?) => string
+   * where `params` fill path-to-regexp placeholders and `searchParams` become
+   * the query string. Pages may pass either a wrapper that forwards all three
+   * args or a simpler `(name, params?) => string` for components that never
+   * emit query strings.
+   */
+  buildHref: (
+    name: string,
+    params?: Record<string, unknown>,
+    searchParams?: Record<string, string>,
+  ) => string;
   /** Permission id for "create discussion". Defaults to 1; pages can override. */
   createPerm?: number;
   /** Privilege id for "login required". Defaults to 1; pages can override. */
@@ -34,8 +46,18 @@ export interface DiscussionSidebarProps {
 }
 
 function LoginToCreate({ buildHref }: { buildHref: DiscussionSidebarProps['buildHref'] }) {
+  // Split path params from query string — previously the `redirect` value
+  // was nested under a `query` key, which path-to-regexp tried to match
+  // against a path placeholder, silently resolving to `#`.
   return (
-    <Link href={buildHref('user_login', { query: { redirect: typeof window !== 'undefined' ? window.location.pathname : '/' } })} className={styles.createBtn}>
+    <Link
+      href={buildHref(
+        'user_login',
+        {},
+        { redirect: typeof window !== 'undefined' ? window.location.pathname : '/' },
+      )}
+      className={styles.createBtn}
+    >
       登录后发起讨论
     </Link>
   );

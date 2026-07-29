@@ -60,7 +60,11 @@ describe('discussionEdit', () => {
     render(
       <Providers
         args={{ ddoc: { _id: 'd1', docId: 1, title: 'x', content: 'y' } }}
-        user={{ _id: 2, hasPerm: (p: bigint) => p !== (1n << 32n), own: () => false }}
+        user={{
+          _id: 2,
+          hasPerm: (p: bigint) => p !== (1n << 32n) && p !== (1n << 33n),
+          own: () => false,
+        }}
       >
         <DiscussionEdit />
       </Providers>,
@@ -68,11 +72,48 @@ describe('discussionEdit', () => {
     expect(screen.queryByRole('button', { name: /删除/ })).toBeNull();
   });
 
-  it('shows Delete button when user is owner', () => {
+  it('shows Delete button when user is owner and holds PERM_DELETE_DISCUSSION_SELF', () => {
     render(
       <Providers
         args={{ ddoc: { _id: 'd1', docId: 1, title: 'x', content: 'y' } }}
-        user={{ _id: 1, hasPerm: () => false, own: (doc: any) => doc._id === 'd1' }}
+        user={{
+          _id: 1,
+          hasPerm: (p: bigint) => p === (1n << 33n),
+          own: (doc: any) => doc._id === 'd1',
+        }}
+      >
+        <DiscussionEdit />
+      </Providers>,
+    );
+    expect(screen.getByRole('button', { name: /删除/ })).toBeInTheDocument();
+  });
+
+  it('hides Delete button for owner who lacks PERM_DELETE_DISCUSSION_SELF', () => {
+    // I3 fix: owner-only path requires the dedicated self-delete perm.
+    render(
+      <Providers
+        args={{ ddoc: { _id: 'd1', docId: 1, title: 'x', content: 'y' } }}
+        user={{
+          _id: 1,
+          hasPerm: (p: bigint) => p === (1n << 32n),
+          own: (doc: any) => doc._id === 'd1',
+        }}
+      >
+        <DiscussionEdit />
+      </Providers>,
+    );
+    expect(screen.queryByRole('button', { name: /删除/ })).toBeNull();
+  });
+
+  it('shows Delete button for non-owner admin who holds PERM_DELETE_DISCUSSION', () => {
+    render(
+      <Providers
+        args={{ ddoc: { _id: 'd1', docId: 1, title: 'x', content: 'y' } }}
+        user={{
+          _id: 99,
+          hasPerm: (p: bigint) => p === (1n << 32n),
+          own: () => false,
+        }}
       >
         <DiscussionEdit />
       </Providers>,

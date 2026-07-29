@@ -27,7 +27,14 @@ export default function DiscussionEdit() {
   const buildUrl = useBuildUrl();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-  const canDelete = !!user?.hasPerm?.(PERM.PERM_DELETE_DISCUSSION) || !!user?.own?.(ddoc);
+  // Mirror the server's gate in `packages/hydrooj/src/handler/discussion.ts:402-405`:
+  //   own delete requires `PERM.PERM_DELETE_DISCUSSION_SELF`, admin delete
+  //   requires `PERM.PERM_DELETE_DISCUSSION`. Using only the admin bit for
+  //   owners hid the control for self-delete and over-granted it to admins.
+  const isOwner = !!user?.own?.(ddoc);
+  const canDelete = isOwner
+    ? !!user?.hasPerm?.(PERM.PERM_DELETE_DISCUSSION_SELF)
+    : !!user?.hasPerm?.(PERM.PERM_DELETE_DISCUSSION);
 
   const submitUpdate = async ({
     title, content, highlight, pin,
