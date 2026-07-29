@@ -1,7 +1,8 @@
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
 import { Button } from './Button';
+import styles from './Button.module.css';
 
 describe('button', () => {
   it('renders children', () => {
@@ -20,33 +21,29 @@ describe('button', () => {
   it('applies primary variant class', () => {
     const { container } = render(<Button variant="primary">Go</Button>);
     const btn = container.querySelector('button');
-    expect(btn?.className).toMatch(/primary/i);
+    expect(btn?.className.split(' ')).toContain(styles.primary);
   });
 
   it('defaults to ghost variant class', () => {
     const { container } = render(<Button>Default</Button>);
     const btn = container.querySelector('button');
-    expect(btn?.className).toMatch(/ghost/i);
+    expect(btn?.className.split(' ')).toContain(styles.ghost);
   });
 
   it('respects type="submit"', () => {
     const { container } = render(<Button type="submit">Send</Button>);
-    const btn = container.querySelector('button');
-    expect(btn?.getAttribute('type')).toBe('submit');
+    expect(container.querySelector('button')?.getAttribute('type')).toBe('submit');
   });
 
   it('applies danger variant class', () => {
     const { container } = render(<Button variant="danger">Delete</Button>);
-    expect(container.querySelector('button')?.className).toMatch(/danger/i);
-  });
-
-  it('keeps ghost as default for unspecified variant', () => {
-    const { container } = render(<Button>Default</Button>);
-    expect(container.querySelector('button')?.className).toMatch(/ghost/i);
+    const btn = container.querySelector('button');
+    expect(btn?.className.split(' ')).toContain(styles.danger);
   });
 
   it('keeps primary intact', () => {
     const { container } = render(<Button variant="primary">Primary</Button>);
-    expect(container.querySelector('button')?.className).toMatch(/primary/i);
+    const btn = container.querySelector('button');
+    expect(btn?.className.split(' ')).toContain(styles.primary);
   });
 });
