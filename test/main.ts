@@ -141,6 +141,32 @@ describe('App', () => {
         });
     });
 
+    describe('SP2 discussion-domain e2e', () => {
+        it('GET /discuss returns ui-next shell (main)', async () => {
+            const res = await agent.get('/discuss').set('Accept', 'text/html');
+            assert.strictEqual(res.status, 200);
+            assert(res.text.includes('id="root"'));
+        });
+
+        it('GET /discuss/node/<name> returns ui-next shell (node)', async () => {
+            const res = await agent.get('/discuss/node/x').set('Accept', 'text/html');
+            assert.strictEqual(res.status, 200);
+            assert(res.text.includes('id="root"'));
+        });
+
+        it('GET /d/1/edit returns ui-next shell (edit)', async () => {
+            const res = await agent.get('/d/1/edit').set('Accept', 'text/html');
+            assert.strictEqual(res.status, 200);
+            assert(res.text.includes('id="root"'));
+        });
+
+        it('GET /discuss/<type>/<name>/create returns ui-next shell (create)', async () => {
+            const res = await agent.get('/discuss/node/x/create').set('Accept', 'text/html');
+            assert.strictEqual(res.status, 200);
+            assert(res.text.includes('id="root"'));
+        });
+    });
+
     // TODO add more tests
 
     const results: Record<string, autocannon.Result> = {};
