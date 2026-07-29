@@ -2,25 +2,9 @@ import Editor from '@monaco-editor/react';
 import type { ChangeEvent } from 'react';
 import { useCallback } from 'react';
 
-// TODO: 接入真正的 Monaco / CodeMirror
-//
-// This is the textarea fallback used everywhere `ProblemForm` / `Scratchpad`
-// would otherwise have mounted `<MonacoEditor />`. The real Monaco bindings
-// live in `packages/ui-default/components/scratchpad/ScratchpadEditorContainer.tsx`
-// and depend on the `monaco-editor` npm package — that dependency has not
-// been adopted into `@hydrooj/ui-next` yet, so the safe interim behaviour is
-// a plain `<textarea>` styled to look like an editor surface.
-//
-// Markers preserved from ui-default's `DataInputComponent.jsx`:
-//   * `spellCheck="false"`           — code shouldn't be spell-checked.
-//   * `wrap="off"`                   — soft-wrapped code is unreadable.
-//   * `data-monaco-fallback="true"`  — CSS hooks / e2e selectors can find
-//                                       every fallback and swap it out once
-//                                       the real Monaco is wired up.
-//   * `className="language-<lang>"`  — keeps highlight.js / prism.js happy
-//                                       (matches monaco's own `language-*`
-//                                       class so any existing CSS keeps
-//                                       rendering.
+// Textarea fallback for MonacoEditor. useMonaco defaults to false so that
+// problem_submit and other lightweight forms stay fast. Scratchpad and
+// ProblemConfigEditor explicitly pass useMonaco to get the real editor.
 
 export interface MonacoEditorProps {
   value: string;

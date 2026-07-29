@@ -1,7 +1,13 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { MonacoEditor } from './MonacoEditor';
+
+vi.mock('@monaco-editor/react', () => ({
+  default: (props: any) => (
+    <div data-testid="monaco-react" data-language={props.language}>{props.value}</div>
+  ),
+}));
 
 describe('monacoEditor', () => {
   it('forwards value, onChange, aria-label, name to the textarea', async () => {
@@ -52,5 +58,22 @@ describe('monacoEditor', () => {
     const ta = screen.getByLabelText('readonly');
     expect(ta).toBeInTheDocument();
     expect(ta).toHaveAttribute('readonly');
+  });
+
+  it('renders the monaco binding when useMonaco is true', () => {
+    render(<MonacoEditor value="code" onChange={() => {}} aria-label="ed" useMonaco language="cpp" />);
+    expect(screen.getByTestId('monaco-react')).toHaveAttribute('data-language', 'cpp');
+  });
+
+  it('falls back to textarea when useMonaco is false', () => {
+    render(<MonacoEditor value="code" onChange={() => {}} aria-label="ed" />);
+    expect(screen.getByLabelText('ed').tagName).toBe('TEXTAREA');
+  });
+
+  it('keeps the data-* fallback hooks in textarea mode', () => {
+    render(<MonacoEditor value="code" onChange={() => {}} aria-label="ed" language="python" />);
+    const ta = screen.getByLabelText('ed');
+    expect(ta).toHaveAttribute('data-monaco-fallback', 'true');
+    expect(ta).toHaveAttribute('data-language', 'python');
   });
 });
