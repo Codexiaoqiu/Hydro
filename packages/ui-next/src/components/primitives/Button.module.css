@@ -3,3 +3,7 @@
 .primary:hover { filter: brightness(1.05); }
 .ghost { background: transparent; color: var(--text-soft); }
 .ghost:hover { background: var(--surface-2); color: var(--text); }
+.danger { background: var(--danger, #c0392b); color: var(--danger-text, #fff); border: 1px solid transparent; }
+.danger:hover:not(:disabled) { background: var(--danger-strong, #a93226); }
+.danger:focus-visible { outline: 2px solid var(--danger-strong, #a93226); outline-offset: 2px; }
+.danger:disabled { background: var(--danger-mute, #e6a39a); cursor: not-allowed; opacity: 0.7; }

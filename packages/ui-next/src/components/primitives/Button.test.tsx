@@ -34,4 +34,19 @@ describe('button', () => {
     const btn = container.querySelector('button');
     expect(btn?.getAttribute('type')).toBe('submit');
   });
+
+  it('applies danger variant class', () => {
+    const { container } = render(<Button variant="danger">Delete</Button>);
+    expect(container.querySelector('button')?.className).toMatch(/danger/i);
+  });
+
+  it('keeps ghost as default for unspecified variant', () => {
+    const { container } = render(<Button>Default</Button>);
+    expect(container.querySelector('button')?.className).toMatch(/ghost/i);
+  });
+
+  it('keeps primary intact', () => {
+    const { container } = render(<Button variant="primary">Primary</Button>);
+    expect(container.querySelector('button')?.className).toMatch(/primary/i);
+  });
 });

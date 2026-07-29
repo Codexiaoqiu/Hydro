@@ -86,6 +86,7 @@ describe('discussionEdit', () => {
       </Providers>,
     );
     expect(screen.getByRole('button', { name: /删除/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /删除/ }).className).toMatch(/danger/);
   });
 
   it('hides Delete button for owner who lacks PERM_DELETE_DISCUSSION_SELF', () => {
@@ -119,5 +120,6 @@ describe('discussionEdit', () => {
       </Providers>,
     );
     expect(screen.getByRole('button', { name: /删除/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /删除/ }).className).toMatch(/danger/);
   });
 });

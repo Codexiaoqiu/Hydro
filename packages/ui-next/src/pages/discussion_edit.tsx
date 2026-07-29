@@ -88,11 +88,11 @@ export default function DiscussionEdit() {
         {canDelete && (
           <div className={styles.deleteRow}>
             {!showDeleteConfirm ? (
-              <Button type="button" variant="ghost" onClick={() => setShowDeleteConfirm(true)}>删除</Button>
+              <Button type="button" variant="danger" onClick={() => setShowDeleteConfirm(true)}>删除</Button>
             ) : (
               <div className={styles.confirmRow}>
                 <span>确认删除?</span>
-                <Button type="button" variant="ghost" onClick={submitDelete}>确认删除</Button>
+                <Button type="button" variant="danger" onClick={submitDelete}>确认删除</Button>
                 <Button type="button" variant="ghost" onClick={() => setShowDeleteConfirm(false)}>取消</Button>
               </div>
             )}
