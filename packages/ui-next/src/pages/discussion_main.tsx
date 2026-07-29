@@ -3,10 +3,12 @@ import {
     DiscussionNodesWidget,
     DiscussionSidebar,
 } from '../components/discussion';
+import { Card } from '../components/primitives/Card';
 import { ProblemSidebar } from '../components/sidebar/ProblemSidebar';
 import { usePageData, useUserContext } from '../context/page-data';
 import { useBuildUrl } from '../hooks/use-build-url';
 import { useTranslate } from '../lib/i18n';
+import { Link } from '../components/link';
 import styles from './discussion_main.module.css';
 
 interface Ddoc {
@@ -24,10 +26,11 @@ interface Ddoc {
 }
 interface VnodeLite {
     _id?: string;
-    id?: string;
+    id?: string | number;
     title?: string;
     type?: number;
-    docId?: string;
+    docId?: number;
+    pid?: string;
     owner?: number;
 }
 interface Vnode {
@@ -61,19 +64,46 @@ export default function DiscussionMain() {
 
     const isMain = page_name === 'discussion_main' || !vnode._id;
     const title = isMain ? t('Discussion') : (vnode.title || t('Discussion'));
-    const buildPageHref = (p: number) => (isMain
-        ? buildUrl('discussion_main', {}, { page: String(p) })
-        : buildUrl('discussion_node', { type: 'node', name: String(vnode._id || vnode.id) }, { page: String(p) }));
+
+    // Build pagination URL using the LOGICAL route identifier for the vnode type.
+    // - problem nodes use `docId` (numeric, also exposed as `pid`)
+    // - contest nodes use `id` (an ObjectId) as a string
+    // - generic nodes (TYPE_DISCUSSION_NODE = 4 / training) use `_id` / `id` as a string
+    const buildPageHref = (p: number) => {
+        if (isMain) return buildUrl('discussion_main', {}, { page: String(p) });
+        if (vnode?.type === TYPE_PROBLEM) {
+            const docId = vnode.docId ?? Number(vnode.id);
+            return buildUrl(
+                'discussion_node',
+                { type: 'problem', name: String(docId) },
+                { page: String(p) },
+            );
+        }
+        if (vnode?.type === TYPE_CONTEST) {
+            return buildUrl(
+                'discussion_node',
+                { type: 'contest', name: String(vnode.id ?? vnode._id) },
+                { page: String(p) },
+            );
+        }
+        return buildUrl(
+            'discussion_node',
+            { type: 'node', name: String(vnode._id || vnode.id) },
+            { page: String(p) },
+        );
+    };
 
     // Right column: pick sidebar by vnode.type (literal integers — see handler/discussion.ts typeMapper).
     let sidebar: React.ReactNode;
     if (!isMain && vnode?.type === TYPE_PROBLEM) {
+        const docId = vnode.docId ?? Number(vnode.id);
+        const pid = vnode.pid ?? String(vnode.id);
         sidebar = (
             <ProblemSidebar
                 context={{
                     pdoc: {
-                        docId: Number(vnode._id),
-                        pid: String(vnode._id),
+                        docId,
+                        pid,
                         title: vnode.title || '',
                         owner: vnode.owner || 0,
                     },
@@ -86,10 +116,28 @@ export default function DiscussionMain() {
                 mode="normal"
             />
         );
+    } else if (!isMain && vnode?.type === TYPE_CONTEST) {
+        // Contest-node pages need a minimal contextual sidebar. The shared
+        // `DiscussionSidebar` only handles generic nodes; render a custom
+        // Card mirroring its shape so contest discussions still surface a
+        // "create" entry point that links to `discussion_create`.
+        const createHref = buildUrl('discussion_create', {
+            type: 'contest',
+            name: String(vnode.id ?? vnode._id),
+        });
+        sidebar = (
+            <Card>
+                <h3 className={styles.sideTitle}>{vnode.title || t('Discussion')}</h3>
+                <Link to="discussion_detail" className={styles.sideLink}>
+                    {t('Discussion')}
+                </Link>
+                <Link href={createHref} className={styles.createBtn}>
+                    {t('CreateDiscussion')}
+                </Link>
+            </Card>
+        );
     } else {
-        // Generic / contest branches: DiscussionSidebar handles the empty-vnode
-        // (discussion_main) and non-problem/contest nodes. Contest-node parity
-        // with ContestDetailSidebar is out of scope for this task.
+        // Generic / empty (discussion_main) — handled by DiscussionSidebar.
         sidebar = (
             <DiscussionSidebar
                 vnode={vnode as any}
@@ -100,11 +148,65 @@ export default function DiscussionMain() {
         );
     }
 
+    // Header actions + breadcrumb. The create entry point is always surfaced;
+    // its target reflects whichever vnode we're rendering for.
+    const createHref = (() => {
+        if (isMain) return buildUrl('discussion_main');
+        if (vnode?.type === TYPE_PROBLEM) {
+            const docId = vnode.docId ?? Number(vnode.id);
+            return buildUrl('discussion_create', { type: 'problem', name: String(docId) });
+        }
+        if (vnode?.type === TYPE_CONTEST) {
+            return buildUrl('discussion_create', {
+                type: 'contest',
+                name: String(vnode.id ?? vnode._id),
+            });
+        }
+        return buildUrl('discussion_create', {
+            type: 'node',
+            name: String(vnode._id || vnode.id),
+        });
+    })();
+
+    const showBreadcrumb = !isMain;
+    const headerCreateEnabled = Boolean(user?._id);
+
     return (
         <div className={styles.layout}>
             <main className={styles.main}>
                 <header className={styles.head}>
-                    <h1>{title}</h1>
+                    <div className={styles.headRow}>
+                        <div>
+                            {showBreadcrumb && (
+                                <nav className={styles.crumbs} aria-label="breadcrumb">
+                                    <ol className={styles.crumbList}>
+                                        <li>
+                                            <Link to="homepage">{t('Home')}</Link>
+                                        </li>
+                                        <li>
+                                            <Link to="discussion_main">{t('Discussion')}</Link>
+                                        </li>
+                                        <li aria-current="page">{vnode.title || t('Discussion')}</li>
+                                    </ol>
+                                </nav>
+                            )}
+                            <h1>{title}</h1>
+                        </div>
+                        {!isMain && headerCreateEnabled && (
+                            <Link href={createHref} className={styles.headCreate}>
+                                {t('CreateDiscussion')}
+                            </Link>
+                        )}
+                        {!isMain && !headerCreateEnabled && (
+                            <Link
+                                to="user_login"
+                                searchParams={{ redirect: typeof window !== 'undefined' ? window.location.pathname : '/' }}
+                                className={styles.headCreate}
+                            >
+                                {t('LoginToCreateDiscussion')}
+                            </Link>
+                        )}
+                    </div>
                 </header>
                 <DiscussionList
                     ddocs={ddocs as any}
@@ -115,6 +217,17 @@ export default function DiscussionMain() {
                     buildHref={(name, params) => buildUrl(name, params as any)}
                     buildPageHref={buildPageHref}
                 />
+                {isMain && ddocs.length === 0 && vnodes[0] && (
+                    <p className={styles.emptyCreate}>
+                        <Link
+                            to="discussion_create"
+                            params={{ type: 'node', name: String(vnodes[0].docId) }}
+                            className={styles.createBtn}
+                        >
+                            {t('CreateDiscussion')}
+                        </Link>
+                    </p>
+                )}
             </main>
             <aside className={styles.side}>
                 {sidebar}

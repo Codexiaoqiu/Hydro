@@ -13,17 +13,94 @@
     padding: var(--space-2, 8px);
     border-bottom: 1px solid var(--border, rgba(0, 0, 0, 0.08));
 }
+.headRow {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-3, 12px);
+    flex-wrap: wrap;
+}
 .head h1 {
     font-family: var(--font-display, system-ui);
     font-size: var(--text-xl, 1.25rem);
     margin: 0;
 }
+.headCreate {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--space-2, 8px) var(--space-4, 16px);
+    border: 1px solid var(--accent, #5e6ad2);
+    border-radius: var(--radius-sm, 6px);
+    background: var(--accent, #5e6ad2);
+    color: var(--accent-fg, #fff);
+    text-decoration: none;
+    font-size: var(--text-sm, 0.875rem);
+    white-space: nowrap;
+}
+.headCreate:hover { opacity: 0.92; }
+.crumbs {
+    font-size: var(--text-xs, 0.75rem);
+    color: var(--fg-muted, #888);
+    margin-bottom: var(--space-2, 8px);
+}
+.crumbList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2, 8px);
+}
+.crumbList li + li::before {
+    content: ' / ';
+    margin-right: var(--space-2, 8px);
+    opacity: 0.5;
+}
+.crumbList a {
+    color: var(--fg-muted, #888);
+    text-decoration: none;
+}
+.crumbList a:hover { text-decoration: underline; }
 .side {
     align-self: start;
     display: flex;
     flex-direction: column;
     gap: var(--space-3, 12px);
 }
+.sideTitle {
+    font-family: var(--font-display, system-ui);
+    font-size: var(--text-lg, 1.125rem);
+    margin: 0 0 var(--space-2, 8px);
+}
+.sideLink {
+    display: inline-block;
+    margin-bottom: var(--space-2, 8px);
+    color: var(--fg-muted, #888);
+    text-decoration: none;
+    font-size: var(--text-xs, 0.75rem);
+}
+.sideLink:hover { text-decoration: underline; }
+.createBtn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: var(--space-2, 8px);
+    border: 1px solid var(--accent, #5e6ad2);
+    border-radius: var(--radius-sm, 6px);
+    background: var(--accent, #5e6ad2);
+    color: var(--accent-fg, #fff);
+    text-decoration: none;
+    cursor: pointer;
+}
+.createBtn:hover { opacity: 0.92; }
+
+.emptyCreate {
+    text-align: center;
+    padding: var(--space-3, 12px);
+    margin: 0;
+}
+
 @media (max-width: 768px) {
     .layout {
         grid-template-columns: 1fr;
