@@ -26,7 +26,7 @@ function wrap(ui: ReactNode, user: PageData['args']['UserContext']) {
   return render(<PageDataProvider initial={buildPageData(user)}>{ui}</PageDataProvider>);
 }
 
-describe('CommentsSection', () => {
+describe('commentsSection', () => {
   it('renders nothing when docs is empty', () => {
     wrap(
       <CommentsSection

@@ -1,6 +1,6 @@
 import { Paginator } from '../primitives/Paginator';
-import { DiscussionListItem, type DiscussionDdoc, type VnodeLite } from './DiscussionListItem';
 import styles from './DiscussionList.module.css';
+import { type DiscussionDdoc, DiscussionListItem, type VnodeLite } from './DiscussionListItem';
 
 export interface DiscussionListProps {
   ddocs: DiscussionDdoc[];

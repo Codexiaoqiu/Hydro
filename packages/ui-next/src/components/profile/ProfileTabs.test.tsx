@@ -11,7 +11,7 @@ function renderTabs(props: any) {
   return render(<ProfileTabs {...props} />);
 }
 
-describe('ProfileTabs', () => {
+describe('profileTabs', () => {
   it('renders the bio tab by default with the bio source', () => {
     renderTabs({ bio: 'hello world' });
     expect(screen.getByRole('tab', { name: '简介' })).toBeInTheDocument();

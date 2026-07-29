@@ -1,7 +1,7 @@
 import { useUserContext } from '../../context/page-data';
 import { CommentEditor } from './CommentEditor';
-import { CommentTree, type CommentItem } from './CommentTree';
 import styles from './CommentsSection.module.css';
+import { type CommentItem, CommentTree } from './CommentTree';
 
 export interface CommentsConfig {
   postOp: string;

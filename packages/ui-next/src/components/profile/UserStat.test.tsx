@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { UserStat } from './UserStat';
 
-describe('UserStat', () => {
+describe('userStat', () => {
   it('renders three labels with values', () => {
     render(<UserStat submitted={100} accepted={50} liked={12} />);
     expect(screen.getByText('100')).toBeInTheDocument();

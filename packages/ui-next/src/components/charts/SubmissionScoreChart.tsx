@@ -1,5 +1,5 @@
-import { TrendBars } from './TrendBars';
 import styles from './SubmissionScoreChart.module.css';
+import { TrendBars } from './TrendBars';
 
 export interface SubmissionScoreChartProps {
   scores: number[];

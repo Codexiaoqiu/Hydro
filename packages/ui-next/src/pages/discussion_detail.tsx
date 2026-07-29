@@ -1,11 +1,11 @@
+import { CommentsSection } from '../components/comments/CommentsSection';
+import { Link } from '../components/link';
+import { MarkdownPreview } from '../components/primitives/MarkdownPreview';
+import { Paginator } from '../components/primitives/Paginator';
+import { UserStat } from '../components/profile/UserStat';
 import { usePageData } from '../context/page-data';
 import { useBuildUrl } from '../hooks/use-build-url';
 import { useTranslate } from '../lib/i18n';
-import { Paginator } from '../components/primitives/Paginator';
-import { CommentsSection } from '../components/comments/CommentsSection';
-import { MarkdownPreview } from '../components/primitives/MarkdownPreview';
-import { Link } from '../components/link';
-import { UserStat } from '../components/profile/UserStat';
 import styles from './discussion_detail.module.css';
 
 interface Ddoc { docId: number, title: string, content: string, owner: number, parentType: number, parentId: number, react?: Record<string, number>, views: number, lock?: boolean, edited?: boolean }
@@ -65,9 +65,9 @@ export default function DiscussionDetail() {
             postOp: 'reply',
             editOp: 'edit_reply',
             deleteOp: 'delete_reply',
-            postPerm: 1,                  // PERM_REPLY_DISCUSSION
-            editSelfPerm: 1,              // PERM_EDIT_DISCUSSION_REPLY_SELF
-            editPerm: 1,                  // PERM_EDIT_DISCUSSION_REPLY
+            postPerm: 1, // PERM_REPLY_DISCUSSION
+            editSelfPerm: 1, // PERM_EDIT_DISCUSSION_REPLY_SELF
+            editPerm: 1, // PERM_EDIT_DISCUSSION_REPLY
             commentRef: 'drid',
             replyRef: 'drrid',
           }}

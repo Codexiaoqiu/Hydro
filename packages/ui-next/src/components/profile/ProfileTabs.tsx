@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { MarkdownPreview } from '../primitives/MarkdownPreview';
 import { Link } from '../link';
+import { MarkdownPreview } from '../primitives/MarkdownPreview';
 import styles from './ProfileTabs.module.css';
 
 export interface ProfileTabsProps {

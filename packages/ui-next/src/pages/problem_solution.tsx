@@ -1,12 +1,12 @@
-import { usePageData, useUserContext } from '../context/page-data';
-import { useBuildUrl } from '../hooks/use-build-url';
+import { CommentsSection } from '../components/comments/CommentsSection';
 import { Paginator } from '../components/primitives/Paginator';
 import { ProblemSidebar } from '../components/sidebar/ProblemSidebar';
-import { CommentsSection } from '../components/comments/CommentsSection';
+import { usePageData, useUserContext } from '../context/page-data';
+import { useBuildUrl } from '../hooks/use-build-url';
 import { useTranslate } from '../lib/i18n';
 import styles from './problem_solution.module.css';
 
-interface Psdoc { docId: string, owner: number, content: string, reply?: Psdoc[]; vote?: number }
+interface Psdoc { docId: string, owner: number, content: string, reply?: Psdoc[], vote?: number }
 interface Pdoc { docId: number, pid?: string, owner: number, title?: string }
 interface Args {
   psdocs: Psdoc[];
@@ -49,9 +49,9 @@ export default function ProblemSolution() {
             postOp: 'submit',
             editOp: 'edit_solution',
             deleteOp: 'delete_solution',
-            postPerm: 1,                  // PERM_CREATE_PROBLEM_SOLUTION
-            editSelfPerm: 1,              // PERM_EDIT_PROBLEM_SOLUTION_SELF
-            editPerm: 1,                  // PERM_EDIT_PROBLEM_SOLUTION
+            postPerm: 1, // PERM_CREATE_PROBLEM_SOLUTION
+            editSelfPerm: 1, // PERM_EDIT_PROBLEM_SOLUTION_SELF
+            editPerm: 1, // PERM_EDIT_PROBLEM_SOLUTION
             commentRef: 'psid',
             replyRef: 'psrid',
           }}

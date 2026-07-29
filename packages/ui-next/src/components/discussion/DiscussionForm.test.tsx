@@ -1,6 +1,7 @@
 /* @vitest-environment happy-dom */
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
+import { DiscussionForm } from './DiscussionForm';
 
 vi.mock('@monaco-editor/react', () => ({
   Editor: (props: {
@@ -29,9 +30,7 @@ vi.mock('@monaco-editor/react', () => ({
   loader: { config: vi.fn() },
 }));
 
-import { DiscussionForm } from './DiscussionForm';
-
-describe('DiscussionForm', () => {
+describe('discussionForm', () => {
   it('renders initial title and content', async () => {
     render(
       <DiscussionForm

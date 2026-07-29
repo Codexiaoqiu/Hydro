@@ -1,12 +1,12 @@
 import { STATUS, STATUS_SHORT_TEXTS } from '@hydrooj/common';
+import { SubmissionScoreChart } from '../components/charts/SubmissionScoreChart';
+import { SubmissionStatusChart } from '../components/charts/SubmissionStatusChart';
+import { Link } from '../components/link';
+import { Paginator } from '../components/primitives/Paginator';
+import { ProblemSidebar } from '../components/sidebar/ProblemSidebar';
 import { usePageData, useUserContext } from '../context/page-data';
 import { useNavigate } from '../context/router';
 import { useBuildUrl } from '../hooks/use-build-url';
-import { Paginator } from '../components/primitives/Paginator';
-import { ProblemSidebar } from '../components/sidebar/ProblemSidebar';
-import { SubmissionStatusChart } from '../components/charts/SubmissionStatusChart';
-import { SubmissionScoreChart } from '../components/charts/SubmissionScoreChart';
-import { Link } from '../components/link';
 import { formatMemoryMB } from '../lib/memory';
 import styles from './problem_statistics.module.css';
 

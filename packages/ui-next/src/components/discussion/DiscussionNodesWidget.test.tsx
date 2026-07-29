@@ -10,7 +10,7 @@ vi.mock('../link', () => ({
 const buildHref = (name: string, p?: Record<string, unknown>) =>
   name === 'discussion_node' ? `/discuss/${p?.type}/${p?.name}` : '#';
 
-describe('DiscussionNodesWidget', () => {
+describe('discussionNodesWidget', () => {
   it('groups nodes by content and renders one link per node', () => {
     const vnodes = [
       { docId: '1', title: 'General A', content: 'General' },

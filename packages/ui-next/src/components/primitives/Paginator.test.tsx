@@ -1,6 +1,6 @@
 /* @vitest-environment happy-dom */
 import { render, screen } from '@testing-library/react';
-import { describe, expect, it, beforeEach, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { PageDataProvider } from '../../context/page-data';
 import { RouterProvider } from '../../context/router';
 import { routeMapStore } from '../../globals';
@@ -21,7 +21,7 @@ function renderWithProviders(ui: React.ReactElement) {
   );
 }
 
-describe('Paginator', () => {
+describe('paginator', () => {
   beforeEach(() => {
     routeMapStore._routeMap = {};
     // Prevent RouterProvider from fetching page data on mount.

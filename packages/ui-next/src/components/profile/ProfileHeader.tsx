@@ -1,5 +1,5 @@
-import { Avatar } from '../primitives/Avatar';
 import { Link } from '../link';
+import { Avatar } from '../primitives/Avatar';
 import { useToast } from '../primitives/Toast';
 import styles from './ProfileHeader.module.css';
 

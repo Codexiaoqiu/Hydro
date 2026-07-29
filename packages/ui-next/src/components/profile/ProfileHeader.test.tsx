@@ -21,7 +21,7 @@ function renderHeader(props: any) {
   );
 }
 
-describe('ProfileHeader', () => {
+describe('profileHeader', () => {
   it('renders username', () => {
     renderHeader({ udoc: baseUdoc, isSelf: false, canViewPrivate: false });
     expect(screen.getByRole('heading', { name: 'alice' })).toBeInTheDocument();

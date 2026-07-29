@@ -1,10 +1,10 @@
 import { PERM } from '@hydrooj/common';
-import { usePageData, useUserContext } from '../context/page-data';
-import { useBuildUrl } from '../hooks/use-build-url';
+import { TagCloud } from '../components/primitives/TagCloud';
 import { ProfileHeader } from '../components/profile/ProfileHeader';
 import { ProfileTabs } from '../components/profile/ProfileTabs';
 import { UserStat } from '../components/profile/UserStat';
-import { TagCloud } from '../components/primitives/TagCloud';
+import { usePageData, useUserContext } from '../context/page-data';
+import { useBuildUrl } from '../hooks/use-build-url';
 import styles from './user_detail.module.css';
 
 interface Pdoc { docId: number, title: string, pid?: string, tag?: string[] }

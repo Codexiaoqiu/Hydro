@@ -1,5 +1,5 @@
-import { Card } from '../primitives/Card';
 import { Link } from '../link';
+import { Card } from '../primitives/Card';
 import styles from './DiscussionNodesWidget.module.css';
 
 export interface Vnode {

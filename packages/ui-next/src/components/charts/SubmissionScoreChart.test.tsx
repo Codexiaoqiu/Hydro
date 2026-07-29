@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { SubmissionScoreChart } from './SubmissionScoreChart';
 
-describe('SubmissionScoreChart', () => {
+describe('submissionScoreChart', () => {
   it('renders 10 buckets', () => {
     const { container } = render(<SubmissionScoreChart scores={[10, 20, 30, 100]} />);
     const bars = container.querySelectorAll('[data-trend-bar]');
