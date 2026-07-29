@@ -1,0 +1,15 @@
+.wrap { padding: var(--space-3, 12px); }
+.header { font-family: var(--font-display, system-ui); font-size: var(--text-md, 1rem); margin: 0; font-weight: 600; }
+.empty { color: var(--fg-muted, #888); text-align: center; padding: var(--space-2, 8px); margin: 0; }
+.group { margin: var(--space-2, 8px) 0; }
+.groupTitle { font-family: var(--font-display, system-ui); font-size: var(--text-sm, 0.875rem); color: var(--fg-muted, #888); margin: 0 0 var(--space-1, 4px); font-weight: 600; }
+.chipList { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: var(--space-1, 4px); }
+.chip {
+  display: inline-flex;
+  padding: var(--space-1, 4px) var(--space-2, 8px);
+  border: 1px solid var(--border, rgba(0,0,0,0.12));
+  border-radius: var(--radius-sm, 6px);
+  background: var(--surface-2, transparent);
+  font-size: var(--text-xs, 0.75rem);
+}
+.chip a { color: var(--accent, #5e6ad2); text-decoration: none; }
