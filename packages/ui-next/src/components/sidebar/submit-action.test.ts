@@ -4,7 +4,6 @@ import { resolveSubmitAction } from './submit-action';
 const baseInput = {
   loggedIn: true,
   hasSubmitPerm: true,
-  domainJoin: true,
   pid: 'P1000',
   tid: undefined as string | undefined,
 };
@@ -32,11 +31,6 @@ describe('resolveSubmitAction', () => {
     const r = resolveSubmitAction({ ...baseInput, hasSubmitPerm: false });
     expect(r.state).toBe('forbidden');
     expect(r.href).toBeUndefined();
-  });
-
-  it('returns forbidden when user has no domain join and cannot submit', () => {
-    const r = resolveSubmitAction({ ...baseInput, hasSubmitPerm: false, domainJoin: false });
-    expect(r.state).toBe('forbidden');
   });
 
   it('returns forbidden when pid is missing', () => {

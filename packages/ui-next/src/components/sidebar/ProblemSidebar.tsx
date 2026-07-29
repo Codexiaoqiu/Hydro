@@ -78,7 +78,6 @@ function buildSubmitItem(ctx: ProblemSidebarContext, t: (k: string) => string): 
   const r = resolveSubmitAction({
     loggedIn: isLoggedIn(ctx.UserContext),
     hasSubmitPerm: canSubmitProblem(ctx.UserContext),
-    domainJoin: true,
     pid: ctx.pdoc.pid ?? String(ctx.pdoc.docId),
     tid: ctx.tdoc?.docId,
   });

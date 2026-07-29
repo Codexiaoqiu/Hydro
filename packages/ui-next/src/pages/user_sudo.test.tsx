@@ -1,5 +1,5 @@
 /* @vitest-environment happy-dom */
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { type PageData, PageDataProvider } from '../context/page-data';
 import { RouterProvider } from '../context/router';
@@ -74,5 +74,39 @@ describe('userSudo', () => {
       </Providers>,
     );
     expect(screen.getByRole('button', { name: /Auth\.UseAuthenticator/ })).toBeInTheDocument();
+  });
+
+  it('shows method-switch links when multiple methods are available', () => {
+    render(
+      <Providers args={{
+        ...baseArgs,
+        UserContext: { ...baseArgs.UserContext, authn: true, tfa: true },
+      }}>
+        <UserSudoPage />
+      </Providers>,
+    );
+    // Default is authn (highest priority) — WebAuthn button visible.
+    expect(screen.getByRole('button', { name: /Auth\.UseAuthenticator/ })).toBeInTheDocument();
+    // TFA and password are still switchable.
+    expect(screen.getByText(/Auth\.UseTfaCode/)).toBeInTheDocument();
+    expect(screen.getByText(/Auth\.UsePassword/)).toBeInTheDocument();
+  });
+
+  it('switches to password when WebAuthn path is bypassed', () => {
+    render(
+      <Providers args={{
+        ...baseArgs,
+        UserContext: { ...baseArgs.UserContext, authn: true, tfa: true },
+      }}>
+        <UserSudoPage />
+      </Providers>,
+    );
+    // Default is authn, no password input visible.
+    expect(screen.queryByLabelText(/Auth\.Password/)).not.toBeInTheDocument();
+    // Click the password switch link.
+    fireEvent.click(screen.getByText(/Auth\.UsePassword/));
+    // Now password input appears, WebAuthn button is gone.
+    expect(screen.getByLabelText(/Auth\.Password/)).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Auth\.UseAuthenticator/ })).not.toBeInTheDocument();
   });
 });

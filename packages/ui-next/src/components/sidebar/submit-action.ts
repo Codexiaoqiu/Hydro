@@ -3,7 +3,6 @@ export type SubmitState = 'allowed' | 'anonymous' | 'forbidden';
 export interface SubmitInputs {
   loggedIn: boolean;
   hasSubmitPerm: boolean;
-  domainJoin: boolean;
   pid: string;
   tid?: string;
 }

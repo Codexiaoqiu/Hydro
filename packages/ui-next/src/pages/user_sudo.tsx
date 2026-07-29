@@ -17,6 +17,7 @@ interface Args {
 }
 
 const FALLBACK = '/homepage';
+type Method = 'authn' | 'tfa' | 'password';
 
 export default function UserSudoPage() {
   const { args } = usePageData() as unknown as { args: Args };
@@ -25,6 +26,9 @@ export default function UserSudoPage() {
   const origins = new Set<string>(args?.endpointOrigin ? [args.endpointOrigin] : []);
   const redirect = sanitizeSudoRedirect(args?.redirect ?? '', origins, FALLBACK);
   const user = args?.UserContext ?? {};
+  const [method, setMethod] = useState<Method>(
+    () => (user.authn ? 'authn' : user.tfa ? 'tfa' : 'password'),
+  );
   const [password, setPassword] = useState('');
   const [tfa, setTfa] = useState('');
   const [authnChallenge, setAuthnChallenge] = useState('');
@@ -77,23 +81,23 @@ export default function UserSudoPage() {
     }
   };
 
+  const switchTo = (next: Method) => (e: React.MouseEvent) => {
+    e.preventDefault();
+    setMethod(next);
+  };
+
   return (
     <AuthShell title={t('Auth.SudoTitle')} subtitle={t('Auth.SudoSubtitle')}>
       <form method="POST" onSubmit={submit}>
         {error && <Alert variant="error" message={error.message} />}
 
-        {!user.authn && !user.tfa && (
-          <Input
-            label={t('Auth.Password')}
-            type="password"
-            name="password"
-            autoComplete="current-password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
+        {user.authn && method === 'authn' && (
+          <Button type="button" variant="primary" onClick={runWebauthn} disabled={submitting}>
+            {authnChallenge ? t('Auth.WebAuthnVerified') : t('Auth.UseAuthenticator')}
+          </Button>
         )}
 
-        {user.tfa && !user.authn && (
+        {user.tfa && method === 'tfa' && (
           <Input
             label={t('Auth.TfaCode')}
             type="text"
@@ -104,14 +108,33 @@ export default function UserSudoPage() {
           />
         )}
 
-        {user.authn && (
-          <Button type="button" variant="primary" onClick={runWebauthn} disabled={submitting}>
-            {authnChallenge ? t('Auth.WebAuthnVerified') : t('Auth.UseAuthenticator')}
-          </Button>
+        {method === 'password' && (
+          <Input
+            label={t('Auth.Password')}
+            type="password"
+            name="password"
+            autoComplete="current-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        )}
+
+        {user.authn && method !== 'authn' && (
+          <a href="#sudo-method" onClick={switchTo('authn')}>{t('Auth.UseAuthenticator')}</a>
+        )}
+        {user.tfa && method !== 'tfa' && (
+          <a href="#sudo-method" onClick={switchTo('tfa')}>{t('Auth.UseTfaCode')}</a>
+        )}
+        {method !== 'password' && (
+          <a href="#sudo-method" onClick={switchTo('password')}>{t('Auth.UsePassword')}</a>
         )}
 
         <input type="hidden" name="authnChallenge" value={authnChallenge} />
-        <Button type="submit" variant="primary" disabled={submitting || (!!user.authn && !authnChallenge)}>
+        <Button
+          type="submit"
+          variant="primary"
+          disabled={submitting || (method === 'authn' && !authnChallenge)}
+        >
           {t('Auth.Confirm')}
         </Button>
       </form>

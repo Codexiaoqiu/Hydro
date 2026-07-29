@@ -374,7 +374,6 @@ export function ContestForm({ pageName, tdoc, tid, UserContext, languages = [], 
             </label>
             <select
               id="contest-permission"
-              name="_permission"
               className={styles.select}
               value={permission}
               onChange={(e) => setPermission(e.currentTarget.value as ContestPermission)}
