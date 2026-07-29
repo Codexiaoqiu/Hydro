@@ -21,6 +21,7 @@ registerPage('discussion_detail', () => import('./discussion_detail'));
 registerPage('discussion_main', () => import('./discussion_main'));
 registerPage('discussion_node', () => import('./discussion_main'));
 registerPage('discussion_create', () => import('./discussion_create'));
+registerPage('discussion_edit', () => import('./discussion_edit'));
 registerPage('user_detail', () => import('./user_detail'));
 registerPage('user_login', () => import('./user_login'), { layout: 'auth' });
 registerPage('user_register', () => import('./user_register'), { layout: 'auth' });
