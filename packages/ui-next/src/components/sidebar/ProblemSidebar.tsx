@@ -5,6 +5,7 @@ import {
   canViewDiscussion, canViewProblemSolution, isLoggedIn,
 } from '../../lib/perms';
 import { Menu, type MenuItem } from './Menu';
+import { resolveSubmitAction } from './submit-action';
 
 // ===== Shared Types (mirrored from problem_detail.tsx) =====================
 interface Pdoc {
@@ -73,14 +74,30 @@ export function getTidQuery(tdoc?: Tdoc): Record<string, string> {
   return tdoc && tdoc.docId != null ? { tid: String(tdoc.docId) } : {};
 }
 
+function buildSubmitItem(ctx: ProblemSidebarContext, t: (k: string) => string): MenuItem {
+  const r = resolveSubmitAction({
+    loggedIn: isLoggedIn(ctx.UserContext),
+    hasSubmitPerm: canSubmitProblem(ctx.UserContext),
+    domainJoin: true,
+    pid: ctx.pdoc.pid ?? String(ctx.pdoc.docId),
+    tid: ctx.tdoc?.docId,
+  });
+
+  if (r.state === 'allowed') {
+    return { key: 'submit', title: t('Problem.Submit'), href: r.href };
+  }
+  if (r.state === 'anonymous') {
+    return { key: 'submit', title: t(r.reasonKey ?? 'Problem.LoginToSubmit'), href: r.href };
+  }
+  return { key: 'submit', title: t(r.reasonKey ?? 'Problem.NoPermissionToSubmit'), disabled: true };
+}
+
 export function getNormalMenu(ctx: ProblemSidebarContext, t: (k: string, a?: Record<string, unknown>) => string): MenuItem[] {
   const {
     pdoc, tdoc, UserContext, buildUrl, discussionCount, solutionCount, psdoc,
   } = ctx;
 
   const items: MenuItem[] = [];
-  const loggedIn = isLoggedIn(UserContext);
-  const canSubmit = canSubmitProblem(UserContext);
   const canRejudge = canRejudgeProblem(UserContext);
   const canViewDisc = canViewDiscussion(UserContext);
   const psdocAccepted = psdoc?.status === STATUS.STATUS_ACCEPTED;
@@ -90,27 +107,7 @@ export function getNormalMenu(ctx: ProblemSidebarContext, t: (k: string, a?: Rec
   const editable = canEditProblem(UserContext, pdoc as unknown as { owner?: number });
   const showRejudge = canRejudge && !pdoc.reference;
 
-  if (canSubmit) {
-    items.push({
-      key: 'submit',
-      title: t('Problem.Submit'),
-      href: buildUrl('problem_submit', { pid: String(pdoc.docId) }, getTidQuery(tdoc)),
-    });
-  } else if (loggedIn) {
-    items.push({
-      key: 'submit',
-      title: t('Problem.NoPermissionToSubmit'),
-      href: '#',
-      onClick: () => { /* TODO: show permission hint */ },
-    });
-  } else {
-    items.push({
-      key: 'submit',
-      title: t('Problem.LoginToSubmit'),
-      href: '#',
-      onClick: () => { /* TODO: open sign-in dialog */ },
-    });
-  }
+  items.push(buildSubmitItem(ctx, t));
 
   if (showRejudge) {
     items.push({
@@ -198,29 +195,7 @@ export function getContestMenu(ctx: ProblemSidebarContext, mode: Mode, t: (k: st
   }
 
   if (mode === 'contest' || (mode !== 'view' && mode !== 'correction')) {
-    const loggedIn = isLoggedIn(UserContext);
-    const canSubmit = canSubmitProblem(UserContext);
-    if (canSubmit) {
-      items.push({
-        key: 'submit',
-        title: t('Problem.Submit'),
-        href: buildUrl('problem_submit', { pid: String(pdoc.docId) }, getTidQuery(tdoc)),
-      });
-    } else if (loggedIn) {
-      items.push({
-        key: 'submit',
-        title: t('Problem.NoPermissionToSubmit'),
-        href: '#',
-        onClick: () => { /* TODO */ },
-      });
-    } else {
-      items.push({
-        key: 'submit',
-        title: t('Problem.LoginToSubmit'),
-        href: '#',
-        onClick: () => { /* TODO */ },
-      });
-    }
+    items.push(buildSubmitItem(ctx, t));
   }
 
   const editable = canEditProblem(UserContext, pdoc as unknown as { owner?: number });
@@ -254,29 +229,7 @@ export function getHomeworkMenu(ctx: ProblemSidebarContext, mode: Mode, t: (k: s
       title: t('Problem.ViewProblem'),
       href: buildUrl('problem_detail', { pid: String(pdoc.docId) }, getTidQuery(tdoc)),
     });
-    const loggedIn = isLoggedIn(UserContext);
-    const canSubmit = canSubmitProblem(UserContext);
-    if (canSubmit) {
-      items.push({
-        key: 'submit',
-        title: t('Problem.Submit'),
-        href: buildUrl('problem_submit', { pid: String(pdoc.docId) }, getTidQuery(tdoc)),
-      });
-    } else if (loggedIn) {
-      items.push({
-        key: 'submit',
-        title: t('Problem.NoPermissionToSubmit'),
-        href: '#',
-        onClick: () => { /* TODO */ },
-      });
-    } else {
-      items.push({
-        key: 'submit',
-        title: t('Problem.LoginToSubmit'),
-        href: '#',
-        onClick: () => { /* TODO */ },
-      });
-    }
+    items.push(buildSubmitItem(ctx, t));
   } else {
     items.push({
       key: 'open-in-problem-set',

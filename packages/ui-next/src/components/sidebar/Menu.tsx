@@ -54,6 +54,8 @@ export interface MenuItem {
   csrf?: boolean;
   /** Render as a thin divider instead of a row. */
   separator?: boolean;
+  /** Non-interactive; renders as a <span> with no href/onClick/form. */
+  disabled?: boolean;
 }
 
 function readCsrfToken(): string | undefined {
@@ -109,6 +111,9 @@ function MenuRow({ item: it }: { item: MenuItem }) {
     </>
   );
 
+  if (it.disabled) {
+    return <span className={`${styles.row} ${styles.disabled}`}>{body}</span>;
+  }
   if (formConfig) {
     return <FormRow form={formConfig} body={body} />;
   }
