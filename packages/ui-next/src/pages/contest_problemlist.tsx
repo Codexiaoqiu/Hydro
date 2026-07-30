@@ -115,15 +115,6 @@ export default function ContestProblemListPage({ _pageData }: ContestProblemList
   const ctxPageData = usePageData() as { args?: ContestProblemListPageArgs } | null;
   const pageData = _pageData ?? ctxPageData;
   const args = pageData?.args;
-
-  if (!args || !args.tdoc) {
-    return (
-      <div className={styles.page} data-page="contest_problemlist">
-        <Alert variant="info" message={t('ContestDetail.Loading')} />
-      </div>
-    );
-  }
-
   const {
     tdoc,
     tsdoc = null,
@@ -134,13 +125,11 @@ export default function ContestProblemListPage({ _pageData }: ContestProblemList
     tcdocs = [],
     showScore = false,
     canViewRecord = false,
-  } = args;
-  const status: 'upcoming' | 'ongoing' | 'done' = isDone(tdoc)
-    ? 'done'
-    : isOngoing(tdoc)
-      ? 'ongoing'
-      : 'upcoming';
-  const pids = tdoc.pids ?? [];
+  } = args ?? {};
+  const status: 'upcoming' | 'ongoing' | 'done' = tdoc
+    ? (isDone(tdoc) ? 'done' : isOngoing(tdoc) ? 'ongoing' : 'upcoming')
+    : 'upcoming';
+  const pids = useMemo(() => tdoc?.pids ?? [], [tdoc?.pids]);
 
   // pid -> alphabetic label "A", "B", "C"…
   const pidLabels = useMemo<Record<number, string>>(() => {
@@ -148,6 +137,14 @@ export default function ContestProblemListPage({ _pageData }: ContestProblemList
     pids.forEach((pid, idx) => { out[pid] = String.fromCharCode(65 + idx); });
     return out;
   }, [pids]);
+
+  if (!args || !args.tdoc) {
+    return (
+      <div className={styles.page} data-page="contest_problemlist">
+        <Alert variant="info" message={t('ContestDetail.Loading')} />
+      </div>
+    );
+  }
 
   const userCtx = (args as Record<string, unknown>).UserContext as
     | { _id?: number, perm?: string, hasPerm?: (p: string) => boolean, own?: (d: { owner?: number | string }) => boolean }
@@ -164,7 +161,6 @@ export default function ContestProblemListPage({ _pageData }: ContestProblemList
       return userCtx?._id != null && d.owner != null && String(d.owner) === String(userCtx._id);
     },
   };
-  const isAdminOrOwner = currentUserPerms.hasPerm('PERM_EDIT_CONTEST') || currentUserPerms.own(tdoc);
 
   const urlForFile = (name: string) => buildUrl(
     'contest_file_download',

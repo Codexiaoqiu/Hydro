@@ -44,6 +44,7 @@ export default function ContestBalloonPage() {
   const tdoc = args?.tdoc;
   const [showSetColor, setShowSetColor] = useState(false);
 
+  // eslint-disable-next-line react-hooks/purity
   const ongoing = tdoc?.beginAt && tdoc?.endAt ? isOngoing(tdoc as any, Date.now()) : false;
   const { data, refresh } = useBalloonPoll<Polled>({
     url: `${window.location.pathname}${window.location.search}`,

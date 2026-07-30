@@ -58,6 +58,29 @@ function layoutReducer(_state: ScratchpadLayout, layout: ScratchpadLayout) {
   return layout;
 }
 
+function PersistenceInner({ problemKey }: { problemKey: string }) {
+  const { state, dispatch } = useScratchpad();
+  useScratchpadPersistence({
+    problemKey,
+    code: state.code,
+    onLoaded: (draft) => dispatch({ type: 'SET_CODE', payload: draft }),
+  });
+  return null;
+}
+
+function HotkeyInner({ onExit }: { onExit: () => void }) {
+  const { dispatch } = useScratchpad();
+  useScratchpadHotkeys({
+    onRunPretest: () => undefined,
+    onSubmit: () => undefined,
+    onExit,
+    onTogglePretest: () => dispatch({ type: 'TOGGLE_PANEL', payload: 'pretest' }),
+    onToggleRecords: () => dispatch({ type: 'TOGGLE_PANEL', payload: 'records' }),
+    canPretest: true,
+  });
+  return null;
+}
+
 export function ScratchpadPanel(props: ScratchpadPanelProps) {
   const t = useTranslate();
   const initialLang = (props.UserContext.codeLang ?? '').split('.')[0] || 'cpp';
@@ -71,6 +94,7 @@ export function ScratchpadPanel(props: ScratchpadPanelProps) {
   );
 
   function handleExit() {
+    // eslint-disable-next-line no-alert
     if (window.confirm(t('Scratchpad.UnsavedConfirm'))) props.onExit();
   }
 
@@ -167,27 +191,4 @@ export function ScratchpadPanel(props: ScratchpadPanelProps) {
       </div>
     </ScratchpadProvider>
   );
-}
-
-function PersistenceInner({ problemKey }: { problemKey: string }) {
-  const { state, dispatch } = useScratchpad();
-  useScratchpadPersistence({
-    problemKey,
-    code: state.code,
-    onLoaded: (draft) => dispatch({ type: 'SET_CODE', payload: draft }),
-  });
-  return null;
-}
-
-function HotkeyInner({ onExit }: { onExit: () => void }) {
-  const { dispatch } = useScratchpad();
-  useScratchpadHotkeys({
-    onRunPretest: () => undefined,
-    onSubmit: () => undefined,
-    onExit,
-    onTogglePretest: () => dispatch({ type: 'TOGGLE_PANEL', payload: 'pretest' }),
-    onToggleRecords: () => dispatch({ type: 'TOGGLE_PANEL', payload: 'records' }),
-    canPretest: true,
-  });
-  return null;
 }

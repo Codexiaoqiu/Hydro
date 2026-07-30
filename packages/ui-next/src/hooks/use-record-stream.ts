@@ -20,6 +20,7 @@ export function useRecordStream<T extends RecordStreamRow>({
 }: UseRecordStreamOptions<T>) {
   const wsRef = useRef<WebSocket | null>(null);
   const onRecordRef = useRef(onRecord);
+  // eslint-disable-next-line react-hooks/refs
   onRecordRef.current = onRecord;
 
   useEffect(() => {

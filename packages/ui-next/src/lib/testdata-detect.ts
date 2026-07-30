@@ -20,49 +20,6 @@ const DEFAULT_SCORE = 10;
  * The client-side fallback is only used when the @hydrooj/common module is
  * unavailable in the bundle.
  */
-export function detectSubtasks(files: string[]): DetectedSubtask[] {
-  // Try to use @hydrooj/common::readSubtasksFromFiles when available; the
-  // server's signature is `(files, config)` so we pass a minimal config.
-  let readSubtasksFromFiles: ((files: string[], cfg: unknown) => unknown) | null = null;
-  let normalizeSubtasks: ((raw: unknown, check: (n: string) => string, t?: string, m?: string) => { subtasks: unknown[] }) | null = null;
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const subtask = require('@hydrooj/common/subtask');
-    if (typeof subtask.readSubtasksFromFiles === 'function') {
-      readSubtasksFromFiles = subtask.readSubtasksFromFiles;
-    }
-    if (typeof subtask.normalizeSubtasks === 'function') {
-      normalizeSubtasks = subtask.normalizeSubtasks;
-    }
-  } catch {
-    // Fall through to client-side heuristic.
-  }
-
-  if (readSubtasksFromFiles && normalizeSubtasks) {
-    try {
-      const raw = readSubtasksFromFiles(files, {}) as unknown[];
-      // checkFile is the server's file-existence check; the client doesn't
-      // touch the filesystem, so a permissive identity function is fine.
-      const normalized = normalizeSubtasks(raw, (n: string) => n, '1000ms', '256m');
-      const subtasks = normalized.subtasks;
-      if (Array.isArray(subtasks) && subtasks.length > 0) {
-        return subtasks.map((s: any, idx: number) => ({
-          id: idx + 1,
-          cases: Array.isArray(s.cases)
-            ? s.cases.map((c: any) => ({ input: String(c.input ?? ''), output: String(c.output ?? '') }))
-            : [],
-          score: typeof s.score === 'number' ? s.score : DEFAULT_SCORE,
-        }));
-      }
-    } catch {
-      // fall through to client-side
-    }
-  }
-
-  // Client-side fallback
-  return clientSideDetect(files);
-}
-
 function clientSideDetect(files: string[]): DetectedSubtask[] {
   // Find pairs using the same heuristics as @hydrooj/common/subtask.ts
   const inputExts = ['.in', '.IN', '.txt', '.TXT', '.in.txt', '.IN.TXT'];
@@ -141,4 +98,60 @@ function clientSideDetect(files: string[]): DetectedSubtask[] {
       cases: group.map((c) => ({ input: c.input, output: c.output })),
       score: DEFAULT_SCORE,
     }));
+}
+
+/**
+ * Client-side fallback detection when @hydrooj/common::subtask exports
+ * don't match the expected signatures.
+ *
+ * Detects two naming conventions:
+ *   - Plain:     1.in / 1.out / 2.in / 2.out  → single subtask, all cases
+ *   - Subtask-Case: 1-1.in / 1-1.out / 1-2.in / 1-2.out / 2-1.in / 2-1.out
+ *                  → grouped by subtask number (first segment)
+ *
+ * I-6: prefer the server's `readSubtasksFromFiles` (with a minimal config)
+ * so the heuristic stays aligned with what the judge will see at runtime.
+ * The client-side fallback is only used when the @hydrooj/common module is
+ * unavailable in the bundle.
+ */
+export function detectSubtasks(files: string[]): DetectedSubtask[] {
+  // Try to use @hydrooj/common::readSubtasksFromFiles when available; the
+  // server's signature is `(files, config)` so we pass a minimal config.
+  let readSubtasksFromFiles: ((files: string[], cfg: unknown) => unknown) | null = null;
+  let normalizeSubtasks: ((raw: unknown, check: (n: string) => string, t?: string, m?: string) => { subtasks: unknown[] }) | null = null;
+  try {
+    const subtask = require('@hydrooj/common/subtask');
+    if (typeof subtask.readSubtasksFromFiles === 'function') {
+      readSubtasksFromFiles = subtask.readSubtasksFromFiles;
+    }
+    if (typeof subtask.normalizeSubtasks === 'function') {
+      normalizeSubtasks = subtask.normalizeSubtasks;
+    }
+  } catch {
+    // Fall through to client-side heuristic.
+  }
+
+  if (readSubtasksFromFiles && normalizeSubtasks) {
+    try {
+      const raw = readSubtasksFromFiles(files, {}) as unknown[];
+      // checkFile is the server's file-existence check; the client doesn't
+      // touch the filesystem, so a permissive identity function is fine.
+      const normalized = normalizeSubtasks(raw, (n: string) => n, '1000ms', '256m');
+      const subtasks = normalized.subtasks;
+      if (Array.isArray(subtasks) && subtasks.length > 0) {
+        return subtasks.map((s: any, idx: number) => ({
+          id: idx + 1,
+          cases: Array.isArray(s.cases)
+            ? s.cases.map((c: any) => ({ input: String(c.input ?? ''), output: String(c.output ?? '') }))
+            : [],
+          score: typeof s.score === 'number' ? s.score : DEFAULT_SCORE,
+        }));
+      }
+    } catch {
+      // fall through to client-side
+    }
+  }
+
+  // Client-side fallback
+  return clientSideDetect(files);
 }

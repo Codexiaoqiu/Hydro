@@ -96,7 +96,7 @@ describe('problemImportPage', () => {
     renderImport();
 
     fireEvent.click(screen.getByRole('button', { name: 'Load PageData' }));
-    const input = await screen.findByLabelText('Package (.zip)');
+    const input = await screen.findByLabelText(/压缩包|Package/i);
     const file = new File(['zip'], 'problems.zip', { type: 'application/zip' });
     fireEvent.change(input, { target: { files: [file] } });
     const form = input.closest('form');
@@ -113,7 +113,7 @@ describe('problemImportPage', () => {
     renderImport();
 
     fireEvent.click(screen.getByRole('button', { name: 'Load PageData' }));
-    const input = await screen.findByLabelText('Package (.zip)');
+    const input = await screen.findByLabelText(/压缩包|Package/i);
     const file = new File(['zip'], 'problems.zip', { type: 'application/zip' });
     fireEvent.change(input, { target: { files: [file] } });
     const form = input.closest('form');
@@ -121,5 +121,14 @@ describe('problemImportPage', () => {
     fireEvent.submit(form!);
 
     expect(await screen.findByText('Unexpected upload failure')).toBeInTheDocument();
+  });
+
+  // Regression: package label must surface in both zh_CN and en catalogs
+  // (regex matches either spelling so the assertion is locale-agnostic).
+  it('renders the package label in the active locale', async () => {
+    renderImport();
+    fireEvent.click(screen.getByRole('button', { name: 'Load PageData' }));
+    const input = await screen.findByLabelText(/压缩包|Package/i);
+    expect(input).toHaveAttribute('type', 'file');
   });
 });

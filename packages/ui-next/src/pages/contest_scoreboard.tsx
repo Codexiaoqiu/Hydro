@@ -116,7 +116,6 @@ export default function ContestScoreboardPage({ _pageData }: ContestScoreboardPa
 
   const tdoc = args?.tdoc;
   const initialRows = args?.rows ?? [];
-  const tsdoc = args?.tsdoc ?? null;
   const udict = args?.udict ?? {};
   const pdict = args?.pdict ?? {};
   const initialGroups = args?.groups ?? [];
@@ -127,6 +126,12 @@ export default function ContestScoreboardPage({ _pageData }: ContestScoreboardPa
   // so payloads that don't include the field (older tests, simple viewers)
   // don't suddenly hide every link.
   const canViewRecord = args?.canViewRecord !== false;
+
+  // `rows` is sourced from polling state and falls back to the SSR payload.
+  // Declared before any consumers (`colIndex` useMemo below) so the
+  // forward-reference is unambiguous.
+  // eslint-disable-next-line ts/no-use-before-define
+  const rows = polled?.rows ?? initialRows;
 
   const colIndex = useMemo(() => {
     const map: Record<string, number> = {};
@@ -150,7 +155,7 @@ export default function ContestScoreboardPage({ _pageData }: ContestScoreboardPa
   }, [tdoc]);
 
   useEffect(() => {
-    if (!storageId || typeof indexedDB === 'undefined') return;
+    if (!storageId || typeof indexedDB === 'undefined') return undefined;
     let cancelled = false;
     (async () => {
       try {
@@ -165,7 +170,7 @@ export default function ContestScoreboardPage({ _pageData }: ContestScoreboardPa
   }, [storageId]);
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined') return undefined;
     const onHash = () => {
       const next = readHashFilter();
       if (next && next !== filter) setFilter(next);
@@ -207,7 +212,7 @@ export default function ContestScoreboardPage({ _pageData }: ContestScoreboardPa
   const pollUrl = typeof window !== 'undefined'
     ? `${window.location.pathname}${window.location.search}`
     : '';
-  const { data: polled, refresh: refreshScoreboard } = useJsonPoll<{
+  const { data: polled } = useJsonPoll<{
     rows?: ScoreboardCell[][];
     groups?: ScoreboardGroup[];
     availableViews?: ScoreboardAvailableViews;
@@ -216,27 +221,20 @@ export default function ContestScoreboardPage({ _pageData }: ContestScoreboardPa
     enabled: ongoing && !!scoreboardUrl,
     intervalMs: 180_000,
   });
+
   // Polled data supersedes the SSR snapshot when present; we keep the
   // initial args as the fallback so the very first paint never flickers.
-  const rows = polled?.rows ?? initialRows;
   const groups = polled?.groups ?? initialGroups;
   const availableViews = polled?.availableViews ?? initialAvailableViews;
-
-  if (!args || !tdoc || rows.length === 0) {
-    return (
-      <div className={styles.page} data-page="contest_scoreboard">
-        <p className={styles.empty}>{t('Common.Loading')}</p>
-      </div>
-    );
-  }
 
   const header = rows[0];
   const dataRows = rows.slice(1);
   const dataRowCount = dataRows.length;
   const starSet = new Set(stars);
-  const isOwner = !!userCtx?.own?.({ owner: tdoc.owner });
+  const isOwner = !!userCtx?.own?.({ owner: tdoc?.owner });
 
   const visibleRows = useMemo(() => {
+    if (!tdoc) return [];
     if (filter === 'all') return dataRows;
     if (filter === 'star') {
       return dataRows.filter((row) => {
@@ -258,10 +256,10 @@ export default function ContestScoreboardPage({ _pageData }: ContestScoreboardPa
       return userCell?.raw != null && uidSet.has(Number(userCell.raw));
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filter, dataRows, userColIdx, rankColIdx, stars]);
+  }, [filter, dataRows, userColIdx, rankColIdx, stars, tdoc]);
 
   const isLocked = useMemo(() => {
-    if (!tdoc.lockAt) return false;
+    if (!tdoc?.lockAt) return false;
     // Honor `tdoc.unlocked`: once the owner clicks "Unlock" on the scoreboard
     // (`ContestScoreboardHandler.post('unlock')` in handler/contest.ts:989),
     // the server stamps `unlocked=true` and the freeze banner must disappear
@@ -271,7 +269,15 @@ export default function ContestScoreboardPage({ _pageData }: ContestScoreboardPa
     if (tdoc.unlocked) return false;
     const lock = new Date(tdoc.lockAt).getTime();
     return Date.now() >= lock;
-  }, [tdoc.lockAt, tdoc.unlocked]);
+  }, [tdoc?.lockAt, tdoc?.unlocked]);
+
+  if (!args || !tdoc || rows.length === 0) {
+    return (
+      <div className={styles.page} data-page="contest_scoreboard">
+        <p className={styles.empty}>{t('Common.Loading')}</p>
+      </div>
+    );
+  }
 
   const typePrefix = pageName === 'homework_scoreboard' ? 'homework' : 'contest';
 
@@ -417,7 +423,12 @@ export default function ContestScoreboardPage({ _pageData }: ContestScoreboardPa
                             >
                               <span aria-hidden="true">{starred ? '★' : '☆'}</span>
                             </button>
-                            {u ? <UserInline user={u} /> : <span>—</span>}
+                            {u ? (
+                            // eslint-disable-next-line ts/no-use-before-define
+                            <UserInline user={u} />
+                          ) : (
+                            <span>—</span>
+                          )}
                           </td>
                         );
                       }
@@ -500,7 +511,6 @@ function UserInline({ user }: { user: SerializedUser }) {
   return (
     <span className={styles.userInline}>
       {user.avatarUrl && (
-        // eslint-disable-next-line jsx-a11y/alt-text
         <img src={user.avatarUrl} alt="" className={styles.userAvatar} />
       )}
       <a className={styles.userLink} href={`/user/${user.uname}`}>

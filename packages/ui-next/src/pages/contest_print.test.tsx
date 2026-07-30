@@ -17,6 +17,8 @@ vi.mock('../hooks/use-api', () => ({
 
 vi.mock('../components/primitives/Toast', () => ({
   ToastProvider: ({ children }: any) => children,
+}));
+vi.mock('../components/primitives/use-toast', () => ({
   useToast: () => ({ info: vi.fn(), success: vi.fn(), error: vi.fn() }),
 }));
 

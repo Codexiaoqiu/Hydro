@@ -1,6 +1,16 @@
 import { useTranslate } from '../../lib/i18n';
 import { useScratchpad } from './ScratchpadContext';
 
+const btnStyle: React.CSSProperties = {
+  background: 'transparent',
+  border: '1px solid var(--border)',
+  color: 'var(--text-soft)',
+  padding: '2px 8px',
+  borderRadius: 'var(--radius-sm)',
+  fontSize: 'var(--text-xs)',
+  cursor: 'pointer',
+};
+
 export function PretestPanel() {
   const { state, dispatch } = useScratchpad();
   const t = useTranslate();
@@ -77,13 +87,3 @@ export function PretestPanel() {
     </div>
   );
 }
-
-const btnStyle: React.CSSProperties = {
-  background: 'transparent',
-  border: '1px solid var(--border)',
-  color: 'var(--text-soft)',
-  padding: '2px 8px',
-  borderRadius: 'var(--radius-sm)',
-  fontSize: 'var(--text-xs)',
-  cursor: 'pointer',
-};

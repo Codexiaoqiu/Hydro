@@ -4,7 +4,7 @@ import { detectLocale, useTranslate } from '../../lib/i18n';
 import { Button } from '../primitives/Button';
 import { Input } from '../primitives/Input';
 import { Modal } from '../primitives/Modal';
-import { useToast } from '../primitives/Toast';
+import { useToast } from '../primitives/use-toast';
 
 export interface CopyToDomainDialogProps {
   /** When false the dialog renders nothing. The page toggles this itself. */
@@ -54,7 +54,9 @@ export function CopyToDomainDialog({
   // Reset local state when the dialog closes so the next open starts fresh.
   useEffect(() => {
     if (!open) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setTarget('');
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setBusy(false);
     }
   }, [open]);

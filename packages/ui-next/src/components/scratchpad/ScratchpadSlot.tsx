@@ -78,4 +78,6 @@ const ScratchpadPlaceholder: React.FC<ScratchpadSlotProps> = () => (
   </div>
 );
 
-export default defineSlot('problem:sidebar:scratchpad', ScratchpadPlaceholder);
+const ProblemSidebarScratchpadSlot = defineSlot('problem:sidebar:scratchpad', ScratchpadPlaceholder);
+
+export default ProblemSidebarScratchpadSlot;

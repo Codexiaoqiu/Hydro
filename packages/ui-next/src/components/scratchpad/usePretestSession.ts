@@ -16,10 +16,11 @@ export function usePretestSession({ url, enabled, rid, dispatch }: UsePretestSes
   const retriesRef = useRef(0);
   const reconnectTimerRef = useRef<number | null>(null);
   const enabledRef = useRef(enabled);
+  // eslint-disable-next-line react-hooks/refs
   enabledRef.current = enabled;
 
   useEffect(() => {
-    if (!enabledRef.current || !rid) return;
+    if (!enabledRef.current || !rid) return undefined;
 
     let cancelled = false;
 

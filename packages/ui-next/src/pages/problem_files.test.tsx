@@ -1,9 +1,5 @@
 /* @vitest-environment happy-dom */
-<<<<<<< Updated upstream
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
-=======
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
->>>>>>> Stashed changes
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ToastProvider } from '../components/primitives';
 import { type PageData, PageDataProvider } from '../context/page-data';
@@ -53,11 +49,7 @@ describe('problem_files page', () => {
   });
 
   it('renders upload widget for a freshly created problem (no files yet)', () => {
-<<<<<<< Updated upstream
     renderPage({ pdoc: { docId: 1, pid: 'P1000', title: 'Sum' }, UserContext: { _id: 1, perm: 'BigInt::32' } });
-=======
-    renderPage({ pdoc: { docId: 1, pid: 'P1000', title: 'Sum' }, UserContext: { _id: 1 } });
->>>>>>> Stashed changes
     expect(screen.getByText(/尚未上传|None uploaded/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /上传|Upload/i })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /返回编辑|Back to edit/i })).toBeInTheDocument();
@@ -71,11 +63,7 @@ describe('problem_files page', () => {
         { name: 'sample.in', size: 1024 },
         { name: 'sample.out', size: 2048 },
       ],
-<<<<<<< Updated upstream
       UserContext: { _id: 1, perm: 'BigInt::32' },
-=======
-      UserContext: { _id: 1 },
->>>>>>> Stashed changes
     });
     expect(screen.getByText('sample.in')).toBeInTheDocument();
     expect(screen.getByText('sample.out')).toBeInTheDocument();
@@ -85,22 +73,14 @@ describe('problem_files page', () => {
     renderPage({
       pdoc: { docId: 1, pid: 'P1000', title: 'Sum' },
       testdata: [{ name: '1.in', size: 10 }, { name: '1.out', size: 20 }],
-<<<<<<< Updated upstream
       UserContext: { _id: 1, perm: 'BigInt::32' },
-=======
-      UserContext: { _id: 1 },
->>>>>>> Stashed changes
     });
     expect(screen.getByText('1.in')).toBeInTheDocument();
     expect(screen.getByText('1.out')).toBeInTheDocument();
   });
 
   it('shows error when pdoc is missing', () => {
-<<<<<<< Updated upstream
     renderPage({ UserContext: { _id: 1, perm: 'BigInt::32' } });
-=======
-    renderPage({ UserContext: { _id: 1 } });
->>>>>>> Stashed changes
     expect(screen.getByRole('alert')).toBeInTheDocument();
   });
 
@@ -109,11 +89,7 @@ describe('problem_files page', () => {
       pdoc: { docId: 1, pid: 'P1000', title: 'Ref' },
       testdata: [{ name: '1.in', size: 10 }], // so Download ZIP renders
       reference: { domainId: 'other', pid: 'P1' },
-<<<<<<< Updated upstream
       UserContext: { _id: 1, perm: 'BigInt::32' },
-=======
-      UserContext: { _id: 1 },
->>>>>>> Stashed changes
     });
     const buttons = screen.getAllByRole('button');
     const labels = buttons.map((b) => (b.textContent || '').trim());
@@ -126,7 +102,6 @@ describe('problem_files page', () => {
     for (const b of blocked) expect(b).toBeDisabled();
   });
 
-<<<<<<< Updated upstream
   it('disables edit controls without problem edit permission', () => {
     renderPage({
       pdoc: { docId: 1, pid: 'P1000', title: 'Read only' },
@@ -143,25 +118,17 @@ describe('problem_files page', () => {
     for (const b of additionalDeletes) expect(b).toBeDisabled();
   });
 
-=======
->>>>>>> Stashed changes
   it('re-fetches page JSON after a testdata mutation instead of reloading', async () => {
     const request = await getRequest();
     renderPage({
       pdoc: { docId: 1, pid: 'P1000', title: 'Sum' },
       testdata: [{ name: '1.in', size: 10 }],
-<<<<<<< Updated upstream
       UserContext: { _id: 1, perm: 'BigInt::32' },
     });
     fireEvent.click(screen.getByRole('button', { name: /delete 1\.in/i }));
     // Task 10: a delete confirmation modal now gates the POST. Confirm it.
     const dialog = await screen.findByRole('alertdialog');
     fireEvent.click(within(dialog).getByRole('button', { name: /删除|delete/i }));
-=======
-      UserContext: { _id: 1 },
-    });
-    fireEvent.click(screen.getByRole('button', { name: /delete 1\.in/i }));
->>>>>>> Stashed changes
     await waitFor(() => expect(request.post).toHaveBeenCalled());
     await waitFor(() => expect(request.get).toHaveBeenCalledWith('/p/P1000/files'));
   });
@@ -181,7 +148,6 @@ describe('problem_files page', () => {
         { name: '1.in', size: 10 },
         { name: '1.out', size: 20 },
       ],
-<<<<<<< Updated upstream
       UserContext: { _id: 1, perm: 'BigInt::32' },
     });
     // First mutation -> recalibrate #1 (in-flight, slow). Task 10 added a
@@ -189,22 +155,13 @@ describe('problem_files page', () => {
     fireEvent.click(screen.getByRole('button', { name: /delete 1\.in/i }));
     let dialog = await screen.findByRole('alertdialog');
     fireEvent.click(within(dialog).getByRole('button', { name: /删除|delete/i }));
-=======
-      UserContext: { _id: 1 },
-    });
-    // First mutation -> recalibrate #1 (in-flight, slow).
-    fireEvent.click(screen.getByRole('button', { name: /delete 1\.in/i }));
->>>>>>> Stashed changes
     await waitFor(() => expect(request.post).toHaveBeenCalledTimes(1));
     expect(screen.queryByText('1.in')).not.toBeInTheDocument();
 
     // Second mutation -> recalibrate #2 (fast, supersedes #1).
     fireEvent.click(screen.getByRole('button', { name: /delete 1\.out/i }));
-<<<<<<< Updated upstream
     dialog = await screen.findByRole('alertdialog');
     fireEvent.click(within(dialog).getByRole('button', { name: /删除|delete/i }));
-=======
->>>>>>> Stashed changes
     await waitFor(() => expect(request.post).toHaveBeenCalledTimes(2));
     await waitFor(() => expect(request.get).toHaveBeenCalledTimes(2));
     expect(screen.queryByText('1.out')).not.toBeInTheDocument();
@@ -224,17 +181,11 @@ describe('problem_files page', () => {
     renderPage({
       pdoc: { docId: 1, pid: 'P1000', title: 'Sum' },
       testdata: [{ name: '1.in', size: 10 }],
-<<<<<<< Updated upstream
       UserContext: { _id: 1, perm: 'BigInt::32' },
     });
     fireEvent.click(screen.getByRole('button', { name: /delete 1\.in/i }));
     const dialog = await screen.findByRole('alertdialog');
     fireEvent.click(within(dialog).getByRole('button', { name: /删除|delete/i }));
-=======
-      UserContext: { _id: 1 },
-    });
-    fireEvent.click(screen.getByRole('button', { name: /delete 1\.in/i }));
->>>>>>> Stashed changes
     await waitFor(() => expect(request.get).toHaveBeenCalled());
     // Optimistic list must still reflect the deletion.
     expect(screen.queryByText('1.in')).not.toBeInTheDocument();

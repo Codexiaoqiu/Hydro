@@ -46,7 +46,6 @@ export function ProblemConfigEditor(props: ProblemConfigEditorProps) {
   if (typeof window === 'undefined') return <FallbackTextarea {...props} />;
   // Fallback path has no debounce — the parent's onReady handle becomes a
   // no-op so callers can call it unconditionally before Save.
-  const noopApi = { flushPendingChange: () => {} };
   return (
     <Suspense fallback={<FallbackTextarea {...props} />}>
       <MonacoWrapper

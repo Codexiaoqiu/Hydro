@@ -56,7 +56,10 @@ export function ProblemConfigTree({ config, testdata, onChange, onAutoDetect }: 
   };
 
   const removeSubtask = (idx: number) => {
-    if (typeof window !== 'undefined' && !window.confirm(`Delete subtask ${idx + 1}?`)) return;
+    if (typeof window !== 'undefined') {
+      // eslint-disable-next-line no-alert
+      if (!window.confirm(`Delete subtask ${idx + 1}?`)) return;
+    }
     apply((cfg) => ({
       ...cfg,
       subtasks: (cfg.subtasks ?? []).filter((_, i) => i !== idx),

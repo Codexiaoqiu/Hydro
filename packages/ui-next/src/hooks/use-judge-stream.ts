@@ -117,7 +117,7 @@ export function useJudgeStream(rids: string[], opts: Options = {}): JudgeStreamS
   };
 
   useEffect(() => {
-    if (opts.paused) return;
+    if (opts.paused) return undefined;
     connect();
     return () => {
       clearScheduledConnect();

@@ -19,7 +19,7 @@ import {
 } from 'react';
 import { Alert, Button } from '../components/primitives';
 import { Modal } from '../components/primitives/Modal';
-import { useToast } from '../components/primitives/Toast';
+import { useToast } from '../components/primitives/use-toast';
 import { usePageData, useUserContext } from '../context/page-data';
 import { request } from '../hooks/use-api';
 import { useTranslate } from '../lib/i18n';

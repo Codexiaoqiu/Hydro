@@ -64,13 +64,6 @@ export default function ContestClarificationPage() {
     }
   };
 
-  const onAskSubmitted = (payload?: { subject?: number, content?: string }) => {
-    // Dead branch retained as a no-op so the type union still compiles if
-    // callers are added later. The ContestClarificationForm no longer
-    // accepts mode='ask', so this handler will not fire under current UI.
-    void payload;
-  };
-
   return (
     <div className={styles.page} data-page="contest_clarification">
       <div className={styles.layout}>

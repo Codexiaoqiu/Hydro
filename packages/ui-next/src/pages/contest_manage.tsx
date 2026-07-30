@@ -3,7 +3,7 @@ import {
 } from 'react';
 import { ContestBackLink } from '../components/contest/ContestBackLink';
 import { Link } from '../components/link';
-import { useToast } from '../components/primitives/Toast';
+import { useToast } from '../components/primitives/use-toast';
 import { usePageData } from '../context/page-data';
 import { request } from '../hooks/use-api';
 import { useTranslate } from '../lib/i18n';
@@ -79,6 +79,7 @@ export default function ContestManagePage({ _pageData }: ContestManagePageProps 
                       const pdoc = pdict[String(pid)];
                       const currentScore = scoreMap[String(pid)];
                       return (
+                        // eslint-disable-next-line ts/no-use-before-define
                         <ScoreRow
                           key={pid}
                           pid={pid}
@@ -96,11 +97,13 @@ export default function ContestManagePage({ _pageData }: ContestManagePageProps 
             </div>
           </section>
 
+          {/* eslint-disable-next-line ts/no-use-before-define */}
           <FilePanel
             title={t('ContestManage.PublicFiles')}
             type="public"
             files={args.files ?? []}
           />
+          {/* eslint-disable-next-line ts/no-use-before-define */}
           <FilePanel
             title={t('ContestManage.PrivateFiles')}
             type="private"

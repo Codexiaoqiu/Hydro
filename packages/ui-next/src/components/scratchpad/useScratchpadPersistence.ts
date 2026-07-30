@@ -9,6 +9,7 @@ export interface UseScratchpadPersistenceArgs {
 
 export function useScratchpadPersistence({ problemKey, code, onLoaded }: UseScratchpadPersistenceArgs) {
   const onLoadedRef = useRef(onLoaded);
+  // eslint-disable-next-line react-hooks/refs
   onLoadedRef.current = onLoaded;
 
   useEffect(() => {

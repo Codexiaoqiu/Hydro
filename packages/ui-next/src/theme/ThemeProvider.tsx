@@ -8,15 +8,6 @@ function applyTheme(next: Theme) {
   window.dispatchEvent(new CustomEvent('hydro:theme-change'));
 }
 
-function resolveInitial(): Theme {
-  if (typeof window === 'undefined') return 'dark';
-  let saved: string | null = null;
-  try { saved = window.localStorage.getItem(STORAGE_KEY); } catch {}
-  if (saved === 'dark' || saved === 'light') return saved;
-  if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) return 'light';
-  return 'dark';
-}
-
 export function ThemeProvider({ children }: PropsWithChildren) {
   // Read what the inline script set on <html>; never override on first render.
   const [theme, setThemeState] = useState<Theme>(() => {
@@ -37,7 +28,7 @@ export function ThemeProvider({ children }: PropsWithChildren) {
   }, []);
 
   useEffect(() => {
-    if (typeof window.matchMedia === 'undefined') return;
+    if (typeof window.matchMedia === 'undefined') return undefined;
     const mql = window.matchMedia('(prefers-color-scheme: light)');
     const onChange = () => {
       let saved: string | null = null;

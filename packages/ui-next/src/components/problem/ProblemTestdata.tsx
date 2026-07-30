@@ -1,29 +1,28 @@
 import { useRef, useState } from 'react';
-import { Button } from '../primitives/Button';
-import { Checkbox } from '../primitives/Checkbox';
-<<<<<<< Updated upstream
-import { ConfirmDialog } from '../primitives/ConfirmDialog';
-=======
->>>>>>> Stashed changes
-import { useTranslate } from '../../lib/i18n';
 import { request } from '../../hooks/use-api';
-import { useToast } from '../primitives/Toast';
 import { useFileSelection } from '../../hooks/use-file-selection';
 import { buildDownloadZip } from '../../lib/download-zip';
-import { type RenameChange } from '../../lib/file-rename';
+import type { RenameChange } from '../../lib/file-rename';
+import { useTranslate } from '../../lib/i18n';
 import { BatchRenameDialog } from '../files/BatchRenameDialog';
 import { FilePreviewDialog } from '../files/FilePreviewDialog';
+import { Button } from '../primitives/Button';
+import { Checkbox } from '../primitives/Checkbox';
+import { ConfirmDialog } from '../primitives/ConfirmDialog';
+import { useToast } from '../primitives/use-toast';
 import { ProblemCreateTestdata } from './ProblemCreateTestdata';
 import { ProblemGenerateTestdata } from './ProblemGenerateTestdata';
 import styles from './ProblemTestdata.module.css';
 
-export interface ProblemTestdataFile { name: string; size: number }
+export interface ProblemTestdataFile { name: string, size: number }
 export interface ProblemTestdataProps {
   pid: string;
   files: ProblemTestdataFile[];
   disabled?: boolean;
-  /** Called after any mutation with the optimistic next list. The page uses
-   *  this to re-request the authoritative file list as JSON. */
+  /**
+   * Called after any mutation with the optimistic next list. The page uses
+   *  this to re-request the authoritative file list as JSON.
+   */
   onChange: (next: ProblemTestdataFile[]) => void;
 }
 
@@ -33,11 +32,8 @@ export function ProblemTestdata({ pid, files, disabled, onChange }: ProblemTestd
   const [busy, setBusy] = useState(false);
   const [renameOpen, setRenameOpen] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
-<<<<<<< Updated upstream
   const [confirmSingle, setConfirmSingle] = useState<string | null>(null);
   const [confirmBulk, setConfirmBulk] = useState(false);
-=======
->>>>>>> Stashed changes
   const inputRef = useRef<HTMLInputElement>(null);
   const toast = useToast();
   const t = useTranslate();
@@ -112,8 +108,11 @@ export function ProblemTestdata({ pid, files, disabled, onChange }: ProblemTestd
       });
       const targets = names
         .map((n) => ({ filename: n, url: resp.links?.[n] }))
-        .filter((tg): tg is { filename: string; url: string } => !!tg.url);
-      if (!targets.length) { toast.error(t('ProblemTestdata.NoLinks')); return; }
+        .filter((tg): tg is { filename: string, url: string } => !!tg.url);
+      if (!targets.length) {
+        toast.error(t('ProblemTestdata.NoLinks'));
+        return;
+      }
       const { blob, failures } = await buildDownloadZip(targets);
       if (failures.length) toast.error(t('ProblemTestdata.ZipFailed', { count: failures.length }));
       if (blob && typeof URL !== 'undefined' && URL.createObjectURL) {
@@ -154,11 +153,7 @@ export function ProblemTestdata({ pid, files, disabled, onChange }: ProblemTestd
           <div className={styles.tools}>
             <Button variant="ghost" onClick={selection.selectAll} disabled={disabled}>{t('ProblemTestdata.SelectAll')}</Button>
             <Button variant="ghost" onClick={() => setRenameOpen(true)} disabled={disabled || selected.length === 0}>{t('ProblemTestdata.Rename')}</Button>
-<<<<<<< Updated upstream
             <Button variant="ghost" onClick={() => setConfirmBulk(true)} disabled={disabled || busy || selected.length === 0}>{t('ProblemTestdata.DeleteSelected')}</Button>
-=======
-            <Button variant="ghost" onClick={() => remove(selected)} disabled={disabled || busy || selected.length === 0}>{t('ProblemTestdata.DeleteSelected')}</Button>
->>>>>>> Stashed changes
           </div>
           <ul className={styles.list}>
             {files.map((f) => (
@@ -178,39 +173,11 @@ export function ProblemTestdata({ pid, files, disabled, onChange }: ProblemTestd
                   {f.name}
                 </button>
                 <span className={styles.size}>{(f.size / 1024).toFixed(1)} KB</span>
-<<<<<<< Updated upstream
                 <Button variant="ghost" onClick={() => setConfirmSingle(f.name)} disabled={disabled || busy} aria-label={`delete ${f.name}`}>×</Button>
-=======
-                <Button variant="ghost" onClick={() => remove([f.name])} disabled={disabled || busy} aria-label={`delete ${f.name}`}>×</Button>
->>>>>>> Stashed changes
               </li>
             ))}
           </ul>
         </>
-<<<<<<< Updated upstream
-=======
-      )}
-
-      <BatchRenameDialog
-        open={renameOpen}
-        selected={selected}
-        existing={names}
-        onClose={() => setRenameOpen(false)}
-        onConfirm={rename}
-      />
-
-      {preview && (
-        <FilePreviewDialog
-          open
-          filename={preview}
-          url={`/p/${encodeURIComponent(pid)}/file/${encodeURIComponent(preview)}?type=${TYPE}`}
-          uploadUrl={endpoint}
-          type={TYPE}
-          size={files.find((f) => f.name === preview)?.size}
-          onClose={() => setPreview(null)}
-          onSaved={() => onChange(files)}
-        />
->>>>>>> Stashed changes
       )}
 
       <BatchRenameDialog

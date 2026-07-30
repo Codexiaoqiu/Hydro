@@ -1,7 +1,8 @@
 /* @vitest-environment happy-dom */
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import { Avatar, avatarUrl } from './avatar';
+import { Avatar } from './avatar';
+import { avatarUrl } from './avatar-url';
 
 describe('avatarUrl', () => {
   it('gravatar hashes lowercase email', () => {

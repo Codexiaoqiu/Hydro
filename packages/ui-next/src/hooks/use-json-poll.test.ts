@@ -24,26 +24,24 @@ afterEach(() => {
 
 describe('useJsonPoll', () => {
   it('fetches immediately when enabled and exposes {data, pending, error, refresh}', async () => {
-    let hook: any;
+    const hook = renderHook(() =>
+      useJsonPoll<{ rows: number[] }>({ url: '/x', enabled: true, intervalMs: 1000 }),
+    );
     await act(async () => {
-      hook = renderHook(() =>
-        useJsonPoll<{ rows: number[] }>({ url: '/x', enabled: true, intervalMs: 1000 }),
-      );
       await vi.advanceTimersByTimeAsync(0);
     });
-    expect(hook!.result.current.data).toEqual({ rows: [1] });
-    expect(hook!.result.current.pending).toBe(false);
-    expect(hook!.result.current.error).toBeNull();
-    expect(typeof hook!.result.current.refresh).toBe('function');
+    expect(hook.result.current.data).toEqual({ rows: [1] });
+    expect(hook.result.current.pending).toBe(false);
+    expect(hook.result.current.error).toBeNull();
+    expect(typeof hook.result.current.refresh).toBe('function');
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
   it('sends same-origin credentials and Accept: application/json', async () => {
-    let hook: any;
+    renderHook(() =>
+      useJsonPoll({ url: '/x', enabled: true, intervalMs: 60_000 }),
+    );
     await act(async () => {
-      hook = renderHook(() =>
-        useJsonPoll({ url: '/x', enabled: true, intervalMs: 60_000 }),
-      );
       await vi.advanceTimersByTimeAsync(0);
     });
     expect(fetchMock).toHaveBeenCalledWith(

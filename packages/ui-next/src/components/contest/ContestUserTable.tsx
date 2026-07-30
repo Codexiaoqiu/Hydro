@@ -4,7 +4,7 @@ import { canResumeContestUser } from '../../lib/contest-user';
 import { formatDateTime } from '../../lib/datetime';
 import { useTranslate } from '../../lib/i18n';
 import { Button } from '../primitives/Button';
-import { useToast } from '../primitives/Toast';
+import { useToast } from '../primitives/use-toast';
 import styles from './ContestUserTable.module.css';
 
 export interface ContestUserRow {
@@ -33,15 +33,6 @@ export interface ContestUserTableProps {
    *  `window.location.reload()`.
    */
   onChange?: () => void;
-}
-
-function personalEndAt(row: ContestUserRow, tdoc: ContestUserTableProps['tdoc']): number {
-  const starts = row.startAt ? new Date(row.startAt).getTime() : 0;
-  const dur = (tdoc.duration ?? 0) * 3_600_000;
-  const per = starts && dur ? starts + dur : Number.POSITIVE_INFINITY;
-  const tdocEnd = new Date(tdoc.endAt).getTime();
-  const rowEnd = row.endAt ? new Date(row.endAt).getTime() : Number.POSITIVE_INFINITY;
-  return Math.min(per, tdocEnd, rowEnd);
 }
 
 /**

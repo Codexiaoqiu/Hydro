@@ -1,6 +1,16 @@
 import { useTranslate } from '../../lib/i18n';
 import { useScratchpad } from './ScratchpadContext';
 
+const btnStyle: React.CSSProperties = {
+  background: 'var(--surface-2)',
+  border: '1px solid var(--border)',
+  color: 'var(--text)',
+  padding: '4px 12px',
+  borderRadius: 'var(--radius-sm)',
+  fontSize: 'var(--text-sm)',
+  cursor: 'pointer',
+};
+
 interface PdocMinimal {
   config?: { type?: string, langs?: string[] } | string;
 }
@@ -62,7 +72,8 @@ export function ScratchpadToolbar({
       if (data.url) window.location.href = data.url;
     } catch (e) {
       dispatch({ type: 'SUBMIT_END' });
-      alert((e as Error).message); // replaced by toast in follow-up
+      // eslint-disable-next-line no-alert
+      alert((e as Error).message);
     }
   }
 
@@ -100,13 +111,3 @@ export function ScratchpadToolbar({
     </div>
   );
 }
-
-const btnStyle: React.CSSProperties = {
-  background: 'transparent',
-  border: '1px solid var(--border)',
-  color: 'var(--text-soft)',
-  padding: '4px 10px',
-  borderRadius: 'var(--radius-sm)',
-  fontSize: 'var(--text-xs)',
-  cursor: 'pointer',
-};

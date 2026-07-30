@@ -3,7 +3,8 @@ import {
   afterEach, beforeEach, describe, expect, it, vi,
 } from 'vitest';
 import { ToastProvider } from '../primitives/Toast';
-import { FilePreviewDialog, previewKind } from './FilePreviewDialog';
+import { FilePreviewDialog } from './FilePreviewDialog';
+import { previewKind } from './preview-kind';
 
 const fetchMock = vi.fn();
 const createObjectURL = vi.fn(() => 'blob:mock-url');

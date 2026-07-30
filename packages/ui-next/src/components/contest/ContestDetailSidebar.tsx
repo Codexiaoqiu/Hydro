@@ -8,7 +8,7 @@ import { Link } from '../link';
 import { Alert } from '../primitives/Alert';
 import { Button } from '../primitives/Button';
 import { ConfirmDialog } from '../primitives/ConfirmDialog';
-import { useToast } from '../primitives/Toast';
+import { useToast } from '../primitives/use-toast';
 import styles from './ContestDetailSidebar.module.css';
 
 export interface ContestDetailSidebarProps {
@@ -61,6 +61,7 @@ export function ContestDetailSidebar({
 
   function onAttend() {
     if (tdoc._code) {
+      // eslint-disable-next-line no-alert
       const code = window.prompt(t('ContestDetail.InvitationCode'));
       if (!code) return;
       postOp('attend', { code });

@@ -49,7 +49,7 @@ export function AddTestcase({
               onChange={(e) => setInput(e.currentTarget.value)}
             >
               <option value="">— pick input —</option>
-              {testdata.filter((f) => /\.(in|IN|txt|TXT)$/.test(f)).map((f) => (
+              {testdata.filter((f) => /\.(?:in|IN|txt|TXT)$/.test(f)).map((f) => (
                 <option key={f} value={f}>{f}</option>
               ))}
             </select>
@@ -62,7 +62,7 @@ export function AddTestcase({
               onChange={(e) => setOutput(e.currentTarget.value)}
             >
               <option value="">— pick output —</option>
-              {testdata.filter((f) => /\.(out|OUT|ans|ANS)$/.test(f)).map((f) => (
+              {testdata.filter((f) => /\.(?:out|OUT|ans|ANS)$/.test(f)).map((f) => (
                 <option key={f} value={f}>{f}</option>
               ))}
             </select>

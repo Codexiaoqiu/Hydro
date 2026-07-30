@@ -30,9 +30,18 @@ export default function ProblemSolution() {
     const form = document.createElement('form');
     form.method = 'post';
     form.action = buildUrl('problem_solution', { pid: String(pdoc.docId) });
-    const f = document.createElement('input'); f.type = 'hidden'; f.name = 'operation'; f.value = 'submit'; form.appendChild(f);
-    const c = document.createElement('input'); c.type = 'hidden'; c.name = 'content'; c.value = content; form.appendChild(c);
-    document.body.appendChild(form); form.submit();
+    const f = document.createElement('input');
+    f.type = 'hidden';
+    f.name = 'operation';
+    f.value = 'submit';
+    form.appendChild(f);
+    const c = document.createElement('input');
+    c.type = 'hidden';
+    c.name = 'content';
+    c.value = content;
+    form.appendChild(c);
+    document.body.appendChild(form);
+    form.submit();
   };
 
   return (

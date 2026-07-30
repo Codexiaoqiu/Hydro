@@ -4,7 +4,7 @@ import { useTranslate } from '../../lib/i18n';
 import { Button } from '../primitives/Button';
 import { HexColorPicker } from '../primitives/HexColorPicker';
 import { Modal } from '../primitives/Modal';
-import { useToast } from '../primitives/Toast';
+import { useToast } from '../primitives/use-toast';
 import styles from './ContestBalloonSetColor.module.css';
 
 const HEX_RE = /^#[0-9a-fA-F]{6}$/;

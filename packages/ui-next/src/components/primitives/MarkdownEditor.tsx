@@ -28,7 +28,9 @@ export function MarkdownEditor({
   const [theme, setTheme] = useState<'light' | 'dark'>(() => readScheme());
   const onSubmitRef = useRef(onSubmit);
   const onUploadRef = useRef(onUpload);
+  // eslint-disable-next-line react-hooks/refs
   onSubmitRef.current = onSubmit;
+  // eslint-disable-next-line react-hooks/refs
   onUploadRef.current = onUpload;
 
   useEffect(() => {

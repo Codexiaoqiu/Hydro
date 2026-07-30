@@ -66,7 +66,7 @@ describe('discussionSidebar', () => {
     expect(screen.queryByText('Contest-X')).toBeNull();
   });
 
-  it('LoginToCreate places redirect on the query string, not as a path param', () => {
+  it('loginToCreate places redirect on the query string, not as a path param', () => {
     // I1 fix: previously `{ query: { redirect } }` was passed as `params`,
     // which path-to-regexp tried to match as a placeholder, silently
     // resolving to `#`. Now `redirect` lives in `searchParams`.

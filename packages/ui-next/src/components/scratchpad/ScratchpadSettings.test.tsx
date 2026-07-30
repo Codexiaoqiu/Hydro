@@ -1,12 +1,12 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { ScratchpadEditorPane } from './ScratchpadEditorPane';
-import { ScratchpadPanel } from './ScratchpadPanel';
 import {
   SCRATCHPAD_SETTINGS_CHANGE_EVENT,
   SCRATCHPAD_SETTINGS_STORAGE_KEY,
-  ScratchpadSettings,
-} from './ScratchpadSettings';
+} from './scratchpad-settings-storage';
+import { ScratchpadEditorPane } from './ScratchpadEditorPane';
+import { ScratchpadPanel } from './ScratchpadPanel';
+import { ScratchpadSettings } from './ScratchpadSettings';
 import { ScratchpadProvider } from './useScratchpadState';
 
 vi.mock('@monaco-editor/react', () => ({

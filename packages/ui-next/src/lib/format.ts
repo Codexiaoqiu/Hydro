@@ -87,6 +87,11 @@ const MB = KB ** 2;
 const GB = KB ** 3;
 const TB = KB ** 4;
 
+function trim(n: number): string {
+  if (Number.isInteger(n)) return String(n);
+  return n.toFixed(1).replace(/\.0$/, '');
+}
+
 export function formatBytes(
   bytes: number | null | undefined,
   opts: FormatBytesOptions = {},
@@ -112,11 +117,6 @@ export function formatBytes(
     if (bytes >= KB) return `${trim(bytes / KB)}KB`;
     return `${bytes}B`;
   }
-}
-
-function trim(n: number): string {
-  if (Number.isInteger(n)) return String(n);
-  return n.toFixed(1).replace(/\.0$/, '');
 }
 
 /**

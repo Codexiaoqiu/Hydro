@@ -3,7 +3,8 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { ToastProvider } from '../components/primitives';
 import { type PageData, PageDataProvider } from '../context/page-data';
-import ProblemDetailPage, { pickPreferredLang, readContentText } from './problem_detail';
+import ProblemDetailPage from './problem_detail';
+import { pickPreferredLang, readContentText } from './problem-detail-helpers';
 
 Object.defineProperty(window, 'location', {
   value: new URL('http://localhost/p/1?mode=scratchpad'),
@@ -25,7 +26,6 @@ vi.mock('../lib/perms', async () => {
 });
 
 vi.mock('../components/scratchpad/ScratchpadPanel', () => {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const React = require('react');
   return {
     ScratchpadPanel: (props: any) =>
@@ -34,6 +34,7 @@ vi.mock('../components/scratchpad/ScratchpadPanel', () => {
           React.createElement('button', {
             type: 'button',
             onClick: () => {
+              // eslint-disable-next-line no-alert
               if (window.confirm('Unsaved changes. Continue?') !== false) {
                 props.onExit();
               }

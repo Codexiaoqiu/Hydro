@@ -3,7 +3,8 @@ import { request } from '../../hooks/use-api';
 import { useTranslate } from '../../lib/i18n';
 import { Button } from '../primitives/Button';
 import { ConfirmDialog } from '../primitives/ConfirmDialog';
-import { useToast } from '../primitives/Toast';
+import { useToast } from '../primitives/use-toast';
+import { truncatePrintContent } from './print-content';
 import styles from './PrintKiosk.module.css';
 
 export interface PrintTask {
@@ -28,26 +29,6 @@ export interface PrintKioskProps {
   endpoint?: string;
   /** Interval (ms) for kiosk allocate polling; defaults to 5 s, matching ui-default. */
   pollIntervalMs?: number;
-}
-
-/** Cap the printable content to 300 lines of 100 columns, matching ui-default. */
-const MAX_LINES = 300;
-const MAX_LINE_WIDTH = 100;
-
-/**
- * Truncate content so that the highlight pipeline never produces an
- * unbounded printable payload. Mirrors `pages/contest_print.page.tsx` in
- * ui-default so a 30 MB source file still fits in the kiosk print window.
- */
-export function truncatePrintContent(content: string): string {
-  const finalContent: string[] = [];
-  let cnt = 0;
-  for (const line of content.split('\n')) {
-    cnt += Math.ceil(line.length / MAX_LINE_WIDTH);
-    if (cnt > MAX_LINES) break;
-    finalContent.push(line);
-  }
-  return finalContent.join('\n');
 }
 
 function languageFromFilename(filename: string): string {
@@ -105,6 +86,7 @@ export function PrintKiosk({ tdoc, isAdmin, endpoint, pollIntervalMs = 5000 }: P
   }, [apiUrl]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     void refresh();
   }, [refresh]);
 
@@ -124,6 +106,7 @@ export function PrintKiosk({ tdoc, isAdmin, endpoint, pollIntervalMs = 5000 }: P
           if (!resp?.task) {
             await new Promise((r) => setTimeout(r, pollIntervalMs));
           } else {
+            // eslint-disable-next-line ts/no-use-before-define, react-hooks/immutability
             await doPrint(resp.task, resp.udoc);
             await refresh();
           }

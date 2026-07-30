@@ -5,6 +5,7 @@ import { Alert, Button } from '../components/primitives';
 import { Menu } from '../components/sidebar/Menu';
 import { usePageData } from '../context/page-data';
 import { useTranslate } from '../lib/i18n';
+import { IFRAME_STATUS_MESSAGE } from '../lib/iframe-protocol';
 import { canRejudgeAny, isLoggedIn } from '../lib/perms';
 import { isTerminalStatus } from '../lib/record-terminal';
 
@@ -82,9 +83,6 @@ function highlightFor(lang?: string): string {
   return lang;
 }
 
-/** Wire-protocol tag shared with `ProblemGenerateTestdata`. */
-const IFRAME_STATUS_MESSAGE = 'hydro-record-status';
-
 export default function RecordDetailPage() {
   const { args } = usePageData() as unknown as { args: Args };
   const { rdoc, pdoc, tdoc, udoc, judge_udoc, allRevs = [], rev, UserContext } = args;
@@ -108,9 +106,9 @@ export default function RecordDetailPage() {
   const firedRef = useRef<number | null>(null);
 
   useEffect(() => {
-    if (rev) return;
-    if (typeof liveStatusRef.current === 'number' && isTerminalStatus(liveStatusRef.current)) return;
-    if (typeof EventSource === 'undefined') return;
+    if (rev) return undefined;
+    if (typeof liveStatusRef.current === 'number' && isTerminalStatus(liveStatusRef.current)) return undefined;
+    if (typeof EventSource === 'undefined') return undefined;
     const es = new EventSource(`/record-detail-conn?domainId=${encodeURIComponent(String(rdoc.domainId ?? ''))}&rid=${encodeURIComponent(String(rdoc._id))}`);
     es.addEventListener('update', (ev) => {
       try {
@@ -142,10 +140,10 @@ export default function RecordDetailPage() {
   // firedRef guards against re-firing for the same status (re-judges may
   // re-stream a terminal value across SSE reconnects).
   useEffect(() => {
-    if (!isIframe) return;
-    if (!isTerminalStatus(liveStatus)) return;
-    if (typeof window === 'undefined') return;
-    if (firedRef.current === liveStatus) return;
+    if (!isIframe) return undefined;
+    if (!isTerminalStatus(liveStatus)) return undefined;
+    if (typeof window === 'undefined') return undefined;
+    if (firedRef.current === liveStatus) return undefined;
     firedRef.current = liveStatus;
     try {
       window.parent.postMessage(
@@ -153,6 +151,7 @@ export default function RecordDetailPage() {
         '*',
       );
     } catch { /* ignore — parent may be gone, the modal will simply not close */ }
+    return undefined;
   }, [isIframe, liveStatus]);
 
   // Reset firedRef when navigating to a different record (the page is

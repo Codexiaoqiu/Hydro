@@ -76,6 +76,7 @@ export function useJsonPoll<T = unknown>({
     })();
     inFlightRef.current = task;
     await task;
+    return undefined;
   }, [url]);
 
   useEffect(() => {

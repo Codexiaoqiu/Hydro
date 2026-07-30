@@ -19,6 +19,7 @@ export function useFileSelection(available: string[]): UseFileSelection {
 
   // Drop stale names when the available list changes.
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSelectedState((prev) => {
       const next = new Set<string>();
       for (const name of available) if (prev.has(name)) next.add(name);

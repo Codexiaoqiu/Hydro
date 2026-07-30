@@ -1,11 +1,11 @@
 import { useRef, useState } from 'react';
 import { HydroClientError, request } from '../../hooks/use-api';
-import { useTranslate } from '../../lib/i18n';
 import { useFileSelection } from '../../hooks/use-file-selection';
-import { type RenameChange } from '../../lib/file-rename';
-import { Button, Checkbox, ConfirmDialog } from '../primitives';
+import type { RenameChange } from '../../lib/file-rename';
+import { useTranslate } from '../../lib/i18n';
 import { BatchRenameDialog } from '../files/BatchRenameDialog';
 import { FilePreviewDialog } from '../files/FilePreviewDialog';
+import { Button, Checkbox, ConfirmDialog } from '../primitives';
 import styles from './ProblemAdditionalFiles.module.css';
 
 export interface ProblemAdditionalFile {
@@ -200,10 +200,7 @@ export function ProblemAdditionalFiles({ pid, files, disabled, onChange }: Props
           uploadUrl={endpoint}
           type={TYPE}
           size={files.find((f) => f.name === preview)?.size}
-<<<<<<< Updated upstream
           readOnly={disabled}
-=======
->>>>>>> Stashed changes
           onClose={() => setPreview(null)}
           onSaved={() => onChange(files)}
         />

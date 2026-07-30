@@ -14,9 +14,10 @@ vi.mock('../../hooks/use-build-url', () => ({
   },
 }));
 
-vi.mock('../primitives/Toast', () => ({
-  useToast: () => toastFn,
-}));
+vi.mock('../primitives/use-toast', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../primitives/use-toast')>();
+  return { ...actual, useToast: () => toastFn };
+});
 
 vi.mock('../link', () => ({
   Link: ({ children, to, params, ...rest }: any) => (

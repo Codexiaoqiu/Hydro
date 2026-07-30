@@ -30,7 +30,7 @@ vi.mock('../hooks/use-balloon-poll', () => ({
   useBalloonPoll: (...args: any[]) => useBalloonPollMock(...args),
 }));
 
-vi.mock('../components/primitives/Toast', async (importOriginal) => {
+vi.mock('../components/primitives/use-toast', async (importOriginal) => {
   const actual = await importOriginal<typeof import('../components/primitives/Toast')>();
   return {
     ...actual,

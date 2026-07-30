@@ -70,8 +70,8 @@ export function ProblemHero({ pdoc }: Props) {
           {pdoc.difficulty != null && (
             <Chip variant="diff">难度 <strong>{pdoc.difficulty} / 10</strong></Chip>
           )}
-          {pdoc.tag?.map((t) => (
-            <Chip key={t} variant="tag">{t}</Chip>
+          {pdoc.tag?.map((tag) => (
+            <Chip key={tag} variant="tag">{tag}</Chip>
           ))}
         </div>
       </div>

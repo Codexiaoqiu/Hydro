@@ -94,6 +94,7 @@ export function Menu({ items }: { items: MenuItem[] }) {
         if (it.separator) {
           return <div key={key} className={styles.sep} role="separator" aria-orientation="horizontal" />;
         }
+        // eslint-disable-next-line ts/no-use-before-define
         return <MenuRow key={key} item={it} />;
       })}
     </div>
@@ -115,6 +116,7 @@ function MenuRow({ item: it }: { item: MenuItem }) {
     return <span className={`${styles.row} ${styles.disabled}`}>{body}</span>;
   }
   if (formConfig) {
+    // eslint-disable-next-line ts/no-use-before-define
     return <FormRow form={formConfig} body={body} />;
   }
   if (it.href) {

@@ -11,7 +11,7 @@
 }
 
 .error {
-  color: var(--danger, #e5484d);
+  color: var(--danger);
   font-size: var(--text-sm);
 }
 

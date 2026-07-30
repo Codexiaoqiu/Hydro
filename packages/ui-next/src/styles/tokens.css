@@ -19,6 +19,13 @@
   --green: #86efac;
   --red: #fca5a5;
 
+  /* Danger family — destructive actions. Hover/focus = --danger-strong, soft fill = --danger-soft, disabled = --danger-mute. */
+  --danger: #f87171;
+  --danger-strong: #ef4444;
+  --danger-soft: rgba(239, 68, 68, 0.12);
+  --danger-mute: #7f1d1d;
+  --text-on-danger: #ffffff;
+
   /* typography */
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
@@ -161,6 +168,10 @@
   --amber: #171717;
   --green: #171717;
   --red: #171717;
+  --danger: #dc2626;
+  --danger-strong: #b91c1c;
+  --danger-soft: rgba(220, 38, 38, 0.10);
+  --danger-mute: #fca5a5;
 
   /* Accent tints → neutral black tints (same alpha, just gray). */
   --tint-cyan-04: rgba(0, 0, 0, 0.03);
@@ -222,6 +233,7 @@
 
   /* Text on a primary button → white (the button itself is black in light mode). */
   --text-on-cyan: #ffffff;
+  --text-on-danger: #ffffff;
 }
 
 :root {

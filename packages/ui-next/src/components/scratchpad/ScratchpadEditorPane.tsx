@@ -3,14 +3,14 @@ import { useEffect, useMemo, useState } from 'react';
 import { PretestPanel } from './PretestPanel';
 import { RecordsPanel } from './RecordsPanel';
 import styles from './Scratchpad.module.css';
-import { useScratchpad } from './ScratchpadContext';
 import {
   DEFAULT_SCRATCHPAD_SETTINGS,
   readScratchpadSettings,
   SCRATCHPAD_SETTINGS_CHANGE_EVENT,
   type ScratchpadEditorTheme,
   type ScratchpadSettingsValue,
-} from './ScratchpadSettings';
+} from './scratchpad-settings-storage';
+import { useScratchpad } from './ScratchpadContext';
 import { ScratchpadSlot } from './ScratchpadSlot';
 import { ScratchpadToolbar } from './ScratchpadToolbar';
 import { usePretestSession } from './usePretestSession';

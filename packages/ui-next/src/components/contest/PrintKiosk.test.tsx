@@ -204,7 +204,6 @@ describe('printKiosk', () => {
   });
 
   it('truncates very long content to keep printable within 300 lines of 100 cols', () => {
-    const PrintKioskInternal = PrintKiosk as unknown as { truncateContent?: (s: string) => string };
     // Access via internal helper: replicate ui-default's algorithm.
     // (Our implementation re-exports it; if not present, the test still
     //  builds confidence via direct call below.)
@@ -225,7 +224,7 @@ describe('printKiosk', () => {
     const lines = out.split('\n');
     expect(lines.length).toBeLessThan(401);
     // Ensure the truncation logic actually stops when count exceeds limit.
-    const bigger = Array.from({ length: 10000 }, (_, i) => 'x'.repeat(1200)).join('\n');
+    const bigger = Array.from({ length: 10000 }, () => 'x'.repeat(1200)).join('\n');
     const truncated = truncate(bigger);
     expect(truncated.length).toBeLessThan(bigger.length);
   });

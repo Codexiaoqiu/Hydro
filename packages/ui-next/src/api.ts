@@ -1,6 +1,7 @@
 export { AuthShell } from './components/auth/AuthShell';
 export type { AuthShellProps } from './components/auth/AuthShell';
-export { showSignInDialog, SignInDialog } from './components/auth/SignInDialog';
+export { showSignInDialog } from './components/auth/show-sign-in-dialog';
+export { SignInDialog } from './components/auth/SignInDialog';
 // Components
 export { Link, type LinkProps } from './components/link';
 export {

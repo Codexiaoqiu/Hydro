@@ -116,7 +116,6 @@ export default function ProblemSubmitPage() {
   });
 
   const [objectiveYaml, setObjectiveYaml] = useState('');
-  const [objectiveAnswersVersion, setObjectiveAnswersVersion] = useState(0);
 
   const { clear: clearObjectiveDraft } = useObjectiveDraft({
     uid: UserContext._id,

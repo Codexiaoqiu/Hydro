@@ -65,7 +65,7 @@ vi.mock('../primitives', async () => {
     ),
     ProblemSelectAutoComplete: () => <div data-testid="problem-select" />,
     RateLimitAlert: () => null,
-    UserSelectAutoComplete: ({ value, onChange, placeholder }: any) => (
+    UserSelectAutoComplete: ({ value, onChange: _onChange, placeholder }: any) => (
       <div data-testid="user-select" data-value={value?.join(',')} data-placeholder={placeholder}>
         <span>UserSelectAutoComplete</span>
       </div>

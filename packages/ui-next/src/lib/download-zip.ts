@@ -90,8 +90,6 @@ export async function buildDownloadZip(
   // asked to cancel, so any completed downloads are intentionally discarded.
   if (signal?.aborted) return { blob: null, failures: [] };
 
-  const results = settled.filter((r): r is PromiseSettledResult<{ filename: string, data: Uint8Array }> => r !== undefined);
-
   // Map each settled result back to its original target so `failures` carries
   // the original filename. The pool order is deterministic (workers fetch
   // strictly increasing indices), so the settled array index equals the

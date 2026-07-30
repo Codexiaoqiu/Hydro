@@ -1,5 +1,4 @@
 /* @vitest-environment happy-dom */
-<<<<<<< Updated upstream
 import { STATUS } from '@hydrooj/common';
 import { act, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -71,62 +70,11 @@ function renderPage(args: Record<string, unknown>) {
         <ToastProvider>
           <RecordDetailPage />
         </ToastProvider>
-=======
-import { act, render } from '@testing-library/react';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { STATUS } from '@hydrooj/common';
-import { type PageData, PageDataProvider } from '../context/page-data';
-import { RouterProvider } from '../context/router';
-import RecordDetailPage from './record_detail';
-
-const IFRAME_STATUS_MESSAGE = 'hydro-record-status';
-
-function buildArgs(overrides: Partial<Record<string, unknown>> = {}): PageData {
-  return {
-    name: 'record_detail',
-    template: '',
-    url: '/record/R1',
-    args: {
-      rdoc: { _id: 'R1', uid: 1, status: STATUS.STATUS_WAITING },
-      pdoc: { docId: 1, pid: 'P1', title: 'Sum' },
-      UserContext: { _id: 1, hasPerm: () => false },
-      UiContext: {},
-      ...overrides,
-    },
-  };
-}
-
-// Capture postMessage without spying on the real `window.parent`. We
-// install a fake parent with a `postMessage` we can replace per-test.
-let captured: Array<{ payload: unknown; target: string }> = [];
-let fakeParent: { postMessage: (msg: unknown, target: string) => void } | null = null;
-
-function installIframeParent() {
-  captured = [];
-  fakeParent = {
-    postMessage: (msg: unknown, target: string) => {
-      captured.push({ payload: msg, target });
-    },
-  };
-  Object.defineProperty(window, 'parent', { configurable: true, value: fakeParent });
-}
-
-function installStandaloneParent() {
-  Object.defineProperty(window, 'parent', { configurable: true, value: window });
-}
-
-function renderPage(args: PageData['args'] = {}) {
-  return render(
-    <PageDataProvider initial={buildArgs(args)}>
-      <RouterProvider>
-        <RecordDetailPage />
->>>>>>> Stashed changes
       </RouterProvider>
     </PageDataProvider>,
   );
 }
 
-<<<<<<< Updated upstream
 describe('record_detail postMessage', () => {
   it('emits window.parent.postMessage with the numeric STATUS_ACCEPTED value', async () => {
     const postMessage = vi.fn();
@@ -200,105 +148,5 @@ describe('record_detail postMessage', () => {
     renderPage(buildArgs({ UserContext: { _id: 99, perm: 'BigInt::16384' } }));
     expect(screen.getAllByText(/重新评测|Rejudge/).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/取消计分|Cancel score/).length).toBeGreaterThan(0);
-=======
-beforeEach(() => {
-  // Provide a no-op EventSource so SSE setup doesn't blow up under happy-dom.
-  (globalThis as { EventSource?: unknown }).EventSource = class {
-    addEventListener() { /* noop */ }
-    close() { /* noop */ }
-  };
-});
-
-afterEach(() => {
-  vi.restoreAllMocks();
-  fakeParent = null;
-});
-
-describe('record_detail iframe protocol', () => {
-  // C2 + Brief §C3: a terminal status should be forwarded to `window.parent`
-  // exactly once, on the very first transition into a terminal value.
-  it('posts hydro-record-status to window.parent when initial status is terminal (AC)', async () => {
-    installIframeParent();
-    renderPage({ rdoc: { _id: 'R1', uid: 1, status: STATUS.STATUS_ACCEPTED } });
-    await act(async () => { /* flush effects */ });
-
-    expect(captured).toHaveLength(1);
-    const [entry] = captured;
-    expect(entry.target).toBe('*');
-    expect(entry.payload).toEqual({ type: IFRAME_STATUS_MESSAGE, status: STATUS.STATUS_ACCEPTED });
-  });
-
-  it('posts hydro-record-status for non-accepted terminal statuses (covers 8/9/11/32/33)', async () => {
-    const cases: Array<[string, number]> = [
-      ['STATUS_SYSTEM_ERROR',    STATUS.STATUS_SYSTEM_ERROR],
-      ['STATUS_CANCELED',        STATUS.STATUS_CANCELED],
-      ['STATUS_HACKED',          STATUS.STATUS_HACKED],
-      ['STATUS_HACK_SUCCESSFUL', STATUS.STATUS_HACK_SUCCESSFUL],
-      ['STATUS_HACK_UNSUCCESSFUL', STATUS.STATUS_HACK_UNSUCCESSFUL],
-    ];
-    for (const [label, status] of cases) {
-      installIframeParent();
-      renderPage({ rdoc: { _id: `R-${label}`, uid: 1, status } });
-      await act(async () => { /* flush effects */ });
-
-      expect(captured, label).toHaveLength(1);
-      const [entry] = captured;
-      expect(entry.target).toBe('*');
-      expect(entry.payload).toEqual({ type: IFRAME_STATUS_MESSAGE, status });
-    }
-  });
-
-  // C2: in-progress statuses MUST NOT postMessage to the parent — the brief
-  // explicitly carves out WAITING/JUDGING so we don't ping the parent mid-run.
-  it('does NOT post while the record is still waiting or judging', async () => {
-    installIframeParent();
-    renderPage({ rdoc: { _id: 'R-wait', uid: 1, status: STATUS.STATUS_WAITING } });
-    await act(async () => { /* flush effects */ });
-    expect(captured).toHaveLength(0);
-  });
-
-  it('does NOT post while the record is compiling or fetching', async () => {
-    installIframeParent();
-    renderPage({ rdoc: { _id: 'R-jdg', uid: 1, status: STATUS.STATUS_JUDGING } });
-    await act(async () => { /* flush effects */ });
-    expect(captured).toHaveLength(0);
-  });
-
-  // Brief §4: when the page is NOT opened in an iframe (i.e. a normal browser
-  // tab), the postMessage code path must be skipped entirely.
-  it('does NOT post to window.parent when the page is not in an iframe', async () => {
-    installIframeParent();
-    installStandaloneParent(); // override iframe parent back to self
-    renderPage({ rdoc: { _id: 'R1', uid: 1, status: STATUS.STATUS_ACCEPTED } });
-    await act(async () => { /* flush effects */ });
-    // In standalone mode postMessage would be called on `window` itself, which
-    // is a benign no-op for our test. The contract is: do NOT call
-    // postMessage specifically on the *parent* in standalone mode. We assert
-    // that the captured fake-parent (which is window.parent in this test) was
-    // never called.
-    expect(captured).toHaveLength(0);
-  });
-
-  // Brief §C2/C3 + I7: when a status update arrives via SSE that is the same
-  // terminal value we've already reported, firedRef must suppress the
-  // duplicate notification so the parent doesn't get pinged twice.
-  it('fires postMessage at most once per terminal status (firedRef)', async () => {
-    installIframeParent();
-    // First render with terminal AC — should post exactly once.
-    const { rerender } = renderPage({ rdoc: { _id: 'R1', uid: 1, status: STATUS.STATUS_ACCEPTED } });
-    await act(async () => { /* flush */ });
-    expect(captured).toHaveLength(1);
-
-    // Rerender with the same status — must NOT post again (firedRef.suppressed).
-    rerender(
-      <PageDataProvider initial={buildArgs({ rdoc: { _id: 'R1', uid: 1, status: STATUS.STATUS_ACCEPTED } })}>
-        <RouterProvider>
-          <RecordDetailPage />
-        </RouterProvider>
-      </PageDataProvider>,
-    );
-    await act(async () => { /* flush */ });
-    expect(captured).toHaveLength(1);
->>>>>>> Stashed changes
   });
 });

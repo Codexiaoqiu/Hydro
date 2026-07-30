@@ -2,6 +2,7 @@ import { type ReactNode, useEffect, useRef, useState } from 'react';
 import libMarkdownStyles from '../../lib/markdown.module.css';
 import { renderArticleBlocks } from '../../lib/markdown/plugins';
 import styles from './MarkdownPreview.module.css';
+import { rewriteFileReferences } from './rewrite-file-references';
 
 export interface MarkdownPreviewProps {
   /** Raw markdown source. Debounced 150ms before render. */
@@ -9,10 +10,6 @@ export interface MarkdownPreviewProps {
 }
 
 const PLACEHOLDER_TEXT = '在左侧编辑题目描述，预览会实时显示。';
-
-export function rewriteFileReferences(source: string): string {
-  return source.replace(/file:\/\/([^\s)]+)/g, '/file/$1');
-}
 
 export function MarkdownPreview({ source }: MarkdownPreviewProps): ReactNode {
   const [displayed, setDisplayed] = useState(source);

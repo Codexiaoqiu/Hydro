@@ -35,7 +35,7 @@ vi.mock('../components/link', () => ({
   useBuildUrl: () => (_name: string, _params?: Record<string, string>) => '#',
 }));
 
-vi.mock('../components/primitives/Toast', async (importOriginal) => {
+vi.mock('../components/primitives/use-toast', async (importOriginal) => {
   const actual = await importOriginal<typeof import('../components/primitives/Toast')>();
   return { ...actual, useToast: () => ({ info: vi.fn(), success: vi.fn(), error: vi.fn() }) };
 });

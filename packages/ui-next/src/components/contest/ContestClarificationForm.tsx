@@ -3,7 +3,7 @@ import { request } from '../../hooks/use-api';
 import { useTranslate } from '../../lib/i18n';
 import { Button } from '../primitives/Button';
 import { MarkdownEditor } from '../primitives/MarkdownEditor';
-import { useToast } from '../primitives/Toast';
+import { useToast } from '../primitives/use-toast';
 import styles from './ContestClarificationForm.module.css';
 
 /**
@@ -42,7 +42,10 @@ export function ContestClarificationForm({ mode, tdoc, did, onSubmitted }: Conte
   const toast = useToast();
 
   const submit = async () => {
-    if (!content.trim()) { toast.error(t('ContestClarification.ContentRequired')); return; }
+    if (!content.trim()) {
+      toast.error(t('ContestClarification.ContentRequired'));
+      return;
+    }
     setBusy(true);
     try {
       const fd = new URLSearchParams();

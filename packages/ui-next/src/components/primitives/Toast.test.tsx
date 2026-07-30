@@ -1,6 +1,7 @@
 import { act, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { ToastProvider, useToast } from './Toast';
+import { ToastProvider } from './Toast';
+import { useToast } from './use-toast';
 
 function Demo({ message }: { message: string }) {
   const toast = useToast();
@@ -26,7 +27,10 @@ describe('toast', () => {
 
   it('throws when useToast called outside Provider', () => {
     const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    function Bad() { useToast(); return null; }
+    function Bad() {
+    useToast();
+    return null;
+  }
     expect(() => render(<Bad />)).toThrow(/ToastProvider/);
     spy.mockRestore();
   });

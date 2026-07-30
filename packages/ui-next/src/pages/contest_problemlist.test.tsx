@@ -18,9 +18,10 @@ vi.mock('../hooks/use-build-url', () => ({
   useBuildUrl: () => (_name: string, params?: Record<string, string>) => `/p/${params?.pid ?? 'x'}`,
 }));
 
-vi.mock('../components/primitives/Toast', () => ({
-  useToast: () => ({ info: vi.fn(), success: vi.fn(), error: vi.fn() }),
-}));
+vi.mock('../components/primitives/use-toast', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../components/primitives/use-toast')>();
+  return { ...actual, useToast: () => ({ info: vi.fn(), success: vi.fn(), error: vi.fn() }) };
+});
 
 vi.mock('../components/link', () => ({
   Link: ({ children, to, params, searchParams, ...rest }: any) => (

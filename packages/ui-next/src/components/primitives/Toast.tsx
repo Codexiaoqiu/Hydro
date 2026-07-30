@@ -1,8 +1,7 @@
 import type { ReactNode } from 'react';
-import { createContext, useCallback, useContext, useState } from 'react';
+import { useCallback, useState } from 'react';
 import styles from './Toast.module.css';
-
-export type ToastVariant = 'info' | 'success' | 'error';
+import { ToastContext, type ToastVariant } from './use-toast';
 
 interface ToastItem {
   id: string;
@@ -10,11 +9,7 @@ interface ToastItem {
   message: string;
 }
 
-interface ToastContextValue {
-  push: (item: Omit<ToastItem, 'id'>) => void;
-}
-
-const ToastContext = createContext<ToastContextValue | null>(null);
+export type { ToastVariant };
 
 export interface ToastProviderProps { children: ReactNode }
 
@@ -48,14 +43,4 @@ export function ToastProvider({ children }: ToastProviderProps) {
       </div>
     </ToastContext.Provider>
   );
-}
-
-export function useToast() {
-  const ctx = useContext(ToastContext);
-  if (!ctx) throw new Error('useToast must be used inside <ToastProvider>');
-  return {
-    info: (message: string) => ctx.push({ variant: 'info', message }),
-    success: (message: string) => ctx.push({ variant: 'success', message }),
-    error: (message: string) => ctx.push({ variant: 'error', message }),
-  };
 }

@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { Button } from '../components/primitives/Button';
 import { ConfirmDialog } from '../components/primitives/ConfirmDialog';
-import { useToast } from '../components/primitives/Toast';
+import { useToast } from '../components/primitives/use-toast';
 import { ProblemConfigBasicForm } from '../components/problem/ProblemConfigBasicForm';
 import { ProblemConfigEditor } from '../components/problem/ProblemConfigEditor';
 import { ProblemConfigTree } from '../components/problem/ProblemConfigTree';
@@ -57,6 +57,7 @@ export default function ProblemConfigPage() {
     setParsed(nextParsed);
   }, []);
 
+  // eslint-disable-next-line react-hooks/preserve-manual-memoization
   const onAutoDetect = useCallback(() => {
     // Backend injects `testdata` via `sortFiles(this.pdoc.data || [])` — the
     // model field is `FileInfo[]` (objects with `.name`), not a flat string
@@ -76,6 +77,7 @@ export default function ProblemConfigPage() {
     toast.success(t('ProblemConfig.AutoDetected', { count: subtasks.length }));
   }, [args?.testdata, parsed, toast, t]);
 
+  // eslint-disable-next-line react-hooks/preserve-manual-memoization
   const save = useCallback(async (force = false) => {
     if (!args?.pdoc) return;
     // Flush any pending 300ms Monaco debounce BEFORE reading `parsed` so a

@@ -11,12 +11,12 @@ import {
   MarkdownEditor, ProblemSelectAutoComplete, RateLimitAlert,
   UserSelectAutoComplete,
 } from '../primitives';
-import styles from './ContestForm.module.css';
 import {
   buildPermissionPayload,
-  deriveInitialPermission,
   type ContestPermission,
+  deriveInitialPermission,
 } from './contest-permission';
+import styles from './ContestForm.module.css';
 
 interface ContestDoc {
   docId?: string;

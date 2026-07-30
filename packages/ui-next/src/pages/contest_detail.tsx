@@ -26,9 +26,9 @@ export interface ContestDetailPageProps {
 
 function PrerenderHints() {
   useEffect(() => {
-    if (typeof document === 'undefined') return;
+    if (typeof document === 'undefined') return undefined;
     const proto = HTMLScriptElement.prototype as unknown as { addSpeculationRules?: unknown };
-    if (typeof proto.addSpeculationRules !== 'function') return;
+    if (typeof proto.addSpeculationRules !== 'function') return undefined;
     const rules = {
       prerender: [
         {

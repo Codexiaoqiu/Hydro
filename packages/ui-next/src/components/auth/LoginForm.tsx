@@ -63,7 +63,7 @@ export function LoginForm({
   const [password, setPassword] = useState('');
   const [rememberme, setRememberme] = useState(false);
   const [tfa, setTfa] = useState('');
-  const [authnChallenge, setAuthnChallenge] = useState('');
+  const [authnChallenge] = useState('');
   const [tfaInfo, setTfaInfo] = useState<TfaInfo | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<HydroClientError | null>(null);
@@ -71,11 +71,12 @@ export function LoginForm({
 
   // Probe TFA / WebAuthn requirement when the username loses focus.
   useEffect(() => {
-    if (!builtInLogin) return;
+    if (!builtInLogin) return undefined;
     const u = uname.trim();
     if (!u) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setTfaInfo(null);
-      return;
+      return undefined;
     }
     let cancelled = false;
     request
@@ -109,8 +110,8 @@ export function LoginForm({
       } else if (typeof window !== 'undefined') {
         window.location.href = redirect || redirectApi.target;
       }
-    } catch (e) {
-      if (e instanceof HydroClientError) setError(e);
+    } catch (err) {
+      if (err instanceof HydroClientError) setError(err);
     } finally {
       setSubmitting(false);
     }

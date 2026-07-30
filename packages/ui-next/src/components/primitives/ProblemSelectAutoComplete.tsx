@@ -96,15 +96,17 @@ export function ProblemSelectAutoComplete({
 
   // Debounced search.
   useEffect(() => {
-    if (!searchUrl) return;
+    if (!searchUrl) return undefined;
     const trimmed = query.trim();
     // Treat an empty query as "show recent problems" so the dropdown stays
     // useful after selecting a chip (which clears the query). Only short-
     // circuit when minQueryLength > 0 forces a non-empty query.
     if (trimmed.length < minQueryLength && minQueryLength > 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setResults([]);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setLoading(false);
-      return;
+      return undefined;
     }
     const handle = window.setTimeout(() => {
       abortRef.current?.abort();

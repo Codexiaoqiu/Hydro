@@ -17,18 +17,17 @@ export function Dropdown({ label, children, open: controlledOpen, onOpenChange, 
   const open = isControlled ? controlledOpen : internalOpen;
   const ref = useRef<HTMLDivElement>(null);
 
-  const setOpen = (next: boolean) => {
-    if (!isControlled) setInternalOpen(next);
-    onOpenChange?.(next);
-  };
-
   useEffect(() => {
-    if (!open) return;
+    if (!open) return undefined;
+    const close = () => {
+      if (!isControlled) setInternalOpen(false);
+      onOpenChange?.(false);
+    };
     const onMouseDown = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+      if (ref.current && !ref.current.contains(e.target as Node)) close();
     };
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setOpen(false);
+      if (e.key === 'Escape') close();
     };
     document.addEventListener('mousedown', onMouseDown);
     document.addEventListener('keydown', onKey);
@@ -36,7 +35,7 @@ export function Dropdown({ label, children, open: controlledOpen, onOpenChange, 
       document.removeEventListener('mousedown', onMouseDown);
       document.removeEventListener('keydown', onKey);
     };
-  }, [open]);
+  }, [open, isControlled, onOpenChange]);
 
   return (
     <div ref={ref} className={`${styles.root} ${className ?? ''}`}>
@@ -45,7 +44,10 @@ export function Dropdown({ label, children, open: controlledOpen, onOpenChange, 
         className={styles.trigger}
         aria-haspopup="menu"
         aria-expanded={open}
-        onClick={() => setOpen(!open)}
+        onClick={() => {
+          if (!isControlled) setInternalOpen(!open);
+          onOpenChange?.(!open);
+        }}
       >
         {label}
       </button>

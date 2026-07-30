@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { request } from '../../hooks/use-api';
 import { detectLocale, useTranslate } from '../../lib/i18n';
 import { Button } from '../primitives/Button';
-import { useToast } from '../primitives/Toast';
+import { useToast } from '../primitives/use-toast';
 import { CopyToDomainDialog } from './CopyToDomainDialog';
 import styles from './ProblemSelectionDisplay.module.css';
 
@@ -26,12 +26,6 @@ interface OpAction {
 
 function buildOpAction(locale: string, op: BatchOp, count: number): OpAction {
   const isZh = locale === 'zh_CN';
-  const isEn = !isZh;
-  const labels = {
-    Hidden: isZh ? `已隐藏 ${count} 道题目` : `Hid ${count} problems`,
-    Unhidden: isZh ? `已取消隐藏 ${count} 道题目` : `Unhid ${count} problems`,
-    Deleted: isZh ? `已删除 ${count} 道题目` : `Deleted ${count} problems`,
-  } as const;
   if (op === 'delete') {
     return {
       op,
@@ -80,7 +74,10 @@ export function ProblemSelectionDisplay(props: ProblemSelectionDisplayProps): Re
   const runBatch = async (op: BatchOp) => {
     if (!pids.length) return;
     const action = buildOpAction(locale, op, pids.length);
-    if (action.confirm && !window.confirm(action.confirm)) return;
+    if (action.confirm) {
+      // eslint-disable-next-line no-alert
+      if (!window.confirm(action.confirm)) return;
+    }
     setBusy(op);
     try {
       await postBatchOperation(op, pids);

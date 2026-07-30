@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { useTranslate } from '../../lib/i18n';
 import { Button } from '../primitives/Button';
-import { useToast } from '../primitives/Toast';
+import { useToast } from '../primitives/use-toast';
 import styles from './ContestBalloonTable.module.css';
 
 /**

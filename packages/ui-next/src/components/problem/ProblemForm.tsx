@@ -140,11 +140,15 @@ export function ProblemForm({
     additionalFile ?? pdoc?.additional_file ?? [],
   );
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setFileList(additionalFile ?? pdoc?.additional_file ?? []);
   }, [additionalFile, pdoc?.additional_file]);
 
   useEffect(() => {
-    if (!langCodes.includes(activeLang)) setActiveLang(langCodes[0]);
+    if (!langCodes.includes(activeLang)) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setActiveLang(langCodes[0]);
+    }
   }, [langCodes, activeLang]);
 
   const submit = async (e?: FormEvent<HTMLFormElement>) => {
@@ -208,27 +212,6 @@ export function ProblemForm({
     }
   };
 
-  const CategoryTreePicker = useCallback(({ tree, onToggle }: { tree: CategoryNode[], onToggle: (name: string) => void }) => (
-    <div className={styles.categoryTree}>
-      {tree.map((node) => (
-        <div key={node.name} className={styles.categoryNode}>
-          <button type="button" className={styles.categoryChip} onClick={() => onToggle(node.name)}>
-            + {node.name}
-          </button>
-          {node.children && node.children.length > 0 && (
-            <div className={styles.subcategoryList}>
-              {node.children.map((sub) => (
-                <button key={sub.name} type="button" className={styles.subcategoryChip} onClick={() => onToggle(sub.name)}>
-                  {sub.name}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-      ))}
-    </div>
-  ), []);
-
   const uploadImage = useCallback(async (files: File[]): Promise<string[]> => {
     if (!files.length) return [];
     try {
@@ -251,7 +234,7 @@ export function ProblemForm({
   }, [pageName, user._id, toast]);
 
   const appendTag = (name: string) => {
-    const cur = tagText.split(',').map((t) => t.trim()).filter(Boolean);
+    const cur = tagText.split(',').map((tag) => tag.trim()).filter(Boolean);
     if (cur.includes(name)) return;
     setTagText([...cur, name].join(','));
   };
@@ -370,6 +353,7 @@ export function ProblemForm({
           {categoryTree && categoryTree.length > 0 && (
             <div>
               <h3 style={{ margin: '0 0 8px', fontSize: 'var(--text-md)' }}>{t('ProblemForm.Categories')}</h3>
+              {/* eslint-disable-next-line ts/no-use-before-define */}
               <CategoryTreePicker tree={categoryTree} onToggle={appendTag} />
             </div>
           )}
@@ -387,5 +371,28 @@ export function ProblemForm({
         onCancel={() => setConfirmDelOpen(false)}
       />
     </>
+  );
+}
+
+function CategoryTreePicker({ tree, onToggle }: { tree: CategoryNode[], onToggle: (name: string) => void }) {
+  return (
+    <div className={styles.categoryTree}>
+      {tree.map((node) => (
+        <div key={node.name} className={styles.categoryNode}>
+          <button type="button" className={styles.categoryChip} onClick={() => onToggle(node.name)}>
+            + {node.name}
+          </button>
+          {node.children && node.children.length > 0 && (
+            <div className={styles.subcategoryList}>
+              {node.children.map((sub) => (
+                <button key={sub.name} type="button" className={styles.subcategoryChip} onClick={() => onToggle(sub.name)}>
+                  {sub.name}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
   );
 }

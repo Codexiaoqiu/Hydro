@@ -48,7 +48,11 @@ export function UserSelectAutoComplete({
   // Hydrate chosen users from UID list. Skips when value is empty so a freshly
   // mounted component does not perform a no-op round-trip.
   useEffect(() => {
-    if (!value.length) { setChosen([]); return undefined; }
+    if (!value.length) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setChosen([]);
+      return undefined;
+    }
     hydrationAc.current?.abort();
     const ctrl = new AbortController();
     hydrationAc.current = ctrl;
@@ -70,7 +74,10 @@ export function UserSelectAutoComplete({
         if (!cancelled) setChosen([]);
       }
     })();
-    return () => { cancelled = true; ctrl.abort(); };
+    return () => {
+      cancelled = true;
+      ctrl.abort();
+    };
     // valueKey intentionally captures sorted value identity; projection/domainId
     // kept for correctness.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -79,7 +86,15 @@ export function UserSelectAutoComplete({
   // Debounced search. Aborts the previous request so a fast typist never
   // sees stale results from an in-flight query.
   useEffect(() => {
-    if (!q) { setCandidates([]); setError(null); setLoading(false); return undefined; }
+    if (!q) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setCandidates([]);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setError(null);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setLoading(false);
+      return undefined;
+    }
     setError(null);
     setLoading(true);
     ac.current?.abort();
@@ -107,7 +122,10 @@ export function UserSelectAutoComplete({
         }
       })();
     }, 200);
-    return () => { clearTimeout(t); ctrl.abort(); };
+    return () => {
+      clearTimeout(t);
+      ctrl.abort();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [q, valueKey, domainId]);
 

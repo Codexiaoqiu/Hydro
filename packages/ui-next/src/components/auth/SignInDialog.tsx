@@ -1,8 +1,9 @@
 import { type ReactNode, useCallback, useEffect, useRef } from 'react';
 import { usePageData } from '../../context/page-data';
-import { SignInDialogContext, useSignInDialogState } from '../../hooks/use-sign-in-dialog';
+import { useSignInDialogState } from '../../hooks/use-sign-in-dialog';
 import { useTranslate } from '../../lib/i18n';
 import { LoginForm, type LoginMethod } from './LoginForm';
+import { MOBILE_BREAKPOINT } from './show-sign-in-dialog';
 import styles from './SignInDialog.module.css';
 
 export interface SignInDialogProps {
@@ -13,8 +14,6 @@ export interface SignInDialogProps {
   /** Called whenever the dialog opens/closes. */
   onOpenChange?: (open: boolean) => void;
 }
-
-const MOBILE_BREAKPOINT = 880;
 
 /**
  * Controlled modal shell used by the global "Login" affordance. Mirrors
@@ -43,7 +42,7 @@ export function SignInDialog({ children, passkeyHint, onOpenChange }: SignInDial
 
   // Esc to close + lock body scroll while open.
   useEffect(() => {
-    if (!open) return;
+    if (!open) return undefined;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') hide();
     };
@@ -100,17 +99,4 @@ export function SignInDialog({ children, passkeyHint, onOpenChange }: SignInDial
       </div>
     </div>
   );
-}
-
-/**
- * Convenience helper: trigger the dialog from anywhere without importing the
- * hook. Mirrors `window.showSignInDialog()` in ui-default.
- */
-export function showSignInDialog(): void {
-  if (typeof window === 'undefined') return;
-  if (window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT}px)`).matches) {
-    window.location.href = '/login';
-    return;
-  }
-  SignInDialogContext.show();
 }

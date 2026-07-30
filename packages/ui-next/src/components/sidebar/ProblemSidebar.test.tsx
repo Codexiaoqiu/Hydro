@@ -4,7 +4,7 @@ import {
   getTidQuery,
   pickSidebarItems,
   type ProblemSidebarContext,
-} from './ProblemSidebar';
+} from './problem-sidebar-items';
 
 const t = (key: string) => key;
 const buildUrl = (name: string, params?: Record<string, unknown>, query?: Record<string, string>) => (
@@ -53,7 +53,7 @@ describe('submit-action integration', () => {
 
   it('forbidden state produces no clickable submit item', () => {
     const items = pickSidebarItems(base, 'normal', t);
-    const submit = items.find((it) => it.key === 'submit');
+    const submit = items.find((item) => item.key === 'submit');
     expect(submit).toBeDefined();
     expect(submit?.href).toBeUndefined();
     expect(submit?.onClick).toBeUndefined();
@@ -67,14 +67,14 @@ describe('submit-action integration', () => {
       UserContext: { ...base.UserContext, perm: 'BigInt::512' },
     };
     const items = pickSidebarItems(ctx, 'contest', t);
-    const submit = items.find((it) => it.key === 'submit');
+    const submit = items.find((item) => item.key === 'submit');
     expect(submit?.href).toBe('/p/P1000/submit?tid=64f0d4a5b1c2d3e4f5a6b7c');
   });
 
   it('anonymous user is routed to /login?redirect', () => {
     const ctx = { ...base, UserContext: { ...base.UserContext, _id: 0, hasPerm: () => false, hasPriv: () => false } };
     const items = pickSidebarItems(ctx, 'normal', t);
-    const submit = items.find((it) => it.key === 'submit');
+    const submit = items.find((item) => item.key === 'submit');
     expect(submit?.href).toMatch(/^\/login\?redirect=/);
   });
 });

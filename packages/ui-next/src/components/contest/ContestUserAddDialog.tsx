@@ -4,7 +4,7 @@ import { useTranslate } from '../../lib/i18n';
 import { Button } from '../primitives/Button';
 import { Checkbox } from '../primitives/Checkbox';
 import { Modal } from '../primitives/Modal';
-import { useToast } from '../primitives/Toast';
+import { useToast } from '../primitives/use-toast';
 import { UserSelectAutoComplete } from '../primitives/UserSelectAutoComplete';
 import styles from './ContestUserAddDialog.module.css';
 

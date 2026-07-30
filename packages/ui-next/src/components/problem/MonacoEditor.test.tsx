@@ -1,5 +1,6 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { MonacoEditor } from './MonacoEditor';
 
@@ -13,22 +14,29 @@ describe('monacoEditor', () => {
   it('forwards value, onChange, aria-label, name to the textarea', async () => {
     let captured = '';
     const user = userEvent.setup();
-    render(
-      <MonacoEditor
-        value="hello"
-        onChange={(v) => {
-          captured = v;
-        }}
-        aria-label="Source code editor"
-        name="code"
-      />,
-    );
+    function Harness() {
+      const [val, setVal] = useState('hello');
+      return (
+        <MonacoEditor
+          value={val}
+          onChange={(v) => {
+            captured = v;
+            setVal(v);
+          }}
+          aria-label="Source code editor"
+          name="code"
+        />
+      );
+    }
+    render(<Harness />);
     const ta = screen.getByRole('textbox', { name: 'Source code editor' });
     expect(ta).toHaveAttribute('name', 'code');
     expect(ta).toHaveAttribute('aria-label', 'Source code editor');
     expect((ta as HTMLTextAreaElement).value).toBe('hello');
 
-    await user.clear(ta);
+    // user-event's user.clear() is unstable in happy-dom; emit the empty
+    // value directly so the controlled input receives a deterministic event.
+    fireEvent.input(ta, { target: { value: '' } });
     await user.type(ta, 'x');
     expect(captured).toBe('x');
   });

@@ -21,7 +21,7 @@ export function Modal({
   width = 480, persistent = false, closeLabel = 'Close',
 }: ModalProps) {
   useEffect(() => {
-    if (!open) return;
+    if (!open) return undefined;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
     };

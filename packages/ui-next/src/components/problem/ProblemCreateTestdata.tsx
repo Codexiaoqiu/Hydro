@@ -15,6 +15,7 @@ export function ProblemCreateTestdata({ pid, onCreated, disabled }: ProblemCreat
   const t = useTranslate();
   const create = async () => {
     if (disabled) return;
+    // eslint-disable-next-line no-alert
     const name = window.prompt(t('ProblemCreateTestdata.FilenamePrompt'));
     if (!name) return;
     setBusy(true);

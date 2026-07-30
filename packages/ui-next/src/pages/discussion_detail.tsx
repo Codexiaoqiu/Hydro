@@ -32,9 +32,18 @@ export default function DiscussionDetail() {
     const form = document.createElement('form');
     form.method = 'post';
     form.action = buildUrl('discussion_detail', { did: String(ddoc.docId) });
-    const op = document.createElement('input'); op.type = 'hidden'; op.name = 'operation'; op.value = 'reply'; form.appendChild(op);
-    const c = document.createElement('input'); c.type = 'hidden'; c.name = 'content'; c.value = content; form.appendChild(c);
-    document.body.appendChild(form); form.submit();
+    const op = document.createElement('input');
+    op.type = 'hidden';
+    op.name = 'operation';
+    op.value = 'reply';
+    form.appendChild(op);
+    const c = document.createElement('input');
+    c.type = 'hidden';
+    c.name = 'content';
+    c.value = content;
+    form.appendChild(c);
+    document.body.appendChild(form);
+    form.submit();
   };
 
   return (

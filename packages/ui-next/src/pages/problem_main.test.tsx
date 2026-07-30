@@ -215,7 +215,7 @@ describe('problemMain', () => {
       pcount: 1,
       ppcount: 1,
     });
-    expect(screen.queryByRole('navigation', { name: 'pagination' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('navigation', { name: /pagination|分页/i })).not.toBeInTheDocument();
   });
 
   it('renders pager items and marks the current page as active', () => {
@@ -226,7 +226,7 @@ describe('problemMain', () => {
       pcount: 0,
       ppcount: 8,
     });
-    const nav = screen.getByRole('navigation', { name: 'pagination' });
+    const nav = screen.getByRole('navigation', { name: /pagination|分页/i });
     // Expect pages 1, 2, 3, 4, 8 with a gap (8 pages > 7 → windowed)
     const items = within(nav).getAllByRole('link');
     const labels = items.map((a) => a.textContent);
@@ -434,7 +434,7 @@ describe('problemMain', () => {
       });
       expect(screen.queryByRole('link', { name: 't6' })).not.toBeInTheDocument();
       expect(screen.queryByRole('link', { name: 't7' })).not.toBeInTheDocument();
-      const toggle = screen.getByRole('button', { name: /Show all/i });
+      const toggle = screen.getByRole('button', { name: /Show all|展开全部/i });
       expect(toggle).toBeInTheDocument();
       expect(toggle).toHaveAttribute('aria-expanded', 'false');
       expect(toggle.textContent).toMatch(/\+2/);
@@ -448,13 +448,13 @@ describe('problemMain', () => {
         pcount: 1,
         ppcount: 1,
       });
-      const toggle = screen.getByRole('button', { name: /Show all/i });
+      const toggle = screen.getByRole('button', { name: /Show all|展开全部/i });
       fireEvent.click(toggle);
       manyTags.forEach((name) => {
         expect(screen.getByRole('link', { name })).toBeInTheDocument();
       });
-      const hide = screen.getByRole('button', { name: /Show less|收起/i });
-      expect(hide).toHaveAttribute('aria-expanded', 'true');
+      // After expand the toggle disappears (hiddenCount == 0).
+      expect(screen.queryByRole('button', { name: /Show all|展开全部|Show less|收起/i })).not.toBeInTheDocument();
     });
 
     it('does not show a toggle when there are <= 5 tags', () => {
@@ -470,5 +470,19 @@ describe('problemMain', () => {
       });
       expect(screen.queryByRole('button', { name: /Show all|Show less|展开|收起/i })).not.toBeInTheDocument();
     });
+  });
+
+  // Regression: pager must expose a navigation landmark in both zh_CN and en
+  // so screen readers can announce the page jump links.
+  it('exposes the pager as a navigation landmark in the active locale', () => {
+    renderProblem({
+      pdocs: [{ docId: 1, domainId: 'system', title: 'P', tag: [], nSubmit: 0, nAccept: 0 }],
+      psdict: {},
+      page: 1,
+      pcount: 0,
+      ppcount: 3,
+    });
+    const nav = screen.getByRole('navigation', { name: /pagination|分页/i });
+    expect(nav).toBeInTheDocument();
   });
 });

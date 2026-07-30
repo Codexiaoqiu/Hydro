@@ -4,15 +4,17 @@ import type { Plugin } from 'unified';
 const SIZE_REGEX = /=(\d+)x(\d+)?$|=x(\d+)$/;
 // Match text nodes that are entire markdown images with space in URL (remark-parse
 // doesn't create image nodes when there's a space before the size spec).
-const TEXT_IMAGE_REGEX = /^!\[([^\]]*)\]\(([^)\s]+)\s+(=\d+x\d*|=\d+x|=x\d+)\)$/;
+const TEXT_IMAGE_REGEX = /^!\[([^\]]*)\]\(([^)\s]+)\s+(=\d+x\d*|=x\d+)\)$/;
 
 export const remarkImageSize: Plugin<[], Root> = function () {
   // Register stringify extension at plugin registration time (processor is unfrozen)
   const extensions = this.data('toMarkdownExtensions') || [];
+  // eslint-disable-next-line ts/no-use-before-define
   extensions.push(imageSizeExtension());
   this.data('toMarkdownExtensions', extensions);
 
   return (tree) => {
+    // eslint-disable-next-line ts/no-use-before-define
     visit(tree);
   };
 };

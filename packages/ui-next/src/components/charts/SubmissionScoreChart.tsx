@@ -11,7 +11,7 @@ export function SubmissionScoreChart({ scores, buckets = 10 }: SubmissionScoreCh
   if (scores.length === 0) {
     return <p className={styles.empty}>暂无分数</p>;
   }
-  const counts = new Array<number>(buckets).fill(0);
+  const counts = Array.from({ length: buckets }, () => 0);
   for (const s of scores) {
     const clamped = Math.max(0, Math.min(100, s));
     const idx = Math.min(buckets - 1, Math.floor((clamped / 100) * buckets));

@@ -6,6 +6,7 @@ const MEDIA_RE = /^@\[(youtube|bilibili|pdf|vimeo)\]\(([^)]+)\)$/;
 
 export const remarkMedia: Plugin<[], Root> = () => {
   return (tree) => {
+    // eslint-disable-next-line ts/no-use-before-define
     visit(tree);
   };
 };

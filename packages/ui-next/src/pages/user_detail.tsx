@@ -21,7 +21,7 @@ interface Args {
 
 export default function UserDetail() {
   const { args } = usePageData() as unknown as { args: Args };
-  const { isSelfProfile, udoc, sdoc, pdocs, tags } = args;
+  const { isSelfProfile, udoc, pdocs, tags } = args;
   const user = useUserContext();
   const buildUrl = useBuildUrl();
   const canViewPrivate = !!user?.hasPerm?.(PERM.PERM_VIEW_USER_PRIVATE_INFO);

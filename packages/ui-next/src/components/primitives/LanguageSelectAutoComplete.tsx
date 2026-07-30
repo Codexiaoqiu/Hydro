@@ -78,6 +78,7 @@ export function LanguageSelectAutoComplete({
 
   // Reset highlight when the filtered list changes length.
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setActiveIndex(0);
   }, [query]);
 

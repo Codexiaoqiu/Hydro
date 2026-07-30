@@ -40,6 +40,7 @@ export function useObjectiveDraft({
   }, [uid, docId, tid]);
 
   const onLoadedRef = useRef(onLoaded);
+  // eslint-disable-next-line react-hooks/refs
   onLoadedRef.current = onLoaded;
 
   // Hydrate from IndexedDB on key change (problem switch).

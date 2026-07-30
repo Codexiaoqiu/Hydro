@@ -91,7 +91,7 @@ function buildTitle(title: string | undefined, config: ProblemOpenGraphProps['pd
  */
 export function ProblemOpenGraph({ pdoc, descriptionLimit }: ProblemOpenGraphProps) {
   useEffect(() => {
-    if (typeof document === 'undefined') return;
+    if (typeof document === 'undefined') return undefined;
 
     const limit = descriptionLimit ?? DEFAULT_DESCRIPTION_LEN;
     const contentText = pickContentText(pdoc.content);

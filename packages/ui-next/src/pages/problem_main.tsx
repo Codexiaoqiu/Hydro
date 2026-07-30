@@ -187,7 +187,7 @@ export default function ProblemMain() {
   const t = useTranslate();
   const [locale] = useState(() => (typeof window === 'undefined' ? 'en' : detectLocale()));
 
-  const pdocs = args.pdocs || [];
+  const pdocs = useMemo(() => args.pdocs || [], [args.pdocs]);
   const psdict = args.psdict || {};
   const page = Math.max(1, args.page || 1);
   const ppcount = Math.max(0, args.ppcount || 0);
@@ -204,14 +204,17 @@ export default function ProblemMain() {
   const [selectedPids, setSelectedPids] = useState<number[]>([]);
 
   useEffect(() => {
-    if (requestedEditMode) setEditMode(true);
+    if (requestedEditMode) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setEditMode(true);
+    }
   }, [requestedEditMode]);
 
   const categorySetting = (UiContext?.problemCategories || {}) as ProblemCategory;
 
   const flatTags = useMemo(() => {
     const tags = new Set<string>();
-    for (const p of pdocs) (p.tag || []).forEach((t) => tags.add(t));
+    for (const p of pdocs) (p.tag || []).forEach((tag) => tags.add(tag));
     return Array.from(tags).slice(0, 16);
   }, [pdocs]);
 

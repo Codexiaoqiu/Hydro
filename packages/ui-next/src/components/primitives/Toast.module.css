@@ -13,7 +13,7 @@
 }
 .info { border-left-color: var(--info, #2563eb); }
 .success { border-left-color: var(--success, #16a34a); }
-.error { border-left-color: var(--danger, #dc2626); }
+.error { border-left-color: var(--danger); }
 .toast button {
   background: transparent; border: none; cursor: pointer;
   font-size: 18px; color: inherit;

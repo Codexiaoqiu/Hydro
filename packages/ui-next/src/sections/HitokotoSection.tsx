@@ -12,7 +12,11 @@ const HITOKOTO = [
 ];
 
 export function HitokotoSection(_props: SectionProps): JSX.Element {
-  const line = useMemo(() => HITOKOTO[Math.floor(Math.random() * HITOKOTO.length)], []);
+  const line = useMemo(
+  // eslint-disable-next-line react-hooks/purity
+  () => HITOKOTO[Math.floor(Math.random() * HITOKOTO.length)],
+  [],
+);
   return (
     <Card variant="default">
       <blockquote className={styles.quote}>

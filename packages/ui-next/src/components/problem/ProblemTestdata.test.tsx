@@ -161,7 +161,7 @@ describe('problemTestdata', () => {
     buildSpy.mockRestore();
   });
 
-  it('batch-renames selected files via a rename_files request', async () => {
+  it('batch-renames selected files via a rename_files request (followup)', async () => {
     const postSpy = vi.spyOn(request, 'post').mockResolvedValue({} as never);
     const onChange = vi.fn();
     renderComp({ onChange });
@@ -174,7 +174,6 @@ describe('problemTestdata', () => {
     // find "1" -> "sample1": 1.in -> sample1.in, 1.out -> sample1.out
     fireEvent.change(within(dialog).getByTestId('batch-rename-find'), { target: { value: '1' } });
     fireEvent.change(within(dialog).getByTestId('batch-rename-replace'), { target: { value: 'sample1' } });
-    fireEvent.click(within(dialog).getByRole('button', { name: /预览|preview/i }));
     fireEvent.click(within(dialog).getByTestId('batch-rename-confirm'));
 
     await waitFor(() => expect(postSpy).toHaveBeenCalledWith('/p/P1/files', {
@@ -191,6 +190,8 @@ describe('problemTestdata', () => {
     renderComp();
     fireEvent.click(screen.getByRole('button', { name: /全选|select all/i }));
     fireEvent.click(screen.getByRole('button', { name: /删除所选|delete selected/i }));
+    const dialog = screen.getByRole('alertdialog');
+    fireEvent.click(within(dialog).getByRole('button', { name: /删除所选|delete selected/i }));
     await waitFor(() => expect(postSpy).toHaveBeenCalledWith('/p/P1/files', {
       operation: 'delete_files',
       type: 'testdata',
@@ -199,7 +200,7 @@ describe('problemTestdata', () => {
     postSpy.mockRestore();
   });
 
-  it('downloads a real ZIP of every file rather than only the first link', async () => {
+  it('downloads a real ZIP of every file rather than only the first link (followup)', async () => {
     const postSpy = vi.spyOn(request, 'post').mockResolvedValue({
       links: { '1.in': 'https://s3/u1', '1.out': 'https://s3/u2' },
     } as never);
@@ -218,14 +219,14 @@ describe('problemTestdata', () => {
     buildSpy.mockRestore();
   });
 
-  it('opens a preview dialog when a file name is clicked', async () => {
+  it('opens a preview dialog when a file name is clicked (followup)', async () => {
     renderComp({ files: [{ name: '1.in', size: 100 }] });
     fireEvent.click(screen.getByRole('button', { name: /open 1\.in|预览 1\.in/i }));
     const dialog = await screen.findByRole('dialog');
     expect(within(dialog).getByRole('button', { name: /复制链接|copy link/i })).toBeInTheDocument();
   });
 
-  it('disables Create / Generate / Download ZIP when disabled (reference)', () => {
+  it('disables Create / Generate / Download ZIP when disabled (reference, followup)', () => {
     renderComp({ disabled: true });
     // Existing row delete button is enabled-but-disabled-too; the three new
     // gates cover the bulk-mutation surface area the brief cares about.
@@ -239,7 +240,7 @@ describe('problemTestdata', () => {
     for (const b of blocked) expect(b).toBeDisabled();
   });
 
-  it('surfaces a toast (and keeps optimistic list) when get_links for the ZIP fails', async () => {
+  it('surfaces a toast (and keeps optimistic list) when get_links for the ZIP fails (followup)', async () => {
     const postSpy = vi.spyOn(request, 'post').mockRejectedValue(new Error('boom'));
     const buildSpy = vi.spyOn(downloadZip, 'buildDownloadZip');
     renderComp();
@@ -250,5 +251,36 @@ describe('problemTestdata', () => {
     expect(screen.getByText('1.out')).toBeInTheDocument();
     postSpy.mockRestore();
     buildSpy.mockRestore();
+  });
+
+  // Regression: bulk delete must route through the ConfirmDialog; a single
+  // click on the toolbar button alone must NOT issue the request.
+  it('requires the user to confirm before bulk-delete posts the request', async () => {
+    const postSpy = vi.spyOn(request, 'post').mockResolvedValue({} as never);
+    renderComp();
+    fireEvent.click(screen.getByRole('button', { name: /全选|select all/i }));
+    fireEvent.click(screen.getByRole('button', { name: /删除所选|delete selected/i }));
+    // Toolbar click only opens the dialog — no network call yet.
+    expect(postSpy).not.toHaveBeenCalled();
+    const dialog = screen.getByRole('alertdialog');
+    fireEvent.click(within(dialog).getByRole('button', { name: /删除所选|delete selected/i }));
+    await waitFor(() => expect(postSpy).toHaveBeenCalledWith('/p/P1/files', expect.objectContaining({ operation: 'delete_files' })));
+    postSpy.mockRestore();
+  });
+
+  // Regression: batch rename has no separate "Preview" button — the preview
+  // list is derived live from form input. Clicking confirm alone must submit.
+  it('batch-renames without an explicit Preview button click', async () => {
+    const postSpy = vi.spyOn(request, 'post').mockResolvedValue({} as never);
+    renderComp();
+    fireEvent.click(screen.getByRole('button', { name: /全选|select all/i }));
+    fireEvent.click(screen.getByRole('button', { name: /重命名|rename/i }));
+    const dialog = await screen.findByRole('dialog');
+    expect(within(dialog).queryByRole('button', { name: /预览|preview/i })).not.toBeInTheDocument();
+    fireEvent.change(within(dialog).getByTestId('batch-rename-find'), { target: { value: '1' } });
+    fireEvent.change(within(dialog).getByTestId('batch-rename-replace'), { target: { value: 'a' } });
+    fireEvent.click(within(dialog).getByTestId('batch-rename-confirm'));
+    await waitFor(() => expect(postSpy).toHaveBeenCalledWith('/p/P1/files', expect.objectContaining({ operation: 'rename_files' })));
+    postSpy.mockRestore();
   });
 });

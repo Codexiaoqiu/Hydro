@@ -10,7 +10,7 @@
  */
 import { type FormEvent, useMemo, useState } from 'react';
 import { Alert, Button, Input } from '../components/primitives';
-import { useToast } from '../components/primitives/Toast';
+import { useToast } from '../components/primitives/use-toast';
 import { usePageData } from '../context/page-data';
 import { request } from '../hooks/use-api';
 import { useTranslate } from '../lib/i18n';

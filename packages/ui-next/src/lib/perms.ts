@@ -32,7 +32,6 @@ export interface UserContextShape {
 
 export type AnyUserContext = UserContextShape | null | undefined;
 
-const BIGINT_PREFIX = 'BigInt::';
 const BIGINT_RE = /^BigInt::(-?\d+)$/;
 
 function parseBig(value: unknown): bigint {

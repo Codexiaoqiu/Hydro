@@ -62,6 +62,7 @@ export function ContestSubmissionList({
           </summary>
           <ul className={styles.list}>
             {list.slice(0, limitPerProblem).map((r) => (
+              // eslint-disable-next-line ts/no-use-before-define
               <SubRow key={r._id} r={r} />
             ))}
             {list.length > limitPerProblem && (

@@ -41,6 +41,7 @@ export function useFileUpload({ url, type, onSettled }: UseFileUploadArgs): UseF
   const mounted = useRef(true);
   const batchIdRef = useRef(0);
   const onSettledRef = useRef(onSettled);
+  // eslint-disable-next-line react-hooks/refs
   onSettledRef.current = onSettled;
 
   const commit = useCallback((next: UploadEntry[]) => {

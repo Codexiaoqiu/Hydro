@@ -30,7 +30,7 @@ export function Select<T extends string = string>({
 
   // Close on outside click / Escape.
   useEffect(() => {
-    if (!open) return;
+    if (!open) return undefined;
     const onDocClick = (e: MouseEvent) => {
       if (!rootRef.current?.contains(e.target as Node)) setOpen(false);
     };

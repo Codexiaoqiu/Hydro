@@ -1,6 +1,6 @@
 import { Link } from '../link';
 import { Avatar } from '../primitives/Avatar';
-import { useToast } from '../primitives/Toast';
+import { useToast } from '../primitives/use-toast';
 import styles from './ProfileHeader.module.css';
 
 export interface ProfileHeaderUdoc {

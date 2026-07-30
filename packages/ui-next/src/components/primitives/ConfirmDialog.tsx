@@ -20,7 +20,7 @@ export function ConfirmDialog({
   const confirmRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    if (!open) return;
+    if (!open) return undefined;
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onCancel(); };
     document.addEventListener('keydown', onKey);
     confirmRef.current?.focus();

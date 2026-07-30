@@ -303,7 +303,7 @@ export default function ContestMain() {
   const buildUrl = useBuildUrl();
   const navigate = useNavigate();
 
-  const tdocs = Array.isArray(args.tdocs) ? args.tdocs : [];
+  const tdocs = useMemo(() => (Array.isArray(args.tdocs) ? args.tdocs : []), [args.tdocs]);
   const tsdict = (args.tsdict ?? {}) as Record<string, SerializedContestStatusDoc>;
   const page = Math.max(1, Number(args.page) || 1);
   const tpcount = Math.max(0, Number(args.tpcount) || 0);

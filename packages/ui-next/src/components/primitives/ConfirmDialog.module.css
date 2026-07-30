@@ -20,4 +20,4 @@
   background: var(--surface, #fff); color: inherit; cursor: pointer; font: inherit;
 }
 .confirm { background: var(--primary, #2563eb); color: #fff; border-color: transparent; }
-.danger { background: var(--danger, #dc2626); color: #fff; border-color: transparent; }
+.danger { background: var(--danger); color: var(--text-on-danger, #fff); border-color: transparent; }

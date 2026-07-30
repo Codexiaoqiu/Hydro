@@ -3,7 +3,7 @@ import { request } from '../../hooks/use-api';
 import { useTranslate } from '../../lib/i18n';
 import { Button } from '../primitives/Button';
 import { MarkdownEditor } from '../primitives/MarkdownEditor';
-import { useToast } from '../primitives/Toast';
+import { useToast } from '../primitives/use-toast';
 import styles from './ContestClarificationInlineForm.module.css';
 
 /**
