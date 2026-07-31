@@ -9,6 +9,10 @@ interface PreviewSummary {
   invalid: number;
 }
 
+interface LocalPreview {
+  count: number;
+}
+
 interface ProgressInfo {
   current: number;
   total: number;
@@ -32,21 +36,22 @@ export default function ManageUserImportPage() {
   const progress = args?.progress;
 
   const [users, setUsers] = useState<string>('');
-  const [localPreview, setLocalPreview] = useState<PreviewSummary | null>(null);
+  const [localPreview, setLocalPreview] = useState<LocalPreview | null>(null);
 
   const handlePreview = () => {
     const total = countNonEmptyLines(users);
-    setLocalPreview({ count: total, valid: total, invalid: 0 });
+    setLocalPreview({ count: total });
   };
 
   const handleSubmit = () => {
     // Submission flow is not wired in this view; backend handles import via SystemUserImportHandler.post.
   };
 
+  const isServerPreview = Boolean(preview);
   const visiblePreview = preview ?? localPreview;
   const previewCount = visiblePreview?.count ?? 0;
-  const previewValid = visiblePreview?.valid ?? 0;
-  const previewInvalid = visiblePreview?.invalid ?? 0;
+  const previewValid = (preview && preview.valid) ?? 0;
+  const previewInvalid = (preview && preview.invalid) ?? 0;
 
   return (
     <div className="manage-user-import">
@@ -95,20 +100,29 @@ export default function ManageUserImportPage() {
       <Card variant="default" header={<h2 className="manage-user-import__subtitle">Preview</h2>}>
         <section className="manage-user-import__preview" aria-label="Import preview">
           {visiblePreview ? (
-            <dl className="manage-user-import__preview-list">
-              <div className="manage-user-import__preview-row">
-                <dt className="manage-user-import__preview-key">Total</dt>
-                <dd className="manage-user-import__preview-value">{previewCount}</dd>
-              </div>
-              <div className="manage-user-import__preview-row">
-                <dt className="manage-user-import__preview-key">Valid</dt>
-                <dd className="manage-user-import__preview-value">{previewValid}</dd>
-              </div>
-              <div className="manage-user-import__preview-row">
-                <dt className="manage-user-import__preview-key">Invalid</dt>
-                <dd className="manage-user-import__preview-value">{previewInvalid}</dd>
-              </div>
-            </dl>
+            isServerPreview ? (
+              <dl className="manage-user-import__preview-list">
+                <div className="manage-user-import__preview-row">
+                  <dt className="manage-user-import__preview-key">Total</dt>
+                  <dd className="manage-user-import__preview-value">{previewCount}</dd>
+                </div>
+                <div className="manage-user-import__preview-row">
+                  <dt className="manage-user-import__preview-key">Valid</dt>
+                  <dd className="manage-user-import__preview-value">{previewValid}</dd>
+                </div>
+                <div className="manage-user-import__preview-row">
+                  <dt className="manage-user-import__preview-key">Invalid</dt>
+                  <dd className="manage-user-import__preview-value">{previewInvalid}</dd>
+                </div>
+              </dl>
+            ) : (
+              <p
+                className="manage-user-import__preview-local"
+                role="status"
+              >
+                Detected: {previewCount} line{previewCount === 1 ? '' : 's'} (validation requires server preview).
+              </p>
+            )
           ) : (
             <p className="manage-user-import__preview-empty" role="status">
               No preview available.

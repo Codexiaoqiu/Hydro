@@ -61,8 +61,11 @@ describe('manage_user_import', () => {
     expect(textarea).toBeDefined();
     fireEvent.change(textarea as HTMLElement, { target: { value: 'a@b.c\nd@e.f\n\ng@h.i' } });
     fireEvent.click(screen.getByRole('button', { name: /preview/i }));
-    // 3 non-empty lines => count 3, valid 3, invalid 0.
-    expect(screen.getAllByText('3')).toHaveLength(2);
+    // Local preview is honest: only the detected line count is shown.
+    // No Valid/Invalid breakdown since the page never validates anything client-side.
+    expect(screen.getByText(/detected: 3 lines/i)).toBeInTheDocument();
+    expect(screen.queryByText('Valid')).not.toBeInTheDocument();
+    expect(screen.queryByText('Invalid')).not.toBeInTheDocument();
   });
 
   it('renders a progress placeholder when no progress is provided', () => {
