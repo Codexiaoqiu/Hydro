@@ -66,6 +66,7 @@ export const NEXT_PAGES = {
   manage_dashboard: ['manage_dashboard.html'],
   manage_script: ['manage_script.html'],
   manage_setting: ['manage_setting.html'],
+  manage_user_import: ['manage_user_import.html'],
 } as const;
 
 export const NEXT_TEMPLATES: readonly string[] = Object.freeze(
