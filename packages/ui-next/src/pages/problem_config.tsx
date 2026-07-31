@@ -57,7 +57,6 @@ export default function ProblemConfigPage() {
     setParsed(nextParsed);
   }, []);
 
-  // eslint-disable-next-line react-hooks/preserve-manual-memoization
   const onAutoDetect = useCallback(() => {
     // Backend injects `testdata` via `sortFiles(this.pdoc.data || [])` — the
     // model field is `FileInfo[]` (objects with `.name`), not a flat string

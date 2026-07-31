@@ -56,7 +56,7 @@ export function CopyToDomainDialog({
     if (!open) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setTarget('');
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+
       setBusy(false);
     }
   }, [open]);

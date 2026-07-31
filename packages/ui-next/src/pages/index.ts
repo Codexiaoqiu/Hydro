@@ -2,6 +2,16 @@ import '../sections';
 
 import { registerPage } from '../registry/page';
 
+registerPage('domain_base', () => import('./domain_base'));
+registerPage('domain_create', () => import('./domain_create'));
+registerPage('domain_dashboard', () => import('./domain_dashboard'));
+registerPage('domain_edit', () => import('./domain_edit'));
+registerPage('domain_join', () => import('./domain_join'));
+registerPage('domain_join_applications', () => import('./domain_join_applications'));
+registerPage('domain_group', () => import('./domain_group'));
+registerPage('domain_permission', () => import('./domain_permission'));
+registerPage('domain_role', () => import('./domain_role'));
+registerPage('domain_user', () => import('./domain_user'));
 registerPage('homepage', () => import('./homepage'));
 registerPage('error', () => import('./error'));
 registerPage('contest_detail', () => import('./contest_detail'));

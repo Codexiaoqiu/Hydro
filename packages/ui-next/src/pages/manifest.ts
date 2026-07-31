@@ -9,6 +9,16 @@
 // drift test passes — its absence would silently break that route.
 
 export const NEXT_PAGES = {
+  domain_base: ['domain_base.html'],
+  domain_create: ['domain_create.html'],
+  domain_dashboard: ['domain_dashboard.html'],
+  domain_edit: ['domain_edit.html'],
+  domain_join: ['domain_join.html'],
+  domain_join_applications: ['domain_join_applications.html'],
+  domain_group: ['domain_group.html'],
+  domain_permission: ['domain_permission.html'],
+  domain_role: ['domain_role.html'],
+  domain_user: ['domain_user.html'],
   homepage: ['main.html'],
   error: ['error.html', 'bsod.html'],
   contest_detail: ['contest_detail.html'],

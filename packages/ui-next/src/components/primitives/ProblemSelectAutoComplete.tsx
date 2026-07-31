@@ -104,7 +104,7 @@ export function ProblemSelectAutoComplete({
     if (trimmed.length < minQueryLength && minQueryLength > 0) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setResults([]);
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+
       setLoading(false);
       return undefined;
     }

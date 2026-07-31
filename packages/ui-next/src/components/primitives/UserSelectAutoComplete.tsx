@@ -89,9 +89,9 @@ export function UserSelectAutoComplete({
     if (!q) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setCandidates([]);
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+
       setError(null);
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+
       setLoading(false);
       return undefined;
     }

@@ -46,13 +46,13 @@ export function RecentProblemsSection({ payload }: SectionProps): JSX.Element | 
           const linkable = pidForLink.length > 0;
           const pidLabel = p.pid || (p.docId != null ? String(p.docId) : '—');
           return (
-              <li
-                key={
-                  // eslint-disable-next-line react-hooks/purity
-                  p.docId ?? p.pid ?? Math.random()
-                }
-                className={styles.item}
-              >
+            <li
+              key={
+                // eslint-disable-next-line react-hooks/purity
+                p.docId ?? p.pid ?? Math.random()
+              }
+              className={styles.item}
+            >
               <div className={styles.cellPid}>
                 <span className={styles.pid}>{pidLabel}</span>
                 {linkable ? (

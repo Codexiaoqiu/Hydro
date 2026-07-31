@@ -28,9 +28,9 @@ describe('toast', () => {
   it('throws when useToast called outside Provider', () => {
     const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
     function Bad() {
-    useToast();
-    return null;
-  }
+      useToast();
+      return null;
+    }
     expect(() => render(<Bad />)).toThrow(/ToastProvider/);
     spy.mockRestore();
   });

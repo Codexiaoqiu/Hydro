@@ -425,10 +425,10 @@ export default function ContestScoreboardPage({ _pageData }: ContestScoreboardPa
                             </button>
                             {u ? (
                             // eslint-disable-next-line ts/no-use-before-define
-                            <UserInline user={u} />
-                          ) : (
-                            <span>—</span>
-                          )}
+                              <UserInline user={u} />
+                            ) : (
+                              <span>—</span>
+                            )}
                           </td>
                         );
                       }
