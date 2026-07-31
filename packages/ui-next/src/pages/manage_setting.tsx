@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Button } from '../components/primitives/Button';
 import { Card } from '../components/primitives/Card';
 import { usePageData } from '../context/page-data';
@@ -26,10 +27,35 @@ function displayValue(raw: string | number | boolean | undefined, type: SystemSe
   return String(raw);
 }
 
+function displayInputType(type: SystemSetting['type']): 'text' | 'number' | 'checkbox' | 'textarea' {
+  if (type === 'number' || type === 'float') return 'number';
+  if (type === 'boolean') return 'checkbox';
+  if (type === 'textarea' || type === 'markdown') return 'textarea';
+  return 'text';
+}
+
+/**
+ * Normalise the in-memory value of a setting into a string suitable for an
+ * `<input defaultValue>` (text/number/textarea). Booleans are handled by the
+ * checkbox branch separately.
+ */
+function rawToString(raw: string | number | boolean | undefined): string {
+  if (raw === undefined || raw === null) return '';
+  return String(raw);
+}
+
 export default function ManageSettingPage() {
   const { args } = usePageData() as unknown as { args: Args };
   const settings = args?.settings ?? [];
   const current = args?.current ?? {};
+
+  // `editingKey` is null when no dialog is open. When non-null it holds the
+  // SystemSettings.key for the row currently being edited.
+  const [editingKey, setEditingKey] = useState<string | null>(null);
+  const editing = editingKey ? settings.find((s) => s.key === editingKey) ?? null : null;
+  const editingValue = editing
+    ? (current[editing.key] !== undefined ? current[editing.key] : editing.value)
+    : undefined;
 
   if (settings.length === 0) {
     return (
@@ -72,7 +98,7 @@ export default function ManageSettingPage() {
                     <Button
                       variant="primary"
                       type="button"
-                      onClick={() => { /* inline edit is not wired in this view */ }}
+                      onClick={() => setEditingKey(s.key)}
                       aria-label={`Edit ${s.key}`}
                     >
                       Edit
@@ -84,6 +110,61 @@ export default function ManageSettingPage() {
           </tbody>
         </table>
       </Card>
+
+      {/*
+        Edit dialog: native `<form method="post" action="/manage/setting">`
+        posts the row's `<key>=<value>` to `SystemSettingHandler.post`, which
+        iterates the body and persists each via `system.set(...)`. Booleans
+        additionally emit a hidden `<key>_bool` companion so the handler can
+        detect unchecked submissions (the standard HTML checkbox gotcha).
+      */}
+      {editing ? (
+        <div className="manage-setting__dialog" role="dialog" aria-modal="true" aria-label={`Edit ${editing.key}`}>
+          <form
+            method="post"
+            action="/manage/setting"
+            className="manage-setting__dialog-form"
+          >
+            <h2 className="manage-setting__dialog-title">Edit {editing.name ?? editing.key}</h2>
+            <p className="manage-setting__dialog-hint" id={`manage-setting-hint-${editing.key}`}>
+              {editing.desc ?? `Key: ${editing.key}`}
+            </p>
+            {displayInputType(editing.type) === 'textarea' ? (
+              <textarea
+                className="manage-setting__dialog-input"
+                name={editing.key}
+                defaultValue={rawToString(editingValue)}
+                rows={6}
+                aria-describedby={`manage-setting-hint-${editing.key}`}
+              />
+            ) : displayInputType(editing.type) === 'checkbox' ? (
+              <label className="manage-setting__dialog-bool">
+                <input
+                  type="checkbox"
+                  name={editing.key}
+                  defaultChecked={Boolean(editingValue)}
+                />
+                <span>Enabled</span>
+                <input type="hidden" name={`${editing.key}_bool`} value="true" />
+              </label>
+            ) : (
+              <input
+                className="manage-setting__dialog-input"
+                type={displayInputType(editing.type)}
+                name={editing.key}
+                defaultValue={rawToString(editingValue)}
+                aria-describedby={`manage-setting-hint-${editing.key}`}
+              />
+            )}
+            <div className="manage-setting__dialog-actions">
+              <Button variant="primary" type="submit">Save</Button>
+              <Button variant="ghost" type="button" onClick={() => setEditingKey(null)}>
+                Cancel
+              </Button>
+            </div>
+          </form>
+        </div>
+      ) : null}
     </div>
   );
 }

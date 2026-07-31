@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /* @vitest-environment happy-dom */
 import { render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';

@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import { useTranslate } from '../../lib/i18n';
 import { useScratchpad } from './ScratchpadContext';
 

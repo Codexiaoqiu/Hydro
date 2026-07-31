@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import { useTheme } from '../theme/useTheme';
 import styles from './ThemeToggle.module.css';
 

@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import type { PropsWithChildren } from 'react';
 import styles from './Button.module.css';
 

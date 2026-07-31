@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import { useRef, useState } from 'react';
 import { request } from '../../hooks/use-api';
 import { useFileSelection } from '../../hooks/use-file-selection';

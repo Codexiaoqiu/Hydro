@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import { type FormEvent, useState } from 'react';
 import { Link } from '../components/link';
 import { Alert, Button, Checkbox, RateLimitAlert } from '../components/primitives';

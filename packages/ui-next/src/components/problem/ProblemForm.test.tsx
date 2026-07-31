@@ -1,3 +1,4 @@
+/* eslint-disable ts/naming-convention */
 import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import type { ComponentProps } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';

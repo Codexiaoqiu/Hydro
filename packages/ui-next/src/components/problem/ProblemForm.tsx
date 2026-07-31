@@ -1,3 +1,4 @@
+/* eslint-disable ts/naming-convention */
 import { type FormEvent, useCallback, useEffect, useState } from 'react';
 import { useUserContext } from '../../context/page-data';
 import { useNavigate } from '../../context/router';

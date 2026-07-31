@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 // preprocess.ts
 
 export interface SamplePairData {

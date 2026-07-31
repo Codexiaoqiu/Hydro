@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import { act, renderHook } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { useScratchpadHotkeys } from './useScratchpadHotkeys';

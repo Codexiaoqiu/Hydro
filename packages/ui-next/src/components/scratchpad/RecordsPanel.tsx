@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import { STATUS_TEXTS } from '@hydrooj/common';
 import { useCallback, useEffect, useState } from 'react';
 import type { RecordStreamRow } from '../../hooks/use-record-stream';

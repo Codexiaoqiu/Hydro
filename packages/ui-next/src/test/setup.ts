@@ -3,6 +3,17 @@ import '@testing-library/jest-dom/vitest';
 import { cleanup } from '@testing-library/react';
 import { afterEach } from 'vitest';
 
+// @monaco-editor/react loads its WASM worker pool from a remote CDN; happy-dom
+// forbids remote scripts and the resulting unhandled DOMException fails the
+// enclosing test file. Stub the React component so the loader never runs.
+vi.mock('@monaco-editor/react', () => ({
+  default: () => null,
+  Editor: () => null,
+  loader: { init: () => Promise.resolve({}) },
+  useMonaco: () => ({ /* stub monaco namespace */ }),
+  loadMonacoEditor: () => Promise.resolve({}),
+}));
+
 // Ensure each test starts with a clean DOM.
 afterEach(() => {
   cleanup();

@@ -19,11 +19,26 @@ interface ProgressInfo {
   status?: string;
 }
 
+interface Message {
+  level?: 'info' | 'warn' | 'error';
+  content: string;
+}
+
 interface Args {
   UserContext?: Record<string, unknown>;
   UiContext?: Record<string, unknown>;
   preview?: PreviewSummary;
   progress?: ProgressInfo;
+  // Server populates these after a POST round-trip on `SystemUserImportHandler.post`.
+  // Each entry is the parsed user payload; we surface the validation messages
+  // alongside the local preview rather than running validation client-side.
+  users?: Array<{
+    email?: string;
+    username?: string;
+    password?: string;
+    displayName?: string;
+  }>;
+  messages?: Message[];
 }
 
 function countNonEmptyLines(value: string): number {
@@ -34,6 +49,7 @@ export default function ManageUserImportPage() {
   const { args } = usePageData() as unknown as { args: Args };
   const preview = args?.preview;
   const progress = args?.progress;
+  const messages = args?.messages ?? [];
 
   const [users, setUsers] = useState<string>('');
   const [localPreview, setLocalPreview] = useState<LocalPreview | null>(null);
@@ -41,10 +57,6 @@ export default function ManageUserImportPage() {
   const handlePreview = () => {
     const total = countNonEmptyLines(users);
     setLocalPreview({ count: total });
-  };
-
-  const handleSubmit = () => {
-    // Submission flow is not wired in this view; backend handles import via SystemUserImportHandler.post.
   };
 
   const isServerPreview = Boolean(preview);
@@ -59,10 +71,18 @@ export default function ManageUserImportPage() {
         variant="default"
         header={<h1 className="manage-user-import__title">Import User</h1>}
       >
+        {/*
+          Native form submission: `SystemUserImportHandler.post` consumes
+          `users` (TSV/CSV) and `draft`, then re-renders `manage_user_import.html`
+          with the parsed payload and validation messages. The Preview button
+          is intentionally `type="button"` so it never triggers a navigation.
+        */}
         <form
           className="manage-user-import__form"
-          onSubmit={(e) => e.preventDefault()}
+          method="post"
+          action="/manage/userimport"
         >
+          <input type="hidden" name="draft" value="false" />
           <label className="manage-user-import__label" htmlFor="manage-user-import-users">
             Users
           </label>
@@ -87,8 +107,7 @@ export default function ManageUserImportPage() {
             </Button>
             <Button
               variant="ghost"
-              type="button"
-              onClick={handleSubmit}
+              type="submit"
               aria-label="Submit"
             >
               Submit
@@ -155,7 +174,17 @@ export default function ManageUserImportPage() {
       </Card>
 
       <Card variant="default" header={<h2 className="manage-user-import__subtitle">Messages</h2>}>
-        <pre className="manage-user-import__messages" name="messages" aria-label="Status messages" />
+        {messages.length > 0 ? (
+          <ul className="manage-user-import__message-list" aria-label="Status messages">
+            {messages.map((m, i) => (
+              <li key={i} className={`manage-user-import__message manage-user-import__message--${m.level ?? 'info'}`} data-level={m.level ?? 'info'}>
+                {m.content}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <pre className="manage-user-import__messages" name="messages" aria-label="Status messages" />
+        )}
       </Card>
     </div>
   );

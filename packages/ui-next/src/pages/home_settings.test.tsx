@@ -1,3 +1,4 @@
+/* eslint-disable ts/naming-convention */
 /* @vitest-environment happy-dom */
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
@@ -43,7 +44,9 @@ describe('home_settings', () => {
   it('renders text + select + number + boolean + markdown fields grouped by family', () => {
     const settings = [
       { family: 'display', key: 'viewLang', name: 'UI Language', type: 'select', range: { zh_CN: '简体中文', en: 'English' }, value: 'zh_CN' },
+
       { family: 'display', key: 'timeZone', name: 'Timezone', type: 'select', range: { UTC: 'UTC', CST: 'CST' }, value: 'UTC' },
+
       { family: 'usage', key: 'avatar', name: 'Avatar URL', type: 'text', value: '' },
       { family: 'usage', key: 'linesOfCode', name: 'Lines of Code', type: 'number', value: 0 },
       { family: 'usage', key: 'markdownBio', name: 'Bio', type: 'markdown', value: '' },
@@ -81,6 +84,7 @@ describe('home_settings', () => {
     } as unknown as Response));
     const settings = [
       { family: 'display', key: 'viewLang', name: 'UI Language', type: 'select', range: { zh_CN: '简体中文', en: 'English' }, value: 'zh_CN' },
+
       { family: 'usage', key: 'avatar', name: 'Avatar URL', type: 'text', value: '' },
       { family: 'usage', key: 'darkMode', name: 'Dark mode', type: 'boolean', value: true },
     ];

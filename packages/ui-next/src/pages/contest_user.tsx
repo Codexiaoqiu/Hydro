@@ -58,8 +58,8 @@ export default function ContestUserPage() {
   const [nowMs, setNowMs] = useState(() => Date.now());
 
   const ongoing = tdoc
-    ? // eslint-disable-next-line react-hooks/purity
-    isOngoing({ beginAt: tdoc.beginAt, endAt: tdoc.endAt }, Date.now())
+    // eslint-disable-next-line react-hooks/purity
+    ? isOngoing({ beginAt: tdoc.beginAt, endAt: tdoc.endAt }, Date.now())
     : false;
   const { data, refresh } = useJsonPoll<Polled>({
     url: `${window.location.pathname}${window.location.search}`,

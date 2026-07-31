@@ -87,14 +87,27 @@ export default function ManageScriptPage() {
                   {formatModified(entry.modified)}
                 </td>
                 <td className="manage-script__cell manage-script__cell--action">
-                  <Button
-                    variant="primary"
-                    type="button"
-                    onClick={() => { /* script execution is not wired in this view */ }}
-                    aria-label={`Run ${entry.id}`}
+                  {/*
+                    Native form submission: `SystemScriptHandler.post` consumes
+                    `id` + `args` (a JSON-encoded argument blob; empty `{}`
+                    is fine for parameter-less scripts) and redirects to the
+                    resulting `/record/<rid>`.
+                  */}
+                  <form
+                    method="post"
+                    action="/manage/script"
+                    style={{ display: 'inline' }}
                   >
-                    Run
-                  </Button>
+                    <input type="hidden" name="id" value={entry.id} />
+                    <input type="hidden" name="args" value="{}" />
+                    <Button
+                      variant="primary"
+                      type="submit"
+                      aria-label={`Run ${entry.id}`}
+                    >
+                      Run
+                    </Button>
+                  </form>
                 </td>
               </tr>
             ))}

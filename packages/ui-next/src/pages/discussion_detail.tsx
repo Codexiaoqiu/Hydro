@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import { CommentsSection } from '../components/comments/CommentsSection';
 import { Link } from '../components/link';
 import { MarkdownPreview } from '../components/primitives/MarkdownPreview';

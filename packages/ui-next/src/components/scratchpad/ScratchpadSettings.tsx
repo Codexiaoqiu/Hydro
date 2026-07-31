@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import { useState } from 'react';
 import styles from './Scratchpad.module.css';
 import { persistScratchpadSettings, readScratchpadSettings, type ScratchpadEditorTheme, type ScratchpadSettingsValue } from './scratchpad-settings-storage';

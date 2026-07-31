@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { type Member, MemberTable } from '../components/domain/MemberTable';
 import {
   RoleSelector,
@@ -34,11 +35,22 @@ interface Args {
 
 const DEFAULT_ROLE_ID = 'default';
 
+/** Coerce bigint|number to a plain JS number for the bitmask input. */
+function toNumber(v: number | bigint): number {
+  return typeof v === 'bigint' ? Number(v) : v;
+}
+
 export default function ManageUserPrivPage() {
   const { args } = usePageData() as unknown as { args: Args };
   const udocs = args?.udocs ?? [];
   const Priv = args?.Priv ?? {};
   const defaultPriv = args?.defaultPriv ?? 0;
+
+  // Selection-mode state. `selectionMode` gates the MemberTable between the
+  // existing Edit-button view (default) and a checkbox-driven batch-edit view.
+  const [selectionMode, setSelectionMode] = useState(false);
+  const [selectedUids, setSelectedUids] = useState<Set<number>>(new Set());
+  const [busy, setBusy] = useState(false);
 
   // Map user docs to MemberTable rows. The MemberTable "role" column is the
   // natural place to surface the per-user priv bitmask, since the Priv column
@@ -60,6 +72,42 @@ export default function ManageUserPrivPage() {
   // row of the original partial: it shows which bits are granted by default.
   const roles: RoleSelectorRole[] = [{ _id: DEFAULT_ROLE_ID, perm: defaultPriv }];
 
+  const exitSelection = () => {
+    setSelectionMode(false);
+    setSelectedUids(new Set());
+    setBusy(false);
+  };
+
+  // Apply action: POST /manage/userpriv once per selected uid, then reload.
+  // The handler accepts a single (uid, priv) per request, so a native HTML
+  // form-per-row would explode to N sub-forms. We batch via fetch with
+  // URLSearchParams (the backend reads `@param('priv', Types.UnsignedInt)`)
+  // and reload once all complete.
+  const applySelection = async (form: HTMLFormElement) => {
+    if (selectedUids.size === 0) return;
+    const priv = Number((form.elements.namedItem('priv') as HTMLInputElement)?.value ?? 0);
+    if (!Number.isFinite(priv) || priv < 0) return;
+    setBusy(true);
+    try {
+      await Promise.all(
+        Array.from(selectedUids).map((uid) =>
+          fetch('/manage/userpriv', {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+            body: new URLSearchParams({ uid: String(uid), priv: String(priv), system: 'false' }).toString(),
+          }),
+        ),
+      );
+      // Reload to pick up the server-rendered udocs / current values.
+      window.location.reload();
+    } catch (e) {
+      setBusy(false);
+      // Keep the user's selection so they can retry.
+      console.error('Failed to update user priv', e);
+    }
+  };
+
   return (
     <div className="manage-user-priv">
       <Card
@@ -67,17 +115,77 @@ export default function ManageUserPrivPage() {
         header={<h1 className="manage-user-priv__title">User Privilege</h1>}
       >
         <div className="manage-user-priv__tools">
-          <Button variant="primary" type="button" aria-label="Select User">
-            Select User
-          </Button>
+          {selectionMode ? (
+            <Button variant="ghost" type="button" onClick={exitSelection} aria-label="Cancel Selection">
+              Cancel
+            </Button>
+          ) : (
+            <Button
+              variant="primary"
+              type="button"
+              onClick={() => setSelectionMode(true)}
+              aria-label="Select User"
+            >
+              Select User
+            </Button>
+          )}
         </div>
       </Card>
 
       <Card variant="default" header={<h2 className="manage-user-priv__subtitle">Users</h2>}>
         <div className="manage-user-priv__users">
-          <MemberTable members={members} type="user" />
+          <MemberTable
+            members={members}
+            type="user"
+            selection={selectionMode}
+            selectedUids={selectedUids}
+            onSelectionChange={setSelectedUids}
+          />
         </div>
       </Card>
+
+      {/*
+        Batch-edit form. Visible only when the user is in selection mode.
+        Each "Save" click issues one POST per selected uid (the handler
+        signature doesn't accept multiple uids), then reloads the page so the
+        server-rendered args reflect the new priv bitmasks.
+      */}
+      {selectionMode ? (
+        <Card variant="default" header={<h2 className="manage-user-priv__subtitle">Apply Privilege</h2>}>
+          <form
+            className="manage-user-priv__apply-form"
+            onSubmit={(e) => {
+              e.preventDefault();
+              applySelection(e.currentTarget);
+            }}
+          >
+            <p className="manage-user-priv__apply-hint" role="status">
+              Applying to {selectedUids.size} user{selectedUids.size === 1 ? '' : 's'}.
+            </p>
+            <label className="manage-user-priv__apply-label" htmlFor="manage-user-priv-bitmask">
+              New priv bitmask
+            </label>
+            <input
+              id="manage-user-priv-bitmask"
+              className="manage-user-priv__apply-input"
+              type="number"
+              name="priv"
+              min={0}
+              defaultValue={toNumber(defaultPriv)}
+            />
+            <div className="manage-user-priv__apply-actions">
+              <Button
+                variant="primary"
+                type="submit"
+                disabled={busy || selectedUids.size === 0}
+                aria-label="Apply Privilege"
+              >
+                {busy ? 'Applying…' : `Apply to ${selectedUids.size}`}
+              </Button>
+            </div>
+          </form>
+        </Card>
+      ) : null}
 
       <Card variant="default" header={<h2 className="manage-user-priv__subtitle">Privileges</h2>}>
         <div className="manage-user-priv__matrix">

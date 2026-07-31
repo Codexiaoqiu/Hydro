@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import { STATUS } from '@hydrooj/common';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from '../components/link';

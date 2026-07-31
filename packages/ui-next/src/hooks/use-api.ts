@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /**
  * `useApi` — fetch-based request layer that mirrors the legacy ui-default
  * `request` module (utils/base.ts). Keeps the same wire conventions:
@@ -89,11 +90,11 @@ function buildBody(data: RequestBody, headers: Record<string, string>): BodyInit
   if (typeof data === 'string') return data;
   if (data instanceof FormData) return data;
   if (data instanceof URLSearchParams) {
-    headers['Content-Type'] = headers['Content-Type'] ?? 'application/x-www-form-urlencoded;charset=UTF-8';
+    headers['Content-Type'] ??= 'application/x-www-form-urlencoded;charset=UTF-8';
     return data;
   }
   if (isPlainObject(data)) {
-    headers['Content-Type'] = headers['Content-Type'] ?? 'application/json;charset=UTF-8';
+    headers['Content-Type'] ??= 'application/json;charset=UTF-8';
     return JSON.stringify(data);
   }
   return data as unknown as BodyInit;

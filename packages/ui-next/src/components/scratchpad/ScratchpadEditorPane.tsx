@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import Editor from '@monaco-editor/react';
 import { useEffect, useMemo, useState } from 'react';
 import { PretestPanel } from './PretestPanel';

@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import { useEffect, useRef, useState } from 'react';
 import { request } from '../../hooks/use-api';
 import { useTranslate } from '../../lib/i18n';

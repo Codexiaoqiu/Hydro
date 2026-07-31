@@ -1,3 +1,5 @@
+/* eslint-disable max-len */
+/* eslint-disable ts/naming-convention */
 import { useMemo } from 'react';
 
 export type Locale = 'zh_CN' | 'zh_TW' | 'en';

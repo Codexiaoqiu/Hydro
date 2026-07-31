@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import { STATUS } from '@hydrooj/common';
 import { useCallback, useEffect, useMemo } from 'react';
 import { Article } from '../components/article/Article';
@@ -62,7 +63,7 @@ interface Args {
   udoc?: Udoc;
   tdoc?: Tdoc;
   tsdoc?: Tsdoc;
-  owner_udoc?: Udoc;
+  ownerUdoc?: Udoc;
   tdocs?: Array<{ docId: string, title: string }>;
   ctdocs?: Array<{ docId: string, title: string }>;
   htdocs?: Array<{ docId: string, title: string }>;
@@ -113,7 +114,7 @@ function statusClassName(status?: number): string {
 export default function ProblemDetailPage() {
   const { args } = usePageData() as unknown as { args: Args };
   const {
-    pdoc, rdoc, psdoc, tdoc, tsdoc, owner_udoc,
+    pdoc, rdoc, psdoc, tdoc, tsdoc, ownerUdoc,
     tdocs = [], ctdocs = [], htdocs = [],
     discussionCount = 0, solutionCount = 0,
     mode = 'normal', UserContext,
@@ -324,9 +325,9 @@ export default function ProblemDetailPage() {
               <ProblemSidebar context={sidebarContext} mode={mode} />
             </div>
 
-            {owner_udoc && (
+            {ownerUdoc && (
               <SideCard title={t('Problem.Uploader') ?? '出题人'}>
-                <Author name={owner_udoc.uname ?? `User ${owner_udoc._id}`} contribution={t('Problem.UploaderContribution') ?? '题目贡献者'} />
+                <Author name={ownerUdoc.uname ?? `User ${ownerUdoc._id}`} contribution={t('Problem.UploaderContribution') ?? '题目贡献者'} />
               </SideCard>
             )}
 
@@ -343,7 +344,7 @@ export default function ProblemDetailPage() {
             )}
 
             {/* eslint-disable-next-line ts/no-use-before-define */}
-            <InformationCard pdoc={pdoc} owner_udoc={owner_udoc} />
+            <InformationCard pdoc={pdoc} ownerUdoc={ownerUdoc} />
           </aside>
         </div>
       </main>
@@ -507,7 +508,7 @@ function ProblemContent({ pdoc, contentText, mode }: { pdoc: Pdoc, contentText: 
   );
 }
 
-function InformationCard({ pdoc, owner_udoc }: { pdoc: Pdoc, owner_udoc?: Udoc }) {
+function InformationCard({ pdoc, ownerUdoc }: { pdoc: Pdoc, ownerUdoc?: Udoc }) {
   const t = useTranslate();
   return (
     <div className={styles.sidebarCard}>
@@ -540,7 +541,7 @@ function InformationCard({ pdoc, owner_udoc }: { pdoc: Pdoc, owner_udoc?: Udoc }
         )}
         <dt style={{ color: 'var(--text-mute)' }}>{t('Problem.Submissions')}</dt><dd style={{ margin: 0 }}>{pdoc.nSubmit ?? '?'}</dd>
         <dt style={{ color: 'var(--text-mute)' }}>{t('Problem.Accepted')}</dt><dd style={{ margin: 0 }}>{pdoc.nAccept ?? '?'}</dd>
-        {owner_udoc && <><dt style={{ color: 'var(--text-mute)' }}>{t('Problem.UploadedBy')}</dt><dd style={{ margin: 0 }}>{owner_udoc.uname ?? owner_udoc._id}</dd></>}
+        {ownerUdoc && <><dt style={{ color: 'var(--text-mute)' }}>{t('Problem.UploadedBy')}</dt><dd style={{ margin: 0 }}>{ownerUdoc.uname ?? ownerUdoc._id}</dd></>}
       </dl>
     </div>
   );

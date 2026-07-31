@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import { STATUS } from '@hydrooj/common';
 import { canEditProblem, canRejudgeProblem, canSubmitProblem, canViewAcceptedSolution, canViewDiscussion, canViewProblemSolution, isLoggedIn } from '../../lib/perms';
 import type { MenuItem } from './Menu';

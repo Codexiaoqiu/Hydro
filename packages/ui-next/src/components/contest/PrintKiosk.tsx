@@ -99,6 +99,9 @@ export function PrintKiosk({ tdoc, isAdmin, endpoint, pollIntervalMs = 5000 }: P
     if (!isKioskActive || !isAdmin) return undefined;
     let active = true;
     (async () => {
+      // `active` is mutated by the cleanup function below; the eslint plugin
+      // can't follow closures across function boundaries.
+      // eslint-disable-next-line no-unmodified-loop-condition
       while (active) {
         try {
           const fd = new URLSearchParams({ operation: 'allocate_print_task' });

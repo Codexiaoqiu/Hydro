@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { Button } from '../components/primitives/Button';
 import { ConfirmDialog } from '../components/primitives/ConfirmDialog';

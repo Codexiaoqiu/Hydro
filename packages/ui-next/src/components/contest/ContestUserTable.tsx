@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { request } from '../../hooks/use-api';
 import { canResumeContestUser } from '../../lib/contest-user';
