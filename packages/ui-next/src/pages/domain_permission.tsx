@@ -1,7 +1,7 @@
 import {
+  RoleSelector,
   type RoleSelectorPermission,
   type RoleSelectorRole,
-  RoleSelector,
 } from '../components/domain/RoleSelector';
 import { Button } from '../components/primitives/Button';
 import { usePageData } from '../context/page-data';

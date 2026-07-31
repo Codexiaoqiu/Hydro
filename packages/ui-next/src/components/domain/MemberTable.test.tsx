@@ -1,7 +1,7 @@
 /* @vitest-environment happy-dom */
 import { render, screen, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import { MemberTable, type Member } from './MemberTable';
+import { type Member, MemberTable } from './MemberTable';
 
 const baseMembers: Member[] = [
   { uid: 1, uname: 'alice', role: 'admin' },

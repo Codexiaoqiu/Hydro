@@ -1,4 +1,4 @@
-import { MemberTable, type Member } from '../components/domain/MemberTable';
+import { type Member, MemberTable } from '../components/domain/MemberTable';
 import { Button } from '../components/primitives/Button';
 import { usePageData } from '../context/page-data';
 
