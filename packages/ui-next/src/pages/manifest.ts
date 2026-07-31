@@ -62,6 +62,7 @@ export const NEXT_PAGES = {
   home_security: ['home_security.html'],
   home_settings: ['home_settings.html'],
   manage_base: ['manage_base.html'],
+  manage_config: ['manage_config.html'],
 } as const;
 
 export const NEXT_TEMPLATES: readonly string[] = Object.freeze(

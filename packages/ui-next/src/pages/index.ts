@@ -55,3 +55,4 @@ registerPage('home_messages', () => import('./home_messages'));
 registerPage('home_security', () => import('./home_security'));
 registerPage('home_settings', () => import('./home_settings'));
 registerPage('manage_base', () => import('./manage_base'));
+registerPage('manage_config', () => import('./manage_config'));
