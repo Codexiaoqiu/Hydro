@@ -60,3 +60,4 @@ registerPage('manage_dashboard', () => import('./manage_dashboard'));
 registerPage('manage_script', () => import('./manage_script'));
 registerPage('manage_setting', () => import('./manage_setting'));
 registerPage('manage_user_import', () => import('./manage_user_import'));
+registerPage('manage_user_priv', () => import('./manage_user_priv'));
