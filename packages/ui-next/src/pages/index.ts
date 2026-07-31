@@ -57,3 +57,4 @@ registerPage('home_settings', () => import('./home_settings'));
 registerPage('manage_base', () => import('./manage_base'));
 registerPage('manage_config', () => import('./manage_config'));
 registerPage('manage_dashboard', () => import('./manage_dashboard'));
+registerPage('manage_script', () => import('./manage_script'));
