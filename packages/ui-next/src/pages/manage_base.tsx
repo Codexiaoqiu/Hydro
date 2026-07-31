@@ -7,13 +7,12 @@ interface Args {
 }
 
 const NAV_ITEMS: Array<{ name: string, url: string }> = [
-  { name: 'Config', url: '/manage/config' },
   { name: 'Dashboard', url: '/manage/dashboard' },
   { name: 'Script', url: '/manage/script' },
+  { name: 'User Import', url: '/manage/userimport' },
+  { name: 'User Priv', url: '/manage/userpriv' },
   { name: 'Setting', url: '/manage/setting' },
-  { name: 'User Import', url: '/manage/user_import' },
-  { name: 'User Priv', url: '/manage/user_priv' },
-  { name: 'Disabled', url: '/manage/disabled' },
+  { name: 'Config', url: '/manage/config' },
 ];
 
 export default function ManageBasePage() {

@@ -22,15 +22,15 @@ describe('manage_base', () => {
     expect(screen.getByRole('heading', { name: /control panel/i })).toBeInTheDocument();
   });
 
-  it('renders sidebar nav with 7 links', () => {
+  it('renders sidebar nav with 6 links', () => {
     renderPage();
-    expect(screen.getByRole('link', { name: 'Config' })).toHaveAttribute('href', '/manage/config');
+    expect(screen.getAllByRole('link')).toHaveLength(6);
     expect(screen.getByRole('link', { name: 'Dashboard' })).toHaveAttribute('href', '/manage/dashboard');
     expect(screen.getByRole('link', { name: 'Script' })).toHaveAttribute('href', '/manage/script');
+    expect(screen.getByRole('link', { name: 'User Import' })).toHaveAttribute('href', '/manage/userimport');
+    expect(screen.getByRole('link', { name: 'User Priv' })).toHaveAttribute('href', '/manage/userpriv');
     expect(screen.getByRole('link', { name: 'Setting' })).toHaveAttribute('href', '/manage/setting');
-    expect(screen.getByRole('link', { name: 'User Import' })).toHaveAttribute('href', '/manage/user_import');
-    expect(screen.getByRole('link', { name: 'User Priv' })).toHaveAttribute('href', '/manage/user_priv');
-    expect(screen.getByRole('link', { name: 'Disabled' })).toHaveAttribute('href', '/manage/disabled');
+    expect(screen.getByRole('link', { name: 'Config' })).toHaveAttribute('href', '/manage/config');
   });
 
   it('honors items passed via args', () => {
