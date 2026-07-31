@@ -40,6 +40,11 @@ function toNumber(v: number | bigint): number {
   return typeof v === 'bigint' ? Number(v) : v;
 }
 
+interface ApplyFailure {
+  uid: number;
+  reason: Error;
+}
+
 export default function ManageUserPrivPage() {
   const { args } = usePageData() as unknown as { args: Args };
   const udocs = args?.udocs ?? [];
@@ -51,6 +56,11 @@ export default function ManageUserPrivPage() {
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedUids, setSelectedUids] = useState<Set<number>>(new Set());
   const [busy, setBusy] = useState(false);
+  // User-visible surface for batch-apply failures. Set when at least one of
+  // the per-uid POSTs throws or returns a non-2xx response; cleared when
+  // the user dismisses it or re-submits. The previous implementation only
+  // logged to `console.error`, which the operator running sudo never sees.
+  const [applyError, setApplyError] = useState<string | null>(null);
 
   // Map user docs to MemberTable rows. The MemberTable "role" column is the
   // natural place to surface the per-user priv bitmask, since the Priv column
@@ -76,6 +86,7 @@ export default function ManageUserPrivPage() {
     setSelectionMode(false);
     setSelectedUids(new Set());
     setBusy(false);
+    setApplyError(null);
   };
 
   // Apply action: POST /manage/userpriv once per selected uid, then reload.
@@ -86,25 +97,60 @@ export default function ManageUserPrivPage() {
   const applySelection = async (form: HTMLFormElement) => {
     if (selectedUids.size === 0) return;
     const priv = Number((form.elements.namedItem('priv') as HTMLInputElement)?.value ?? 0);
-    if (!Number.isFinite(priv) || priv < 0) return;
+    if (!Number.isFinite(priv) || priv < 0) {
+      setApplyError(`Invalid privilege bitmask: ${priv}`);
+      return;
+    }
     setBusy(true);
+    setApplyError(null);
+    // Capture the count up-front so the success message can mention how
+    // many users were targeted (the selected set could change mid-flight
+    // if a future hot-reload wired up).
+    const targetCount = selectedUids.size;
+    // Capture ids up-front so we can still report failures even after the
+    // user has already tried to clear the selection.
+    const targetIds = Array.from(selectedUids);
     try {
-      await Promise.all(
-        Array.from(selectedUids).map((uid) =>
+      const results = await Promise.allSettled(
+        targetIds.map((uid) =>
           fetch('/manage/userpriv', {
             method: 'POST',
             credentials: 'same-origin',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
             body: new URLSearchParams({ uid: String(uid), priv: String(priv), system: 'false' }).toString(),
+          }).then(async (res) => {
+            if (!res.ok) {
+              // Surface the status + body excerpt so the admin knows whether
+              // it was a permission issue (403), validation problem (400),
+              // or a server-side handler crash (500).
+              const text = await res.text().catch(() => '');
+              throw new Error(`uid=${uid} → HTTP ${res.status}${text ? `: ${text.slice(0, 120)}` : ''}`);
+            }
+            return res;
           }),
         ),
       );
-      // Reload to pick up the server-rendered udocs / current values.
-      window.location.reload();
-    } catch (e) {
+      const failed = results
+        .map((r, i) => (r.status === 'rejected' ? { uid: targetIds[i], reason: (r as PromiseRejectedResult).reason as Error } : null))
+        .filter((x): x is ApplyFailure => x !== null);
+      if (failed.length === 0) {
+        // Reload to pick up the server-rendered udocs / current values.
+        window.location.reload();
+        return;
+      }
+      // Partial failure: keep the selection so the admin can re-apply after
+      // fixing the offending uids; surface the count + a few reasons.
+      const sample = failed.slice(0, 3).map((f) => f.reason.message).join('; ');
+      setApplyError(
+        `Failed to update ${failed.length} of ${targetCount} users. ${sample}${failed.length > 3 ? ` (+${failed.length - 3} more)` : ''}`,
+      );
       setBusy(false);
-      // Keep the user's selection so they can retry.
-      console.error('Failed to update user priv', e);
+    } catch (e) {
+      // Defensive fallback: `allSettled` shouldn't reject, but if a non-fetch
+      // error sneaks in (e.g. URLSearchParams construction), make sure the
+      // busy state resets and the user is told.
+      setBusy(false);
+      setApplyError(`Unexpected error: ${(e as Error)?.message ?? String(e)}`);
     }
   };
 
@@ -152,6 +198,19 @@ export default function ManageUserPrivPage() {
       */}
       {selectionMode ? (
         <Card variant="default" header={<h2 className="manage-user-priv__subtitle">Apply Privilege</h2>}>
+          {applyError ? (
+            <div className="manage-user-priv__apply-error" role="alert" data-testid="apply-error">
+              <span className="manage-user-priv__apply-error-text">{applyError}</span>
+              <Button
+                variant="ghost"
+                type="button"
+                onClick={() => setApplyError(null)}
+                aria-label="Dismiss error"
+              >
+                Dismiss
+              </Button>
+            </div>
+          ) : null}
           <form
             className="manage-user-priv__apply-form"
             onSubmit={(e) => {

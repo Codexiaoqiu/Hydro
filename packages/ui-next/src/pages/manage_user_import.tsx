@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Button } from '../components/primitives/Button';
 import { Card } from '../components/primitives/Card';
 import { usePageData } from '../context/page-data';
@@ -53,10 +53,30 @@ export default function ManageUserImportPage() {
 
   const [users, setUsers] = useState<string>('');
   const [localPreview, setLocalPreview] = useState<LocalPreview | null>(null);
+  const formRef = useRef<HTMLFormElement>(null);
 
-  const handlePreview = () => {
+  const handleLocalPreview = () => {
     const total = countNonEmptyLines(users);
     setLocalPreview({ count: total });
+  };
+
+  // Submit the import form with a given `draft` value.
+  //   - `draft=true`  → server parses + validates each row but does NOT
+  //     create users (mirrors the legacy `pages/manage_user_import.page.js`
+  //     Preview button). The page re-renders with validation messages.
+  //   - `draft=false` → server actually creates users.
+  //
+  // We mutate the hidden input directly + call `form.submit()` to bypass
+  // React's async state-update cycle. Using two separate `<button>`s with
+  // the same `name="draft"` would leave the field ambiguous when the user
+  // types into the textarea and hits Enter, so a single hidden + imperative
+  // toggle is the cleanest way to drive this two-mode submit.
+  const submitAs = (draft: 'true' | 'false') => {
+    const form = formRef.current;
+    if (!form) return;
+    const draftInput = form.querySelector<HTMLInputElement>('input[name="draft"]');
+    if (draftInput) draftInput.value = draft;
+    form.submit();
   };
 
   const isServerPreview = Boolean(preview);
@@ -74,10 +94,20 @@ export default function ManageUserImportPage() {
         {/*
           Native form submission: `SystemUserImportHandler.post` consumes
           `users` (TSV/CSV) and `draft`, then re-renders `manage_user_import.html`
-          with the parsed payload and validation messages. The Preview button
-          is intentionally `type="button"` so it never triggers a navigation.
+          with the parsed payload and validation messages.
+
+          The two action buttons (Preview / Submit) both call
+          `submitAs(...)`, which mutates the `draft` hidden input in place
+          and then triggers a native form POST:
+            Preview → draft=true   → server validates only, no creation.
+            Submit  → draft=false  → server actually creates the users.
+          This restores the parity that `pages/manage_user_import.page.js`
+          had with its two buttons (the previous native-form fix had a
+          single Submit that always set draft=false, silently dropping the
+          Preview-only path).
         */}
         <form
+          ref={formRef}
           className="manage-user-import__form"
           method="post"
           action="/manage/userimport"
@@ -100,14 +130,21 @@ export default function ManageUserImportPage() {
             <Button
               variant="primary"
               type="button"
-              onClick={handlePreview}
+              onClick={() => {
+                // Pure-client preview line count (no server round-trip);
+                // the labelled "Preview" submit button below drives the
+                // server-side validation preview.
+                handleLocalPreview();
+                submitAs('true');
+              }}
               aria-label="Preview"
             >
               Preview
             </Button>
             <Button
               variant="ghost"
-              type="submit"
+              type="button"
+              onClick={() => submitAs('false')}
               aria-label="Submit"
             >
               Submit
@@ -177,7 +214,14 @@ export default function ManageUserImportPage() {
         {messages.length > 0 ? (
           <ul className="manage-user-import__message-list" aria-label="Status messages">
             {messages.map((m, i) => (
-              <li key={i} className={`manage-user-import__message manage-user-import__message--${m.level ?? 'info'}`} data-level={m.level ?? 'info'}>
+              // `level + index` is stable across renders for the same server
+              // payload; using `i` alone would shift React keys if any
+              // message were ever prepended (e.g. live progress messages).
+              <li
+                key={`${m.level ?? 'info'}-${i}`}
+                className={`manage-user-import__message manage-user-import__message--${m.level ?? 'info'}`}
+                data-level={m.level ?? 'info'}
+              >
                 {m.content}
               </li>
             ))}

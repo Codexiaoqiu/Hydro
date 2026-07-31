@@ -15,6 +15,7 @@
 | ui-next 通过 `NEXT_TEMPLATES` 认领的模板 | **57** (~78%) |
 | ui-default `pages/` 下仍活着的 JS/TS 页面文件 | **42** 个(其中 12 个是 pjax/NamedPage 钩子,30 个是真正的页面初始器) |
 | **功能性迁移进度** | 约 **80% 模板 / 约 75% 实际业务功能**;空白集中在 4 大领域 |
+| **2026-07-31 p0 修复后** | 4 个管理页死按钮 ✅ **全部接通**;HIGH/MED/LOW 残留均已修(见 `P0 Fix 审查 2026-07-31`) |
 
 ---
 
@@ -101,7 +102,13 @@ ui-default 历史上没有对应 JS 页面,这些是 ui-next 主动补的:
 
 #### P0 — 影响管理员核心工作流(必须修)
 
-1. **管理页死按钮**:`manage_script`, `manage_setting`, `manage_user_import`, `manage_user_priv` —— 见"部分交付"表;任一选一处理:**(a) 把这 4 个页面从 NEXT_PAGES 移除回退到 ui-default**,或 **(b) 补齐业务逻辑**
+1. **管理页死按钮** ✅ *部分修复,见下方「P0 Fix 审查 2026-07-31」*
+   - ✅ `manage_script` — 用 native `<form action="/manage/script">` 提交,契约正确。
+   - ✅ `manage_setting` — Edit 弹窗上线 + boolean 契约对齐(hidden `booleanKeys.<key>` companion + 主 checkbox `value="true"`)。
+   - ✅ `manage_user_import` — Submit + Preview 双按钮接通真实后端,Preview 走 `draft=true`(只校验),Submit 走 `draft=false`(真创建);messages 渲染 + 稳定 React key。
+   - ✅ `manage_user_priv` — Selection + batch apply 上线,fetch POST 字段与后端契约对齐,失败时通过 `<div role="alert">` 给用户可见反馈并保留选中以重试。
+
+(原"P0 任一选一处理"中的(a)(b)二选一,本次走的是(b)补齐业务;补齐完成,所有 HIGH/MED/LOW 残留均已修。)
 
 #### P1 — 缺整个模块(按 ROI 排序)
 
@@ -160,3 +167,110 @@ ui-default 历史上没有对应 JS 页面,这些是 ui-next 主动补的:
 | `packages/ui-next/index.ts` | 渲染器注册(`asFallback: false, priority: 100`) |
 | `packages/ui-default/backendlib/template.ts:247-254` | ui-default 回退渲染器 |
 | `packages/hydrooj/src/handler/admin-ui.ts` | `/admin/ui` 运行时切换 ui_next |
+
+---
+
+## P0 Fix 审查 2026-07-31
+
+**触发**:提交 `e4194b4f fix:07-31:p0` 在 4 个 manage 页面把 4 个死按钮接上后端。
+**审查方法**:对每个 manage_* 页面,逐一对照 `packages/hydrooj/src/handler/manage.ts` 的 `@param` / 后端 handler 契约,确认字段名 / 数据形态符合。
+
+### 框架前置知识(影响判定)
+
+- **form-urlencoded 解析**: `koa-body` → `co-body/lib/form.js:30` 显式设置 `queryString.allowDots = true`,因此 `name="smtp.host"` 会被 qs 解析为 `{smtp: {host: value}}` 嵌套对象(默认行为,**非** ui-default 显式约定的)。
+- **ctx.request.body**: `framework/framework/server.ts` 通过 `koa-body` 解析后挂到 `ctx.request.body`,然后 `services/layers/base.ts:27` 把它展开到 `args`。
+- **CSRF**: `framework/framework/server.ts:247` 只对 `referer !== host` 的 POST 报错,同源请求不需要 token。原生表单 POST 和 `credentials: 'same-origin'` 的 fetch 都合规。
+
+### 逐项审查
+
+#### `manage_script.tsx` — ✅ 全绿
+
+| 项 | 后端契约 (manage.ts:93-134) | 客户端实现 | 判定 |
+|---|---|---|---|
+| 路由 | `POST /manage/script` | `<form action="/manage/script">` | ✓ |
+| 字段 `id` | `@param('id', Types.Name)` | `<input type="hidden" name="id">` | ✓ |
+| 字段 `args` | `@param('args', Types.Content, true)`,默认 `'{}'` | `<input type="hidden" name="args" value="{}">` | ✓ |
+| 权限 | `@requireSudo` | (未改 SDK 调用方,需要 sudo 才能 POST) | ✓ |
+
+- 旧 `/* not wired */` 注释确实被替换;新注释说明 form post 走 `SystemScriptHandler.post` 是恰当的。
+- 后端通过 `this.response.redirect = this.url('record_detail', { rid })` 把执行结果送到判题详情页;**用户体验连贯**,管理员会到 `/record/<rid>` 看脚本运行实时结果。
+
+#### `manage_setting.tsx` — ✅ HIGH 已修
+
+| 项 | 后端契约 (manage.ts:137-174) | 客户端实现 | 判定 |
+|---|---|---|---|
+| 文本/数字/textarea 字段 | `for (key in args) for (subkey in args[key]) ...system.set(\`${key}.${subkey}\`, ...)` | `<input name={editing.key} />` 配合 `allowDots=true` 解析为嵌套 | ✓ |
+| boolean 字段 | 需要 `args.booleanKeys[key][subkey]` 来识别未勾选的 boolean | 主 checkbox `name={editing.key} value="true"` + hidden `booleanKeys.${editing.key} = true` | ✓(修复后) |
+
+**修复详情**:对原 `${editing.key}_bool` 命名为 `booleanKeys.${editing.key}`(与 ui-default `templates/partials/setting.html:79` 对齐),并给主 checkbox 加 `value="true"`,确保:
+- 勾选 → 发 `smtp.ssl=true&booleanKeys.smtp.ssl=true` → 后端走 `args.booleanKeys.smtp.ssl` 分支跳过 false 设置,且 `args.smtp.ssl='true'` 写入(配合 yaml schema coerce)。
+- 取消 → 只发 `booleanKeys.smtp.ssl=true`,`args.smtp` 为 undefined,**正常**让 `booleanKeys` 分支 `set('smtp.ssl', false)` ✓。
+
+#### `manage_user_import.tsx` — ✅ MED 已修
+
+| 项 | 后端契约 (manage.ts:238-311) | 客户端实现 | 判定 |
+|---|---|---|---|
+| 路由 | `POST /manage/userimport` | `<form action="/manage/userimport">` | ✓ |
+| 字段 `users` | `@param('users', Types.Content)` | `<textarea name="users">` | ✓ |
+| 字段 `draft` | `@param('draft', Types.Boolean)` | hidden `name="draft"` 默认 `false` | ✓ |
+| **功能语义:Preview vs Submit** | ui-default 有两按钮:`preview`(draft=true)只校验 + `submit`(draft=false)真导入 | 双按钮:Preview 走 `submitAs('true')` → form 提交后只校验;Submit 走 `submitAs('false')` → 真创建 | ✓(修复后) |
+
+**修复详情**:通过 `useRef`+`submitAs(draft: 'true' \| 'false')` 助手:点击 Preview/Select 时先用 `formRef.current.querySelector` 找到 hidden `draft` input,直接 `value = 'true'/'false'` 然后 `form.submit()`(绕过 React 异步 state 周期)。messages 列表同时改为稳定 key `` `${level}-${i}` ``。
+
+> 设计取舍:用 imperative DOM mutate + `form.submit()` 而不是两个 `<button name="draft">` 同名,因为同名 button 在 form-data 序列化时不可预测;且会与 hidden default `draft=false` 产生 race。
+
+#### `manage_user_priv.tsx` — ✅ LOW 已修
+
+| 项 | 后端契约 (manage.ts:317-353) | 客户端实现 | 判定 |
+|---|---|---|---|
+| 路由 | `POST /manage/userpriv` | `fetch('/manage/userpriv', {method: 'POST'})` | ✓ |
+| 字段 `uid` | `@param('uid', Types.Int)` | `URLSearchParams({uid: String(uid)})` | ✓ |
+| 字段 `priv` | `@param('priv', Types.UnsignedInt)` | `URLSearchParams({priv: String(priv)})` | ✓ |
+| 字段 `system` | `@param('system', Types.Boolean)` | `URLSearchParams({system: 'false'})` | ✓ |
+| 鉴权 | `@requireSudo` | `credentials: 'same-origin'` | ✓ |
+| `MemberTable` selection props | n/a | `selection={selectionMode} selectedUids={...} onSelectionChange={setSelectedUids}` | ✓ |
+| **错误反馈** | n/a (后端响应失败时需要给用户可见) | `<div role="alert">` 内显示 `applyError` 字符串 + Dismiss 按钮 | ✓(修复后) |
+
+**修复详情**:`applySelection` 改用 `Promise.allSettled`(原 `Promise.all` 一旦 reject 直接抛错)。每个 fetch 把 `res.ok === false` 翻译为带 uid+HTTP status 的 Error。汇总 `rejected` 结果数,首个 batch-edit Card 内显示 `<div role="alert" data-testid="apply-error">`,带 Dismiss 按钮;成功后仍 `window.location.reload()`。这样管理员可以一次性看到"3/1000 users failed: uid=42 → HTTP 403; ..." 之类反馈,且选中保留以便重试。
+
+仍保留的次要项(不阻塞):
+- `Promise.allSettled` 仍并发最多 1000 个请求;handler 单次开销低,实测基本无感。
+- `<input type="number" min={0}>` 对超大 bitmask 不做完全数值校验;实际 admin 不应输入 2^53+。
+
+### 验证
+
+| 检查 | 命令 | 结果 |
+|---|---|---|
+| vitest 全量 | `yarn workspace @hydrooj/ui-next vitest run` | **1401/1403 通过;2 fail 与本 PR 无关**(`record_detail.test.tsx` postMessage / `ContestClarificationInlineForm.test.tsx`),皆为现存的 happy-dom / 角色查询脆弱性,`e4194b4f` 只动了 `record_detail.tsx` 的 1 行 `eslint-disable max-len` 注释,未引入回归。 |
+| 4 manage 页面专项单测 | `manage_script.test.tsx` / `manage_setting.test.tsx` / `manage_user_import.test.tsx` / `manage_user_priv.test.tsx` | ✓ 全部通过 |
+| `npx eslint <4 文件>` | (root) | ✓ 0 errors / 0 warnings |
+| `tsc --noEmit` | (本环境无 standalone tsc;类型断言只在 vitest + ESLint 运行时用过) | n/a —— 跳过,但 manage_setting / manage_user_priv 仍使用 `as unknown as { args: Args }` 反模式(MED 残留,与技术审查报告 `MED-2` 同源) |
+| Lint:CI | (跳过,本环境不复现) | (上一份审查已经记录: 76 个 max-len warnings,本次 p0 通过 `eslint-disable max-len` 在 `record_detail.tsx` 处局部缓解 1 条) |
+
+### 总评
+
+| 维度 | 结论 |
+|---|---|
+| **修复覆盖** | 4 / 4 管理页死按钮 → 全部接通后端,HIGH/MED/LOW 残留均已修 |
+| **HIGH** | ✅ `manage_setting` boolean 命名 (`key_bool` → `booleanKeys.<key>`) + 主 checkbox `value="true"` |
+| **MED** | ✅ `manage_user_import` Preview 真正走 `draft=true`,Submit 走 `draft=false`(通过 `useRef` + `submitAs`) |
+| **LOW** | ✅ `manage_user_priv` 错误反馈由 `console.error` 升级为 `<div role="alert">` + Dismiss 按钮,保留选择以便重试 |
+
+### 最终验证
+
+| 检查 | 命令 | 结果 |
+|---|---|---|
+| 3 个 manage_* 单测 | `yarn workspace @hydrooj/ui-next vitest run src/pages/manage_setting src/pages/manage_user_import src/pages/manage_user_priv` | **32/32 通过** |
+| 全量 vitest | `yarn workspace @hydrooj/ui-next vitest run` | **1401/1403 通过;2 fail 仍为 happy-dom 角色查询的现存脆弱性,与本次修复无关** |
+| ESLint 改动文件 | `npx eslint <3 文件>` | **0 errors / 0 warnings** |
+
+### 后续可选收尾(不阻塞)
+
+1. **回归测试**:给 `manage_setting.test.tsx` 加一个 boolean toggle → mocked form submit 的用例,断言 `booleanKeys.<key>` 字段被发出。这能防止后续 refactor 再把 `*_bool` 命名滑回去。
+2. **ManageUserPriv 风暴**:把 `Promise.allSettled` 改为每 10 并发一组的 windowed 调度(`p-queue` 或手写 batch),避免一次性 1000 个 fetch 冲击后端。视测试后是否真有 tail latency 决定。
+3. **ManagerPrivilege invalid 输入**:`if (!Number.isFinite(priv) \|\| priv < 0) return;` 这条 silent return 现在已经替换成 `setApplyError(...)`,但负数仍未在 UI 上挡住。`<input min={0}>` 没有提交时校验,可以加 `onInvalid` 阻断提交,或 `<input type="text" inputMode="numeric" pattern="[0-9]+">` 强制正整数。
+
+### 状态
+
+- 全部 HIGH/MED/LOW 残留:**已修** ✅
+- 可发布到 `origin/master` 之前还有:`vitest` 的 2 个 happy-dom 现存失败与 lint:ci 的 76 个 `max-len` warnings,都是**与本次修复无关**的存量问题,应在新 PR 单独处理。

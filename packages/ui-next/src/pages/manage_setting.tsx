@@ -115,8 +115,11 @@ export default function ManageSettingPage() {
         Edit dialog: native `<form method="post" action="/manage/setting">`
         posts the row's `<key>=<value>` to `SystemSettingHandler.post`, which
         iterates the body and persists each via `system.set(...)`. Booleans
-        additionally emit a hidden `<key>_bool` companion so the handler can
-        detect unchecked submissions (the standard HTML checkbox gotcha).
+        additionally emit a hidden `booleanKeys.<key>` companion so the
+        handler can detect unchecked submissions (the standard HTML
+        checkbox gotcha — unchecked checkboxes don't appear in form data
+        at all, so without the hidden companion unchecking would silently
+        keep the previous value).
       */}
       {editing ? (
         <div className="manage-setting__dialog" role="dialog" aria-modal="true" aria-label={`Edit ${editing.key}`}>
@@ -138,14 +141,28 @@ export default function ManageSettingPage() {
                 aria-describedby={`manage-setting-hint-${editing.key}`}
               />
             ) : displayInputType(editing.type) === 'checkbox' ? (
+              // Boolean contract (must mirror `templates/partials/setting.html`
+              // + `SystemSettingHandler.post` in packages/hydrooj/src/handler/manage.ts):
+              //   1. The main checkbox submits `key=true` when checked.
+              //   2. The hidden `booleanKeys.key` companion is always sent so
+              //      the server can detect unchecked submissions and persist
+              //      `false` — without this hidden field, unchecking a
+              //      checkbox would silently keep the previous value (the
+              //      standard HTML "checkbox absent when unchecked" gotcha).
+              // The dot in `editing.key` is honored by `co-body`'s
+              // `allowDots=true` setting, so the hidden field arrives at the
+              // handler as the nested path `args.booleanKeys.<key>` that
+              // `SystemSettingHandler.post` reads to identify unset booleans.
               <label className="manage-setting__dialog-bool">
                 <input
                   type="checkbox"
                   name={editing.key}
+                  value="true"
                   defaultChecked={Boolean(editingValue)}
+                  aria-describedby={`manage-setting-hint-${editing.key}`}
                 />
                 <span>Enabled</span>
-                <input type="hidden" name={`${editing.key}_bool`} value="true" />
+                <input type="hidden" name={`booleanKeys.${editing.key}`} value="true" />
               </label>
             ) : (
               <input
