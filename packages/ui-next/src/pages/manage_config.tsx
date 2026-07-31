@@ -77,15 +77,7 @@ export default function ManageConfigPage() {
             ))}
           </div>
           <div className="manage-config__actions">
-            <Button
-              variant="primary"
-              type="submit"
-              onClick={() => {
-                // Persistence is wired in a follow-up task; the button is
-                // intentionally a no-op placeholder so the form structure is
-                // visible here without an oversized stub.
-              }}
-            >
+            <Button variant="primary" type="submit">
               Save
             </Button>
           </div>

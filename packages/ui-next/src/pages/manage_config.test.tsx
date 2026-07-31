@@ -37,6 +37,10 @@ describe('manage_config', () => {
     expect(screen.getByRole('textbox', { name: /site name/i })).toBeInTheDocument();
     expect(screen.getByRole('spinbutton', { name: /max connections/i })).toBeInTheDocument();
     expect(screen.getByRole('checkbox', { name: /enable signup/i })).toBeInTheDocument();
+    // Pin field counts so a regression that adds a stray textbox/spinbutton/checkbox is caught.
+    expect(screen.getAllByRole('textbox')).toHaveLength(1);
+    expect(screen.getAllByRole('spinbutton')).toHaveLength(1);
+    expect(screen.getAllByRole('checkbox')).toHaveLength(1);
   });
 
   it('initializes input values from args.value', () => {
