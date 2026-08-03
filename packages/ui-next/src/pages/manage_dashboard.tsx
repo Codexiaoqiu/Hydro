@@ -29,6 +29,8 @@ interface Domain {
   avatar?: string;
 }
 
+// Args documents the shape of the backend-injected page-data payload.
+// eslint-disable-next-line ts/no-unused-vars
 interface Args {
   UserContext?: Record<string, unknown>;
   UiContext?: Record<string, unknown>;
@@ -54,7 +56,7 @@ function toIsoString(time: string | number): string {
 }
 
 export default function ManageDashboardPage() {
-  const { args } = usePageData() as unknown as { args: Args };
+  const { args } = usePageData();
   const domain = args?.domain;
   const messages = args?.messages ?? [];
   const activities = args?.activities ?? [];

@@ -11,6 +11,8 @@ interface SchemaNode {
   default?: unknown;
 }
 
+// Args documents the shape of the backend-injected page-data payload.
+// eslint-disable-next-line ts/no-unused-vars
 interface Args {
   UserContext?: Record<string, unknown>;
   UiContext?: Record<string, unknown>;
@@ -24,7 +26,7 @@ function initialValue(node: SchemaNode, value?: Record<string, unknown>): string
 }
 
 export default function ManageConfigPage() {
-  const { args } = usePageData() as unknown as { args: Args };
+  const { args } = usePageData();
   const schema = args?.schema ?? [];
   const value = args?.value ?? {};
 

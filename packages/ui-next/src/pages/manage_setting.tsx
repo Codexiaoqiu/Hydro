@@ -15,6 +15,8 @@ interface SystemSetting {
   range?: string[];
 }
 
+// Args documents the shape of the backend-injected page-data payload.
+// eslint-disable-next-line ts/no-unused-vars
 interface Args {
   UserContext?: Record<string, unknown>;
   UiContext?: Record<string, unknown>;
@@ -46,7 +48,7 @@ function rawToString(raw: string | number | boolean | undefined): string {
 }
 
 export default function ManageSettingPage() {
-  const { args } = usePageData() as unknown as { args: Args };
+  const { args } = usePageData();
   const settings = args?.settings ?? [];
   const current = args?.current ?? {};
   const showUiRenderer = canEditSystem(args?.UserContext);

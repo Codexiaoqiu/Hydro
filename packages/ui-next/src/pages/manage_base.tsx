@@ -1,5 +1,7 @@
 import { usePageData } from '../context/page-data';
 
+// Args documents the shape of the backend-injected page-data payload.
+// eslint-disable-next-line ts/no-unused-vars
 interface Args {
   UserContext?: Record<string, unknown>;
   UiContext?: Record<string, unknown>;
@@ -16,7 +18,7 @@ const NAV_ITEMS: Array<{ name: string, url: string }> = [
 ];
 
 export default function ManageBasePage() {
-  const { args } = usePageData() as unknown as { args: Args };
+  const { args } = usePageData();
   const items = args?.items ?? NAV_ITEMS;
   return (
     <div className="manage-layout">

@@ -20,6 +20,8 @@ interface Message {
   content: string;
 }
 
+// Args documents the shape of the backend-injected page-data payload.
+// eslint-disable-next-line ts/no-unused-vars
 interface Args {
   UserContext?: Record<string, unknown>;
   UiContext?: Record<string, unknown>;
@@ -38,7 +40,7 @@ interface Args {
 }
 
 export default function ManageUserImportPage() {
-  const { args } = usePageData() as unknown as { args: Args };
+  const { args } = usePageData();
   const preview = args?.preview;
   const progress = args?.progress;
   const messages = args?.messages ?? [];

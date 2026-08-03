@@ -22,6 +22,8 @@ interface UserDoc {
   [key: string]: unknown;
 }
 
+// Args documents the shape of the backend-injected page-data payload.
+// eslint-disable-next-line ts/no-unused-vars
 interface Args {
   UserContext?: Record<string, unknown>;
   UiContext?: Record<string, unknown>;
@@ -46,7 +48,7 @@ interface ApplyFailure {
 }
 
 export default function ManageUserPrivPage() {
-  const { args } = usePageData() as unknown as { args: Args };
+  const { args } = usePageData();
   const udocs = args?.udocs ?? [];
   const Priv = args?.Priv ?? {};
   const defaultPriv = args?.defaultPriv ?? 0;

@@ -16,6 +16,8 @@ interface ScriptEntry {
   modified?: string | number;
 }
 
+// Args documents the shape of the backend-injected page-data payload.
+// eslint-disable-next-line ts/no-unused-vars
 interface Args {
   UserContext?: Record<string, unknown>;
   UiContext?: Record<string, unknown>;
@@ -48,7 +50,7 @@ function formatModified(modified: string | number | undefined): string | undefin
 }
 
 export default function ManageScriptPage() {
-  const { args } = usePageData() as unknown as { args: Args };
+  const { args } = usePageData();
   const entries = toEntries(args?.scripts);
 
   if (entries.length === 0) {
