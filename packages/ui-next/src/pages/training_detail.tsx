@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { Link } from '../components/link';
 import { Card } from '../components/primitives/Card';
 import { usePageData } from '../context/page-data';
-import { useBuildUrl } from '../hooks/use-build-url';
 import { request } from '../hooks/use-api';
+import { useBuildUrl } from '../hooks/use-build-url';
 import { own } from '../lib/perms';
 import styles from './training_detail.module.css';
 
