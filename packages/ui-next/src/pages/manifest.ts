@@ -58,6 +58,7 @@ export const NEXT_PAGES = {
   problem_hack: ['problem_hack.html'],
   record_detail: ['record_detail.html'],
   record_main: ['record_main.html'],
+  home_files: ['home_files.html'],
   home_messages: ['home_messages.html'],
   home_security: ['home_security.html'],
   home_settings: ['home_settings.html'],

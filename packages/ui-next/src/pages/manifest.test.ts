@@ -14,6 +14,11 @@ describe('nEXT_PAGES manifest', () => {
     expect(registeredKeys).toEqual(manifestKeys);
   });
 
+  it('registers the home_files page for the user file template', () => {
+    expect(NEXT_PAGES).toHaveProperty('home_files', ['home_files.html']);
+    expect(registeredPageKeys()).toContain('home_files');
+  });
+
   it('nEXT_TEMPLATES contains the homepage / error / create templates', () => {
     // Failure of any of these would silently regress C1 for the most-used page.
     expect(NEXT_TEMPLATES).toContain('main.html');
