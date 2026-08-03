@@ -167,6 +167,49 @@ describe('App', () => {
         });
     });
 
+    describe('SP8 P1-3: ui_next boolean contract via /manage/setting', () => {
+        // The handler used to persist ui_next as a normalized boolean via
+        // system.set() but then re-broadcast the *raw* form args (containing
+        // ui_next: 'true' as a string) from this.ctx.broadcast('system/setting', args).
+        // The model:system listener overwrites the cache with that string, so
+        // system.get('ui_next') returned 'true' until restart, breaking the
+        // top-level boolean contract. We now drop the scalar ui_next key from
+        // the raw form args before re-broadcasting. This suite locks that in.
+        before(async () => {
+            const { UserModel, SystemModel } = require('hydrooj');
+            await UserModel.setSuperAdmin(2);
+            // Establish sudo mode: GET triggers the @requireSudo redirect, and
+            // POSTing the password to /user/sudo arms the session for one hour.
+            await agent.get('/manage/setting').expect(302);
+            await agent.post('/user/sudo').send({ password: '123456' }).expect(302);
+            // First-touch baseline so this test does not depend on prior state.
+            const baseline = SystemModel.get('ui_next');
+            await SystemModel.set('ui_next', !!baseline);
+        });
+
+        it('POST ui_next="true" yields boolean true (not string)', async () => {
+            const { SystemModel } = require('hydrooj');
+            await agent.post('/manage/setting')
+                .type('form')
+                .send({ ui_next: 'true', 'booleanKeys.ui_next': 'true' })
+                .expect(302);
+            const cur = SystemModel.get('ui_next');
+            assert.strictEqual(cur, true, `expected boolean true, got ${JSON.stringify(cur)}`);
+            assert.strictEqual(typeof cur, 'boolean', 'ui_next must stay a boolean');
+        });
+
+        it('POST without ui_next yields boolean false (companion path)', async () => {
+            const { SystemModel } = require('hydrooj');
+            await agent.post('/manage/setting')
+                .type('form')
+                .send({ 'booleanKeys.ui_next': 'true' })
+                .expect(302);
+            const cur = SystemModel.get('ui_next');
+            assert.strictEqual(cur, false, `expected boolean false, got ${JSON.stringify(cur)}`);
+            assert.strictEqual(typeof cur, 'boolean', 'ui_next must stay a boolean');
+        });
+    });
+
     // TODO add more tests
 
     const results: Record<string, autocannon.Result> = {};

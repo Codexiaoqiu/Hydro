@@ -169,6 +169,11 @@ class SystemSettingHandler extends SystemHandler {
             } else if (key === 'ui_next' && !args[key]) tasks.push(system.set(key, false));
         }
         await Promise.all(tasks);
+        // The scalar `ui_next` key was already persisted (and broadcast) with
+        // a normalized boolean above. Drop it from the raw form args before
+        // re-broadcasting so the listener cache does not get clobbered by the
+        // original string 'true'/'false'.
+        delete args.ui_next;
         this.ctx.broadcast('system/setting', args);
         this.back();
     }
