@@ -6,20 +6,20 @@ import { TYPE_CONTEST, TYPE_PROBLEM } from '../lib/document-types';
 import { useTranslate } from '../lib/i18n';
 import styles from './discussion_create.module.css';
 
-interface VnodeLite {
+export interface VnodeLite {
   _id?: string;
   id?: string | number;
   title?: string;
   type?: number;
   docId?: number | string;
 }
-interface Args {
+export interface Args {
   path: Array<[string, string, Record<string, unknown>?, boolean?]>;
   vnode: VnodeLite;
 }
 
 export default function DiscussionCreate() {
-  const { args } = usePageData() as unknown as { args: Args };
+  const { args } = usePageData();
   const { vnode } = args;
   const buildUrl = useBuildUrl();
   const t = useTranslate();

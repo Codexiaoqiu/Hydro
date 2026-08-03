@@ -18,7 +18,7 @@ import { PreferenceSection } from '../sections/PreferenceSection';
 
 // Mirrors packages/hydrooj/src/model/setting.ts::_Setting. Only the fields we
 // actually render are typed here; the rest are forwarded as-is to the server.
-interface SettingRow {
+export interface SettingRow {
   family: string;
   key: string;
   value: unknown;
@@ -29,7 +29,7 @@ interface SettingRow {
   range?: Record<string, string> | null;
 }
 
-interface Args {
+export interface Args {
   category: 'preference' | 'account' | 'domain';
   page_name: string;
   current: Record<string, unknown>;
@@ -119,7 +119,7 @@ function Field({ s, value, onChange }: { s: SettingRow, value: unknown, onChange
 }
 
 export default function HomeSettingsPage() {
-  const { args } = usePageData() as unknown as { args: Args };
+  const { args } = usePageData();
   const t = useTranslate();
   const toast = useToast();
   // `args.settings ?? []` produces a fresh array reference every render, which

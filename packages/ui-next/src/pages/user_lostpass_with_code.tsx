@@ -5,12 +5,12 @@ import { usePageData } from '../context/page-data';
 import { HydroClientError, request } from '../hooks/use-api';
 import { useTranslate } from '../lib/i18n';
 
-interface Args {
+export interface Args {
   uname?: string;
 }
 
 export default function UserLostPassWithCodePage() {
-  const { args } = usePageData() as unknown as { args: Args };
+  const { args } = usePageData();
   const uname = args?.uname ?? '';
   const [password, setPassword] = useState('');
   const [verifyPassword, setVerifyPassword] = useState('');

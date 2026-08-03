@@ -6,7 +6,7 @@ import { useNavigate } from '../context/router';
 import { HydroClientError } from '../hooks/use-api';
 import { useTranslate } from '../lib/i18n';
 
-interface Rdoc {
+export interface Rdoc {
   _id: string;
   status?: number;
   score?: number;
@@ -15,7 +15,7 @@ interface Rdoc {
   pid?: number | string;
   judgeAt?: number;
 }
-interface Args {
+export interface Args {
   rdocs?: Rdoc[];
   udict?: Record<number, { uname?: string, avatar?: string }>;
   pdoc?: { title?: string, pid?: string, docId?: number };
@@ -65,7 +65,7 @@ const STATUS_KEYS = [
 ];
 
 export default function RecordMainPage() {
-  const { args } = usePageData() as unknown as { args: Args };
+  const { args } = usePageData();
   const {
     rdocs = [], udict = {}, pdoc, UiContext, filter, languages = [],
   } = args;

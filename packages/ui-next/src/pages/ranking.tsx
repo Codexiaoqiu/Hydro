@@ -1,11 +1,11 @@
 import { usePageData } from '../context/page-data';
 
-interface UserLite { _id: number, uname: string, avatar: string }
-interface Entry { rank: number, score: number, udoc: UserLite }
-interface Args { ranking: Entry[] }
+export interface UserLite { _id: number, uname: string, avatar: string }
+export interface Entry { rank: number, score: number, udoc: UserLite }
+export interface Args { ranking: Entry[] }
 
 export default function RankingPage() {
-  const { args } = usePageData() as unknown as { args: Args };
+  const { args } = usePageData();
   return (
     <div className="section">
       <div className="section__header">

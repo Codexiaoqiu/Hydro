@@ -6,9 +6,9 @@ import { useBuildUrl } from '../hooks/use-build-url';
 import { useTranslate } from '../lib/i18n';
 import styles from './problem_solution.module.css';
 
-interface Psdoc { docId: string, owner: number, content: string, reply?: Psdoc[], vote?: number }
-interface Pdoc { docId: number, pid?: string, owner: number, title?: string }
-interface Args {
+export interface Psdoc { docId: string, owner: number, content: string, reply?: Psdoc[], vote?: number }
+export interface Pdoc { docId: number, pid?: string, owner: number, title?: string }
+export interface Args {
   psdocs: Psdoc[];
   page: number;
   pcount: number;
@@ -20,7 +20,7 @@ interface Args {
 }
 
 export default function ProblemSolution() {
-  const { args } = usePageData() as unknown as { args: Args };
+  const { args } = usePageData();
   const { psdocs, page, pcount, pdoc, sid } = args;
   const buildUrl = useBuildUrl();
   const t = useTranslate();

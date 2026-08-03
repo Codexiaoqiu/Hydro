@@ -39,7 +39,7 @@ function randomBase32(len: number): string {
   return s;
 }
 
-interface SessionEntry {
+export interface SessionEntry {
   _id: string;
   isCurrent?: boolean;
   updateUaInfo?: { browser?: { name?: string }, os?: { name?: string } };
@@ -47,7 +47,7 @@ interface SessionEntry {
   updateIp?: string;
 }
 
-interface AuthenticatorEntry {
+export interface AuthenticatorEntry {
   credentialID: string;
   name: string;
   credentialType: string;
@@ -57,7 +57,7 @@ interface AuthenticatorEntry {
   fmt?: string;
 }
 
-interface Args {
+export interface Args {
   UserContext?: { _id?: number, uname?: string, mail?: string };
   sudoUid?: number | null;
   sessions?: SessionEntry[];
@@ -83,7 +83,7 @@ function QRCodeCanvas({ data, size }: { data: string, size: number }) {
 }
 
 export default function HomeSecurityPage() {
-  const { args } = usePageData() as unknown as { args: Args };
+  const { args } = usePageData();
   const user = useUserContext();
   const t = useTranslate();
   const toast = useToast();

@@ -6,16 +6,16 @@ import { usePageData } from '../context/page-data';
 // packages/hydrooj/src/handler/domain.ts:152 — `rudocs` is a role -> members
 // map (the handler groups users by their assigned role), `roles` is the
 // ordered list of role definitions, and `domain` is the active domain doc.
-interface DomainUser { uid: number, uname: string, role: string, join?: number }
-interface Domain { _id: string, name: string, displayName: string }
-interface Args {
+export interface DomainUser { uid: number, uname: string, role: string, join?: number }
+export interface Domain { _id: string, name: string, displayName: string }
+export interface Args {
   domain: Domain;
   rudocs: Record<string, DomainUser[]>;
   roles: Array<{ _id: string }>;
 }
 
 export default function DomainUserPage() {
-  const { args } = usePageData() as unknown as { args: Args };
+  const { args } = usePageData();
   const { domain, rudocs } = args;
   // Flatten the role-grouped map into a single ordered list. The original
   // template rendered each role as its own tbody with the role name as a

@@ -1,7 +1,7 @@
 import { ProblemForm } from '../components/problem/ProblemForm';
 import { usePageData } from '../context/page-data';
 
-interface Args {
+export interface Args {
   /**
    * Server injects `i18n.langs(false)` — `Record<langCode, displayName>`.
    */
@@ -10,7 +10,7 @@ interface Args {
 }
 
 export default function ProblemCreatePage() {
-  const { args } = usePageData() as unknown as { args: Args };
+  const { args } = usePageData();
   return (
     <ProblemForm
       pageName="problem_create"

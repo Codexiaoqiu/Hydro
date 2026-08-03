@@ -8,7 +8,7 @@ import { usePageData } from '../context/page-data';
 import { useTranslate } from '../lib/i18n';
 import styles from './contest_clarification.module.css';
 
-interface Args {
+export interface Args {
   tdoc?: { docId: number, pids: number[], title?: string };
   tcdocs?: ClarItem[];
   pdict?: Record<number, { docId?: number, title?: string }>;
@@ -17,7 +17,7 @@ interface Args {
 }
 
 export default function ContestClarificationPage() {
-  const { args } = usePageData() as unknown as { args: Args };
+  const { args } = usePageData();
   const t = useTranslate();
   const tdoc = args?.tdoc;
   const currentUid = (args?.UserContext as { _id?: number } | undefined)?._id ?? 0;

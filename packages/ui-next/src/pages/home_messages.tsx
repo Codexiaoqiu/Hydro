@@ -81,7 +81,7 @@ function buildInitial(args: HomeMessagesArgs): Conversation[] {
 }
 
 export default function HomeMessagesPage() {
-  const { args } = usePageData() as unknown as { args: HomeMessagesArgs };
+  const { args } = usePageData();
   const ui = useUiContext() as unknown as { ws_prefix?: string };
   const t = useTranslate();
   const selfUid = args.selfUid ?? 0;

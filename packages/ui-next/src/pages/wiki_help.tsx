@@ -1,10 +1,10 @@
 import { usePageData } from '../context/page-data';
 
-interface Section { id: string, title: string, content: string }
-interface Args { sections: Section[] }
+export interface Section { id: string, title: string, content: string }
+export interface Args { sections: Section[] }
 
 export default function WikiHelpPage() {
-  const { args } = usePageData() as unknown as { args: Args };
+  const { args } = usePageData();
   return (
     <div className="wiki-layout">
       <aside className="wiki-toc">

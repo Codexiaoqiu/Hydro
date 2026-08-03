@@ -12,7 +12,7 @@ import { TYPE_CONTEST, TYPE_PROBLEM } from '../lib/document-types';
 import { useTranslate } from '../lib/i18n';
 import styles from './discussion_main.module.css';
 
-interface Ddoc {
+export interface Ddoc {
   _id: string;
   docId: string;
   title: string;
@@ -25,7 +25,7 @@ interface Ddoc {
   highlight?: boolean;
   hidden?: boolean;
 }
-interface VnodeLite {
+export interface VnodeLite {
   _id?: string;
   id?: string | number;
   title?: string;
@@ -34,13 +34,13 @@ interface VnodeLite {
   pid?: string;
   owner?: number;
 }
-interface Vnode {
+export interface Vnode {
   docId: string;
   title: string;
   content?: string;
   type?: number;
 }
-interface Args {
+export interface Args {
   ddocs: Ddoc[];
   dpcount: number;
   udict: Record<number, { _id: number, uname: string, avatar?: string }>;
@@ -52,7 +52,7 @@ interface Args {
 }
 
 export default function DiscussionMain() {
-  const { args } = usePageData() as unknown as { args: Args };
+  const { args } = usePageData();
   const {
     ddocs, dpcount, udict, page, vndict, vnode, page_name, vnodes,
   } = args;

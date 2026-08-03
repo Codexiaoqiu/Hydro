@@ -6,13 +6,13 @@ import { usePageData } from '../context/page-data';
 import { HydroClientError, request } from '../hooks/use-api';
 import { useTranslate } from '../lib/i18n';
 
-interface Args {
+export interface Args {
   mail?: string;
   UserContext?: { mail?: string };
 }
 
 export default function UserRegisterPage() {
-  const { args } = usePageData() as unknown as { args: Args };
+  const { args } = usePageData();
   const [mail, setMail] = useState(args?.mail ?? '');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<HydroClientError | null>(null);

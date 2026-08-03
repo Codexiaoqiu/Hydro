@@ -16,7 +16,7 @@ import {
   validateProblemConfigYaml } from '../lib/yaml-config';
 import styles from './problem_config.module.css';
 
-interface Args {
+export interface Args {
   pdoc?: { docId: number, pid?: string };
   testdata?: string[];
   config?: string;
@@ -25,7 +25,7 @@ interface Args {
 type Tab = 'editor' | 'basic' | 'subtasks';
 
 export default function ProblemConfigPage() {
-  const { args } = usePageData() as unknown as { args: Args };
+  const { args } = usePageData();
   const t = useTranslate();
   const toast = useToast();
   const [tab, setTab] = useState<Tab>('editor');

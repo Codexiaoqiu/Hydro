@@ -6,14 +6,14 @@ import { usePageData } from '../context/page-data';
 import { HydroClientError, request } from '../hooks/use-api';
 import { useTranslate } from '../lib/i18n';
 
-interface Args {
+export interface Args {
   pdoc?: { docId: number, pid?: string, title: string };
   rdoc?: { _id: string };
   tid?: string;
 }
 
 export default function ProblemHackPage() {
-  const { args } = usePageData() as unknown as { args: Args };
+  const { args } = usePageData();
   const { pdoc, rdoc, tid } = args;
   const t = useTranslate();
   const [input, setInput] = useState('');

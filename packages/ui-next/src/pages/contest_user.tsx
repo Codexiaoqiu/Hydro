@@ -13,7 +13,7 @@ import { isOngoing } from '../lib/contest-status';
 import { useTranslate } from '../lib/i18n';
 import styles from './contest_user.module.css';
 
-interface Args {
+export interface Args {
   tdoc?: {
     docId: number;
     title?: string;
@@ -50,7 +50,7 @@ interface Polled {
  *     `users` API is called instead of the nonexistent `/user/search` route.
  */
 export default function ContestUserPage() {
-  const { args } = usePageData() as unknown as { args: Args };
+  const { args } = usePageData();
   const t = useTranslate();
   const tdoc = args?.tdoc;
   const domainId = args?.UserContext?.domainId ?? 'system';

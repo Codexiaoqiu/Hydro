@@ -8,20 +8,20 @@ import { usePostLoginRedirect } from '../hooks/use-post-login-redirect';
 import { useTranslate } from '../lib/i18n';
 import { TwoFactorDialog, type TwoFactorResult } from '../sections/TwoFactorDialog';
 
-interface UserLoginArgs {
+export interface UserLoginArgs {
   builtInLogin?: boolean;
   loginMethods?: LoginMethod[];
   redirect?: string;
   UserContext?: { _id?: number, uname?: string };
 }
 
-interface TwoFactorCallbackCtx {
+export interface TwoFactorCallbackCtx {
   password: string;
   rememberme: boolean;
   info: { tfa: boolean, authn?: boolean } | null;
 }
 
-interface TwoFactorState {
+export interface TwoFactorState {
   uname: string;
   password: string;
   rememberme: boolean;
@@ -31,7 +31,7 @@ interface TwoFactorState {
 }
 
 export default function UserLoginPage() {
-  const { args } = usePageData() as unknown as { args: UserLoginArgs };
+  const { args } = usePageData();
   const { builtInLogin = true, loginMethods = [], redirect, UserContext } = args ?? {};
   const isLoggedIn = !!UserContext?._id;
   const t = useTranslate();

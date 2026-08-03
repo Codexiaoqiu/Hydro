@@ -8,8 +8,8 @@ import { useNavigate } from '../context/router';
 import { HydroClientError, request } from '../hooks/use-api';
 import { useTranslate } from '../lib/i18n';
 
-interface UserLite { authn?: boolean, tfa?: boolean, _id?: number }
-interface Args {
+export interface UserLite { authn?: boolean, tfa?: boolean, _id?: number }
+export interface Args {
   builtInLogin?: boolean;
   redirect?: string;
   UserContext?: UserLite;
@@ -20,7 +20,7 @@ const FALLBACK = '/homepage';
 type Method = 'authn' | 'tfa' | 'password';
 
 export default function UserSudoPage() {
-  const { args } = usePageData() as unknown as { args: Args };
+  const { args } = usePageData();
   const t = useTranslate();
   const navigate = useNavigate();
   const origins = new Set<string>(args?.endpointOrigin ? [args.endpointOrigin] : []);

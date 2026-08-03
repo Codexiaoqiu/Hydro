@@ -5,14 +5,14 @@ import { usePageData } from '../context/page-data';
 // settings or null), `rolesWithText` (select options for role), `expirations`
 // (a pre-filtered expire-select options object), and `url_prefix` (used to
 // render the public join URL).
-interface JoinSettings {
+export interface JoinSettings {
   method: number;
   role: string;
   group?: string;
   code?: string;
   expire?: number | string | null;
 }
-interface Args {
+export interface Args {
   joinSettings: JoinSettings | null;
   rolesWithText: Array<[string, string]>;
   expirations: Record<string, string>;
@@ -41,7 +41,7 @@ function formatExpire(value: JoinSettings['expire']): string {
 }
 
 export default function DomainJoinApplicationsPage() {
-  const { args } = usePageData() as unknown as { args: Args };
+  const { args } = usePageData();
   const { joinSettings, rolesWithText, expirations, url_prefix } = args;
   // The original template uses `handler.args.domainId` to build the public
   // join URL. Extract it from the current page URL as a best-effort fallback

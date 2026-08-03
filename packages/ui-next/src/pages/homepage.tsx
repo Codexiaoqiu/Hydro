@@ -3,12 +3,12 @@ import { SectionSlot } from '../registry/sections';
 import type { SectionProps } from '../sections/types';
 import styles from '../styles/homepage.module.css';
 
-interface ContentColumn {
+export interface ContentColumn {
   width: number;
   sections: Array<[string, unknown]>;
 }
 
-interface HomepageArgs {
+export interface HomepageArgs {
   UserContext?: { viewLangName?: string };
   UiContext?: Record<string, unknown>;
   contents?: ContentColumn[];
@@ -17,7 +17,7 @@ interface HomepageArgs {
 }
 
 export default function Homepage() {
-  const { args } = usePageData() as unknown as { args: HomepageArgs };
+  const { args } = usePageData();
   const { contents, udict = {}, domain = { _id: '' } } = args ?? {};
   const cols = Array.isArray(contents) ? contents : [];
   console.log(cols);

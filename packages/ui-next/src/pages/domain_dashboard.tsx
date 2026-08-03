@@ -1,12 +1,12 @@
 import { usePageData } from '../context/page-data';
 
-interface Domain { _id: string, name: string, displayName: string, owner: number }
-interface Stats { userCount: number, groupCount: number, problemCount: number, contestCount: number }
-interface Activity { time: number, message: string }
-interface Args { domain: Domain, stats: Stats, recentActivities: Activity[] }
+export interface Domain { _id: string, name: string, displayName: string, owner: number }
+export interface Stats { userCount: number, groupCount: number, problemCount: number, contestCount: number }
+export interface Activity { time: number, message: string }
+export interface Args { domain: Domain, stats: Stats, recentActivities: Activity[] }
 
 export default function DomainDashboardPage() {
-  const { args } = usePageData() as unknown as { args: Args };
+  const { args } = usePageData();
   const cards = [
     { label: 'Users', value: args.stats.userCount },
     { label: 'Groups', value: args.stats.groupCount },

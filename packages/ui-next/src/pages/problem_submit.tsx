@@ -23,7 +23,7 @@ import { useObjectiveDraft } from '../hooks/use-objective-draft';
 import { useTranslate } from '../lib/i18n';
 import styles from './problem_submit.module.css';
 
-interface ObjectiveConfig {
+export interface ObjectiveConfig {
   type: 'objective';
   subType?: 'text' | 'single' | 'multiple' | string;
   choices?: ObjectiveQuestion[];
@@ -36,7 +36,7 @@ function isObjectiveConfig(
   return !!cfg && typeof cfg === 'object' && cfg.type === 'objective';
 }
 
-interface Args {
+export interface Args {
   UserContext: ProblemSidebarContext['UserContext'] & { codeLang?: string };
   UiContext: Record<string, unknown>;
   pdoc: ProblemSidebarContext['pdoc'] & {
@@ -77,7 +77,7 @@ function CodeEditorField({ codeLanguage, ariaLabel }: { codeLanguage: string, ar
 }
 
 export default function ProblemSubmitPage() {
-  const { args } = usePageData() as unknown as { args: Args };
+  const { args } = usePageData();
   const buildUrl = useBuildUrl();
   const t = useTranslate();
   const {

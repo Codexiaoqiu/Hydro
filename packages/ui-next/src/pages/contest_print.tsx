@@ -6,7 +6,7 @@ import { usePageData } from '../context/page-data';
 import { useTranslate } from '../lib/i18n';
 import styles from './contest_print.module.css';
 
-export interface ContestPrintPageArgs {
+export interface Args {
   tdoc?: { docId: number | string, title?: string, allowPrint?: boolean };
   /**
    * Server flags the admin wiring via the template, mirroring ui-default's
@@ -17,7 +17,7 @@ export interface ContestPrintPageArgs {
 
 export default function ContestPrintPage() {
   const t = useTranslate();
-  const { args } = usePageData() as unknown as { args: ContestPrintPageArgs };
+  const { args } = usePageData();
 
   if (!args?.tdoc) {
     return (

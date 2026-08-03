@@ -1,15 +1,15 @@
 import { Button } from '../components/primitives/Button';
 import { usePageData } from '../context/page-data';
 
-interface Domain { _id: string, name: string, role: string }
-interface Args {
+export interface Domain { _id: string, name: string, role: string }
+export interface Args {
   domains: Domain[];
   hasCreatePriv: boolean;
   hasJoinPriv: boolean;
 }
 
 export default function HomeDomainPage() {
-  const { args } = usePageData() as unknown as { args: Args };
+  const { args } = usePageData();
   return (
     <div className="section">
       <div className="section__header">

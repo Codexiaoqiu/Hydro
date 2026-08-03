@@ -12,7 +12,7 @@ interface Args {
   UserContext?: Record<string, unknown>;
 }
 
-interface ImportPageData {
+export interface ImportPageData {
   name?: string;
   template?: string;
   args?: Args;

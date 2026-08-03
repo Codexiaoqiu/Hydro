@@ -10,7 +10,7 @@ import { IFRAME_STATUS_MESSAGE } from '../lib/iframe-protocol';
 import { canRejudgeAny, isLoggedIn } from '../lib/perms';
 import { isTerminalStatus } from '../lib/record-terminal';
 
-interface Rdoc {
+export interface Rdoc {
   _id: string;
   status?: number;
   score?: number;
@@ -22,8 +22,8 @@ interface Rdoc {
   hackTarget?: string;
   uid: number;
 }
-interface Pdoc { docId: number, pid?: string, title: string, config?: { hackable?: boolean } }
-interface Args {
+export interface Pdoc { docId: number, pid?: string, title: string, config?: { hackable?: boolean } }
+export interface Args {
   rdoc: Rdoc;
   pdoc: Pdoc;
   tdoc?: { rule?: string, docId?: string };
@@ -85,7 +85,7 @@ function highlightFor(lang?: string): string {
 }
 
 export default function RecordDetailPage() {
-  const { args } = usePageData() as unknown as { args: Args };
+  const { args } = usePageData();
   const { rdoc, pdoc, tdoc, udoc, judge_udoc, allRevs = [], rev, UserContext } = args;
   const t = useTranslate();
   const [liveStatus, setLiveStatus] = useState<number | undefined>(rdoc.status);

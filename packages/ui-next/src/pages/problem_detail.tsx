@@ -26,7 +26,7 @@ import styles from './problem_detail.module.css';
 import { pickPreferredLang, readContentText } from './problem-detail-helpers';
 
 // ===== Types (unchanged from existing) =====================================
-interface Pdoc {
+export interface Pdoc {
   docId: number;
   pid?: string;
   title: string;
@@ -51,12 +51,12 @@ interface Pdoc {
   additional_file?: Array<{ name: string, size: number }>;
 }
 
-interface Rdoc { _id?: string, status?: number, score?: number }
-interface Psdoc { star?: boolean, status?: number }
-interface Tdoc { _id?: string, docId?: string, pids?: Array<number | string>, rule?: string, owner?: number }
-interface Tsdoc { detail?: Record<string, { status?: number }>, attend?: boolean, startAt?: number }
-interface Udoc { _id?: number, uname?: string, avatar?: string }
-interface Args {
+export interface Rdoc { _id?: string, status?: number, score?: number }
+export interface Psdoc { star?: boolean, status?: number }
+export interface Tdoc { _id?: string, docId?: string, pids?: Array<number | string>, rule?: string, owner?: number }
+export interface Tsdoc { detail?: Record<string, { status?: number }>, attend?: boolean, startAt?: number }
+export interface Udoc { _id?: number, uname?: string, avatar?: string }
+export interface Args {
   pdoc: Pdoc;
   rdoc?: Rdoc;
   psdoc?: Psdoc;
@@ -112,7 +112,7 @@ function statusClassName(status?: number): string {
 
 // ===== Page ================================================================
 export default function ProblemDetailPage() {
-  const { args } = usePageData() as unknown as { args: Args };
+  const { args } = usePageData();
   const {
     pdoc, rdoc, psdoc, tdoc, tsdoc, ownerUdoc,
     tdocs = [], ctdocs = [], htdocs = [],

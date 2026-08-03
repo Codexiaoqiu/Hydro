@@ -7,8 +7,8 @@ import { usePageData, useUserContext } from '../context/page-data';
 import { useBuildUrl } from '../hooks/use-build-url';
 import styles from './user_detail.module.css';
 
-interface Pdoc { docId: number, title: string, pid?: string, tag?: string[] }
-interface Args {
+export interface Pdoc { docId: number, title: string, pid?: string, tag?: string[] }
+export interface Args {
   isSelfProfile: boolean;
   udoc: any;
   sdoc?: { updateAt?: number };
@@ -20,7 +20,7 @@ interface Args {
 }
 
 export default function UserDetail() {
-  const { args } = usePageData() as unknown as { args: Args };
+  const { args } = usePageData();
   const { isSelfProfile, udoc, pdocs, tags } = args;
   const user = useUserContext();
   const buildUrl = useBuildUrl();

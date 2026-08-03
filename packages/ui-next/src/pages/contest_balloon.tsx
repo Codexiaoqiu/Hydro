@@ -16,7 +16,7 @@ import { isOngoing } from '../lib/contest-status';
 import { useTranslate } from '../lib/i18n';
 import styles from './contest_balloon.module.css';
 
-interface Args {
+export interface Args {
   tdoc?: {
     _id: string;
     docId: string;
@@ -39,7 +39,7 @@ interface Polled {
 }
 
 export default function ContestBalloonPage() {
-  const { args } = usePageData() as unknown as { args: Args };
+  const { args } = usePageData();
   const t = useTranslate();
   const tdoc = args?.tdoc;
   const [showSetColor, setShowSetColor] = useState(false);

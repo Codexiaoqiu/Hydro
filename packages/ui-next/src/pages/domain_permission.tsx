@@ -13,17 +13,17 @@ import { usePageData } from '../context/page-data';
 // packages/hydrooj/src/model/builtin.ts:80, keyed by family with each
 // permission's `key` (bit) and `desc` (label). `domain` is the active
 // domain doc.
-interface Domain { _id: string, name: string }
-interface Role {
+export interface Domain { _id: string, name: string }
+export interface Role {
   _id: string;
   perm: bigint | number | string;
   count?: number;
 }
-interface Permission {
+export interface Permission {
   key: bigint | number;
   desc: string;
 }
-interface Args {
+export interface Args {
   domain: Domain;
   roles: Role[];
   PERMS_BY_FAMILY?: Record<string, Permission[]>;
@@ -120,7 +120,7 @@ function PermissionMatrix({ roles, families }: {
 }
 
 export default function DomainPermissionPage() {
-  const { args } = usePageData() as unknown as { args: Args };
+  const { args } = usePageData();
   const { domain, roles, PERMS_BY_FAMILY = {} } = args;
   const matrixRoles: RoleSelectorRole[] = (roles ?? []).map((r) => ({ _id: r._id, perm: r.perm }));
   // Flatten the family-grouped permissions into a single ordered list so the

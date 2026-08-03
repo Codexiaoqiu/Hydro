@@ -2,7 +2,7 @@ import { ProblemForm } from '../components/problem/ProblemForm';
 import { usePageData } from '../context/page-data';
 import { canEditProblem } from '../lib/perms';
 
-interface Args {
+export interface Args {
   pdoc?: {
     docId: number;
     pid?: string;
@@ -25,7 +25,7 @@ interface Args {
 }
 
 export default function ProblemEditPage() {
-  const { args } = usePageData() as unknown as { args: Args };
+  const { args } = usePageData();
   const pdoc = args?.pdoc;
   // canDelete when either the user owns the problem or has PERM_EDIT_PROBLEM.
   const canDelete = !!(pdoc && canEditProblem(args?.UserContext as any, pdoc));

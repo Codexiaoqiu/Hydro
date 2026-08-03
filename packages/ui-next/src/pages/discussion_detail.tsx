@@ -9,8 +9,8 @@ import { useBuildUrl } from '../hooks/use-build-url';
 import { useTranslate } from '../lib/i18n';
 import styles from './discussion_detail.module.css';
 
-interface Ddoc { docId: number, title: string, content: string, owner: number, parentType: number, parentId: number, react?: Record<string, number>, views: number, lock?: boolean, edited?: boolean }
-interface Args {
+export interface Ddoc { docId: number, title: string, content: string, owner: number, parentType: number, parentId: number, react?: Record<string, number>, views: number, lock?: boolean, edited?: boolean }
+export interface Args {
   ddoc: Ddoc;
   dsdoc: { react?: Record<string, number>, view?: boolean, star?: boolean } | null;
   drdocs: Array<{ docId: string, owner: number, content: string, reply?: any[] }>;
@@ -24,7 +24,7 @@ interface Args {
 }
 
 export default function DiscussionDetail() {
-  const { args } = usePageData() as unknown as { args: Args };
+  const { args } = usePageData();
   const { ddoc, dsdoc, drdocs, page, pcount, udict, vnode } = args;
   const buildUrl = useBuildUrl();
   const t = useTranslate();

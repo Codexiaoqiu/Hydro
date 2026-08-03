@@ -12,13 +12,13 @@ import { usePageData } from '../context/page-data';
 // `domain.getRoles(domainId, true)`, i.e. one entry per role with its
 // `perm` bitmask and (when requested) a `count` of users currently in
 // the role. `domain` is the active domain doc.
-interface Domain { _id: string, name: string, displayName: string }
-interface Role {
+export interface Domain { _id: string, name: string, displayName: string }
+export interface Role {
   _id: string;
   perm: bigint | number | string;
   count?: number;
 }
-interface Args {
+export interface Args {
   domain: Domain;
   roles: Role[];
 }
@@ -50,7 +50,7 @@ function defaultPermissions(): RoleSelectorPermission[] {
 }
 
 export default function DomainRolePage() {
-  const { args } = usePageData() as unknown as { args: Args };
+  const { args } = usePageData();
   const { domain, roles } = args;
   const matrixRoles: RoleSelectorRole[] = (roles ?? []).map((r) => ({ _id: r._id, perm: r.perm }));
   const permissions = defaultPermissions();

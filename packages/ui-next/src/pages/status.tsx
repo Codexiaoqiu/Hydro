@@ -1,10 +1,10 @@
 import { usePageData } from '../context/page-data';
 
-interface Journal { time: number, level: 'info' | 'warn' | 'error' | string, message: string }
-interface Args { journals: Journal[] }
+export interface Journal { time: number, level: 'info' | 'warn' | 'error' | string, message: string }
+export interface Args { journals: Journal[] }
 
 export default function StatusPage() {
-  const { args } = usePageData() as unknown as { args: Args };
+  const { args } = usePageData();
   const sorted = [...args.journals].sort((a, b) => b.time - a.time);
   return (
     <div className="section">

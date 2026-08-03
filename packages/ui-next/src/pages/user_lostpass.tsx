@@ -6,12 +6,12 @@ import { usePageData } from '../context/page-data';
 import { HydroClientError, request } from '../hooks/use-api';
 import { useTranslate } from '../lib/i18n';
 
-interface Args {
+export interface Args {
   smtpConfigured?: boolean;
 }
 
 export default function UserLostPassPage() {
-  const { args } = usePageData() as unknown as { args: Args };
+  const { args } = usePageData();
   const smtpConfigured = args?.smtpConfigured !== false;
   const [mail, setMail] = useState('');
   const [submitting, setSubmitting] = useState(false);

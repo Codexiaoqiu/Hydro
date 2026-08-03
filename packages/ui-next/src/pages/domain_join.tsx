@@ -4,10 +4,10 @@ import { usePageData } from '../context/page-data';
 // packages/hydrooj/src/handler/domain.ts:367 — namely `joinSettings` (may be
 // null when the inviter is already a privileged member), `code`, `target`,
 // `redirect`, and the `domainInfo` block (name, owner, avatar, bulletin).
-interface OwnerLite { _id: number, uname: string, displayName?: string }
-interface DomainInfo { name: string, owner: OwnerLite, avatar: string, bulletin: string }
-interface JoinSettings { method: number, role: string, group?: string, code?: string, expire?: number | null }
-interface Args {
+export interface OwnerLite { _id: number, uname: string, displayName?: string }
+export interface DomainInfo { name: string, owner: OwnerLite, avatar: string, bulletin: string }
+export interface JoinSettings { method: number, role: string, group?: string, code?: string, expire?: number | null }
+export interface Args {
   joinSettings: JoinSettings | null;
   code: string;
   target: string;
@@ -19,7 +19,7 @@ interface Args {
 const JOIN_METHOD_CODE = 2;
 
 export default function DomainJoinPage() {
-  const { args } = usePageData() as unknown as { args: Args };
+  const { args } = usePageData();
   const { domainInfo, joinSettings, code, target, redirect } = args;
   const requireCode = joinSettings?.method === JOIN_METHOD_CODE;
   return (

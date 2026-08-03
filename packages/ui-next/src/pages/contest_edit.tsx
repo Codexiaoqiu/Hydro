@@ -3,7 +3,7 @@ import { ContestForm } from '../components/contest/ContestForm';
 import type { LanguageOption } from '../components/primitives';
 import { usePageData } from '../context/page-data';
 
-interface Args {
+export interface Args {
   tdoc?: {
     docId?: string;
     title?: string;
@@ -31,7 +31,7 @@ interface Args {
 }
 
 export default function ContestEditPage() {
-  const { args } = usePageData() as unknown as { args: Args };
+  const { args } = usePageData();
   return (
     <>
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: 'var(--space-4) var(--space-6) 0' }}>

@@ -10,8 +10,8 @@ import { useBuildUrl } from '../hooks/use-build-url';
 import { formatMemoryMB } from '../lib/memory';
 import styles from './problem_statistics.module.css';
 
-interface Rsdoc { _id: string, uid: number, time?: number, memory?: number, status: number, lang: string, length: number }
-interface Args {
+export interface Rsdoc { _id: string, uid: number, time?: number, memory?: number, status: number, lang: string, length: number }
+export interface Args {
   rsdocs: Rsdoc[];
   page: number;
   pcount: number;
@@ -27,7 +27,7 @@ interface Args {
 const STATUS_OVERFLOW = new Set([STATUS.STATUS_TIME_LIMIT_EXCEEDED, STATUS.STATUS_MEMORY_LIMIT_EXCEEDED, STATUS.STATUS_OUTPUT_LIMIT_EXCEEDED]);
 
 export default function ProblemStatistics() {
-  const { args } = usePageData() as unknown as { args: Args };
+  const { args } = usePageData();
   const { rsdocs, page, pcount, sort, direction, pdoc, udict, types } = args;
   const buildUrl = useBuildUrl();
   const navigate = useNavigate();

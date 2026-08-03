@@ -1,10 +1,10 @@
 import { usePageData } from '../context/page-data';
 
-interface Domain { _id: string, name: string, displayName: string, owner: number }
-interface Args { domain: Domain, userPerm: string }
+export interface Domain { _id: string, name: string, displayName: string, owner: number }
+export interface Args { domain: Domain, userPerm: string }
 
 export default function DomainBasePage() {
-  const { args } = usePageData() as unknown as { args: Args };
+  const { args } = usePageData();
   return (
     <div className="domain-layout">
       <header className="domain-banner">

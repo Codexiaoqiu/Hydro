@@ -7,7 +7,7 @@ import { useBuildUrl } from '../hooks/use-build-url';
 import { PERM } from '../lib/perm-constants';
 import styles from './discussion_edit.module.css';
 
-interface Ddoc {
+export interface Ddoc {
   _id: string;
   docId: number;
   title: string;
@@ -15,13 +15,13 @@ interface Ddoc {
   highlight?: boolean;
   pin?: boolean;
 }
-interface Args {
+export interface Args {
   ddoc: Ddoc;
   UserContext?: { hasPerm?: (p: bigint) => boolean, own?: (doc: any) => boolean };
 }
 
 export default function DiscussionEdit() {
-  const { args } = usePageData() as unknown as { args: Args };
+  const { args } = usePageData();
   const { ddoc } = args;
   const user = args?.UserContext;
   const buildUrl = useBuildUrl();
