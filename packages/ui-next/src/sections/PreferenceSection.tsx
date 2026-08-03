@@ -29,19 +29,27 @@ import { applyFontFilter } from './PreferenceSection.fonts';
 
 export { supportFontFamily } from './PreferenceSection.fonts';
 
+// `document.fonts` is the FontFaceSet API; may be undefined in older
+// browsers. The legacy script assigned `document.fonts.onloadingdone`
+// directly — we use addEventListener to allow coexistence. Kept at module
+// scope so the type is not re-declared on every component re-render.
+interface FontsApi {
+  addEventListener?: (t: string, h: () => void) => void;
+  removeEventListener?: (t: string, h: () => void) => void;
+  onloadingdone?: ((h: () => void) => void) | null;
+}
+
 export function PreferenceSection(): null {
   useEffect(() => {
-    // Run on mount after the form has been laid out (the selects exist now).
+    // Runs after React 19 commits the parent's children, so by this point
+    // the sibling `<form>` (rendered after `<PreferenceSection/>` in
+    // `home_settings.tsx`) has mounted its `<select name="fontFamily">`
+    // and `<select name="codeFontFamily">` into the DOM. `applyFontFilter`
+    // queries them by `[name=...]`, so those nodes MUST exist before this
+    // effect fires — which they do because React commits the parent tree
+    // before firing effects on any of its descendants.
     applyFontFilter();
     const handler = () => applyFontFilter();
-    // `document.fonts` is the FontFaceSet API; may be undefined in older
-    // browsers. The legacy script assigned `document.fonts.onloadingdone`
-    // directly — we use addEventListener to allow coexistence.
-    interface FontsApi {
-      addEventListener?: (t: string, h: () => void) => void;
-      removeEventListener?: (t: string, h: () => void) => void;
-      onloadingdone?: ((h: () => void) => void) | null;
-    }
     const fonts = (document as { fonts?: FontsApi }).fonts;
     if (fonts) {
       if (typeof fonts.addEventListener === 'function') {

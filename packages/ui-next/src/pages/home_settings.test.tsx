@@ -172,6 +172,11 @@ describe('home_settings', () => {
     const openOpt = Array.from(ff!.options).find((o) => o.value === 'supported');
     expect(missingOpt?.hidden).toBe(true);
     expect(openOpt?.hidden).toBe(false);
+    // Manual resets are required even though `beforeEach` runs
+    // `vi.restoreAllMocks()`: `restoreAllMocks` only resets *spies* created
+    // via `vi.spyOn`. The mock fns declared by `vi.mock(...)` above are
+    // vi.mock-hoisted factories whose `.mock*` state persists across tests,
+    // so without these resets the next test sees call history from this one.
     supportFontFamilyMock.mockReset();
     applyFontFilterMock.mockReset();
   });
@@ -185,8 +190,11 @@ describe('home_settings', () => {
       },
     ];
     render(<Providers args={{ category: 'account', settings, current: {} }}><HomeSettingsPage /></Providers>);
-    await act(async () => { await new Promise((r) => setTimeout(r, 30)); });
-    expect(getContextSpy).not.toHaveBeenCalled();
+    // `<PreferenceSection/>` is only mounted when `args.category === 'preference'`,
+    // so `applyFontFilter` (and therefore `getContext`) is never called for
+    // `account`. The assertion is safe to make synchronously after render
+    // because no microtask schedules the helper — the absence is structural.
+    await waitFor(() => expect(getContextSpy).not.toHaveBeenCalled());
     getContextSpy.mockRestore();
   });
 

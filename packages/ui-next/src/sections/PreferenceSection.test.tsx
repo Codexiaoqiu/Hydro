@@ -4,7 +4,7 @@ import { supportFontFamily } from './PreferenceSection.fonts';
 
 afterEach(() => { vi.restoreAllMocks(); });
 
-function mockCanvas({ same, fonts = [] }: { same: boolean, fonts?: string[] }): void {
+function mockCanvas({ same }: { same: boolean, fonts?: string[] }): void {
   // supportFontFamily calls paint() twice: once for the Arial baseline and
   // once for the candidate font. We toggle the per-call buffer so the test
   // can express "second call differs from first" via `same: false`.
@@ -22,16 +22,6 @@ function mockCanvas({ same, fonts = [] }: { same: boolean, fonts?: string[] }): 
       return { data: new Uint8ClampedArray(100 * 100 * 4).fill(fillValue) };
     },
   } as unknown as CanvasRenderingContext2D));
-  Object.defineProperty(document, 'fonts', {
-    configurable: true,
-    value: {
-      addEventListener: () => {},
-      removeEventListener: () => {},
-      onloadingdone: null,
-      check: () => Promise.resolve(false),
-      load: () => Promise.resolve(fonts),
-    },
-  });
 }
 
 describe('supportFontFamily', () => {
