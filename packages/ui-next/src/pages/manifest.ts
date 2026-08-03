@@ -56,6 +56,11 @@ export const NEXT_PAGES = {
   problem_files: ['problem_files.html'],
   problem_config: ['problem_config.html'],
   problem_hack: ['problem_hack.html'],
+  training_main: ['training_main.html'],
+  training_detail: ['training_detail.html'],
+  training_create: ['training_edit.html'], // shared template
+  training_edit: ['training_edit.html'],
+  training_files: ['training_files.html'],
   record_detail: ['record_detail.html'],
   record_main: ['record_main.html'],
   home_files: ['home_files.html'],
