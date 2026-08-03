@@ -1,6 +1,6 @@
 /* @vitest-environment happy-dom */
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ToastProvider } from '../components/primitives';
 import { type PageData, PageDataProvider } from '../context/page-data';
 import { RouterProvider } from '../context/router';
@@ -47,7 +47,24 @@ function renderPage(args: PageData['args'] = { UserContext: { _id: 1 } }) {
 }
 
 describe('contest_create page', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => {
+    vi.clearAllMocks();
+    // RouterProvider fetches the current page when the test is not running with
+    // server injection. Return a local page-shaped response instead of letting
+    // happy-dom open a real localhost socket.
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: true,
+      redirected: false,
+      status: 200,
+      statusText: 'OK',
+      headers: { get: () => '' },
+      json: async () => ({}),
+    }));
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
 
   it('renders the create form with a title field', () => {
     renderPage();

@@ -17,8 +17,8 @@ vi.mock('@monaco-editor/react', () => ({
 // @monaco-editor/loader fetches Monaco from a CDN at runtime; happy-dom blocks
 // the request and produces an ECONNREFUSED that propagates into the test.
 // Stub the loader so @monaco-editor/react never attempts a network fetch.
-vi.mock('@monaco-editor/loader', () => ({
-  init: vi.fn().mockResolvedValue({
+vi.mock('@monaco-editor/loader', () => {
+  const monaco = {
     editor: {
       create: () => ({
         getValue: () => '',
@@ -28,8 +28,37 @@ vi.mock('@monaco-editor/loader', () => ({
     },
     KeyMod: { CtrlCmd: 1 },
     KeyCode: { Enter: 1 },
-  }),
-}));
+  };
+  type Cancelable<T> = Promise<T> & { cancel: () => void };
+  let monacoInstance: typeof monaco | null = null;
+
+  const config = vi.fn((params?: { monaco?: typeof monaco }) => {
+    if (params?.monaco) monacoInstance = params.monaco;
+  });
+  const init = vi.fn(() => {
+    const value = monacoInstance ?? monaco;
+    let canceled = false;
+    const promise = new Promise<typeof monaco>((resolve, reject) => {
+      Promise.resolve(value).then((instance) => {
+        if (canceled) {
+          reject(Object.assign(new Error('operation is manually canceled'), {
+            type: 'cancelation',
+            msg: 'operation is manually canceled',
+          }));
+        } else {
+          monacoInstance = instance;
+          resolve(instance);
+        }
+      });
+    }) as Cancelable<typeof monaco>;
+    promise.cancel = () => { canceled = true; };
+    return promise;
+  });
+  const __getMonacoInstance = vi.fn(() => monacoInstance);
+  const namedExports = { init, config, __getMonacoInstance };
+
+  return { default: { ...namedExports }, ...namedExports };
+});
 
 // Ensure each test starts with a clean DOM.
 afterEach(() => {
