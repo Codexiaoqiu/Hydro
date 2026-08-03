@@ -106,4 +106,15 @@ describe('homework_main', () => {
       '/homework?page=3&q=graph&group=B',
     );
   });
+
+  it('hides the create button for a user without PERM_CREATE_HOMEWORK', () => {
+    renderPage({
+      tdocs: [{ docId: 'hw1', title: 'Algebra' }],
+      page: 1,
+      tpcount: 1,
+      UserContext: { _id: 2, perm: 'BigInt::0', priv: 0 },
+    });
+
+    expect(screen.queryByText('创建作业')).not.toBeInTheDocument();
+  });
 });

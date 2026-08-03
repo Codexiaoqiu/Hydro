@@ -113,6 +113,15 @@ describe('homework_detail', () => {
     expect(screen.queryByRole('link', { name: '文件' })).not.toBeInTheDocument();
   });
 
+  it('hides the Attend button for a logged-in user without PERM_ATTEND_HOMEWORK', () => {
+    renderPage({
+      tdoc: { docId: 'hw1', title: 'Algebra', owner: 1, pids: [] },
+      UserContext: { _id: 2, perm: 'BigInt::0', priv: 0 },
+    });
+
+    expect(screen.queryByTestId('attend')).not.toBeInTheDocument();
+  });
+
   it('shows Edit links for an owner with only PERM_EDIT_HOMEWORK_SELF', () => {
     renderPage({
       tdoc: { docId: 'hw1', title: 'Algebra', owner: 7, pids: [] },
@@ -126,7 +135,7 @@ describe('homework_detail', () => {
   it('posts the attend operation for an eligible user', async () => {
     renderPage({
       tdoc: { docId: 'hw1', title: 'Algebra', pids: [] },
-      UserContext: { _id: 7 },
+      UserContext: { _id: 7, perm: `BigInt::${PERM.PERM_ATTEND_HOMEWORK}`, priv: 0 },
     });
     const fetchMock = vi.fn().mockResolvedValue(jsonResponse());
     vi.stubGlobal('fetch', fetchMock);

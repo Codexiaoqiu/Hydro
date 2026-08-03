@@ -70,7 +70,7 @@ export default function HomeworkDetail() {
 
   const user = args.UserContext as UserContextShape | undefined;
   const canEdit = own(user, tdoc, PERM.PERM_EDIT_HOMEWORK_SELF) || hasPerm(user, PERM.PERM_EDIT_HOMEWORK);
-  const canAttend = !!args.UserContext?._id && !args.tsdoc?.attend;
+  const canAttend = !!args.UserContext?._id && !args.tsdoc?.attend && hasPerm(user, PERM.PERM_ATTEND_HOMEWORK);
   const ddocs = args.ddocs ?? [];
   const pdict = args.pdict ?? {};
   const attend = async () => {
