@@ -25,6 +25,12 @@ export interface LoginFormProps {
   hideFootnote?: boolean;
   /** Override the post-login redirect (e.g. for sudo flows that should stay on page). */
   onSuccess?: (resp: unknown) => void;
+  /**
+   * Called when the server signals the user must complete 2FA (HTTP 403
+   * ValidationError '2FA' / 'Authn'). The form stays mounted so the caller
+   * can drive the challenge submission (TFA code or WebAuthn) and retry.
+   */
+  onTwoFactorRequired?: (uname: string) => void;
   /** Apply the auth-shell-styled full-width variant. */
   wide?: boolean;
 }
@@ -55,6 +61,7 @@ export function LoginForm({
   submitLabel,
   hideFootnote,
   onSuccess,
+  onTwoFactorRequired,
   wide,
 }: LoginFormProps) {
   const t = useTranslate();
@@ -111,7 +118,12 @@ export function LoginForm({
         window.location.href = redirect || redirectApi.target;
       }
     } catch (err) {
-      if (err instanceof HydroClientError) setError(err);
+      if (err instanceof HydroClientError) {
+        setError(err);
+        if (onTwoFactorRequired && err.code === 403 && err.rawMessage?.startsWith('Field 2FA')) {
+          onTwoFactorRequired(uname);
+        }
+      }
     } finally {
       setSubmitting(false);
     }
