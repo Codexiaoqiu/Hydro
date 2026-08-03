@@ -61,6 +61,11 @@ export const NEXT_PAGES = {
   training_create: ['training_edit.html'], // shared template
   training_edit: ['training_edit.html'],
   training_files: ['training_files.html'],
+  homework_main: ['homework_main.html'],
+  homework_detail: ['homework_detail.html'],
+  homework_create: ['homework_edit.html'],
+  homework_edit: ['homework_edit.html'],
+  homework_files: ['homework_files.html'],
   record_detail: ['record_detail.html'],
   record_main: ['record_main.html'],
   home_files: ['home_files.html'],
