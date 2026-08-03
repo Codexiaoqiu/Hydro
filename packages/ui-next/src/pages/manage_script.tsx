@@ -16,9 +16,7 @@ interface ScriptEntry {
   modified?: string | number;
 }
 
-// Args documents the shape of the backend-injected page-data payload.
-// eslint-disable-next-line ts/no-unused-vars
-interface Args {
+export interface Args {
   UserContext?: Record<string, unknown>;
   UiContext?: Record<string, unknown>;
   scripts?: Record<string, Script> | ScriptEntry[];

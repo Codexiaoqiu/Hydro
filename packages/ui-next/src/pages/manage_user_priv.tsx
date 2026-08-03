@@ -22,9 +22,7 @@ interface UserDoc {
   [key: string]: unknown;
 }
 
-// Args documents the shape of the backend-injected page-data payload.
-// eslint-disable-next-line ts/no-unused-vars
-interface Args {
+export interface Args {
   UserContext?: Record<string, unknown>;
   UiContext?: Record<string, unknown>;
   udocs?: UserDoc[];
