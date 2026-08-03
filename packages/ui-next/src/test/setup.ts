@@ -14,6 +14,23 @@ vi.mock('@monaco-editor/react', () => ({
   loadMonacoEditor: () => Promise.resolve({}),
 }));
 
+// @monaco-editor/loader fetches Monaco from a CDN at runtime; happy-dom blocks
+// the request and produces an ECONNREFUSED that propagates into the test.
+// Stub the loader so @monaco-editor/react never attempts a network fetch.
+vi.mock('@monaco-editor/loader', () => ({
+  init: vi.fn().mockResolvedValue({
+    editor: {
+      create: () => ({
+        getValue: () => '',
+        getModel: () => ({ setValue: () => {} }),
+        onDidChangeModelContent: () => ({ dispose: () => {} }),
+      }),
+    },
+    KeyMod: { CtrlCmd: 1 },
+    KeyCode: { Enter: 1 },
+  }),
+}));
+
 // Ensure each test starts with a clean DOM.
 afterEach(() => {
   cleanup();
