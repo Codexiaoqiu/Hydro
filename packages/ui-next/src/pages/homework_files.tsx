@@ -4,7 +4,7 @@ import { usePageData } from '../context/page-data';
 import { request } from '../hooks/use-api';
 import { formatFileSize } from '../lib/format';
 import { PERM } from '../lib/perm-constants';
-import { own } from '../lib/perms';
+import { hasPerm, own, type UserContextShape } from '../lib/perms';
 import styles from './homework_files.module.css';
 
 interface FileEntry {
@@ -38,8 +38,9 @@ export default function HomeworkFiles() {
 
   if (!tdoc) return <div className={styles.page}><p>作业不存在。</p></div>;
 
-  const canEdit = own(args.UserContext as never, tdoc, PERM.PERM_EDIT_HOMEWORK_SELF)
-    || !!(args.UserContext as { perm?: string } | undefined)?.perm;
+  const user = args.UserContext as UserContextShape | undefined;
+  const canEdit = own(user, tdoc, PERM.PERM_EDIT_HOMEWORK_SELF)
+    || hasPerm(user, PERM.PERM_EDIT_HOMEWORK);
   const url = (name: string) => args.urlForFile?.(name)
     ?? `/homework/${tdoc.docId}/file/public/${encodeURIComponent(name)}`;
   const toggleSelected = (name: string) => {

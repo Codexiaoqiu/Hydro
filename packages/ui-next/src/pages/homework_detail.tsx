@@ -6,7 +6,7 @@ import { usePageData } from '../context/page-data';
 import { request } from '../hooks/use-api';
 import { useBuildUrl } from '../hooks/use-build-url';
 import { PERM } from '../lib/perm-constants';
-import { own } from '../lib/perms';
+import { hasPerm, own, type UserContextShape } from '../lib/perms';
 import styles from './homework_detail.module.css';
 
 interface Tdoc {
@@ -68,9 +68,8 @@ export default function HomeworkDetail() {
     return <div className={styles.page}><div className={styles.empty}>作业不存在。</div></div>;
   }
 
-  const user = args.UserContext as never;
-  const permission = (args.UserContext as { perm?: string } | undefined)?.perm ?? '';
-  const canEdit = own(user, tdoc, PERM.PERM_EDIT_HOMEWORK_SELF) || permission.includes('BigInt');
+  const user = args.UserContext as UserContextShape | undefined;
+  const canEdit = own(user, tdoc, PERM.PERM_EDIT_HOMEWORK_SELF) || hasPerm(user, PERM.PERM_EDIT_HOMEWORK);
   const canAttend = !!args.UserContext?._id && !args.tsdoc?.attend;
   const ddocs = args.ddocs ?? [];
   const pdict = args.pdict ?? {};

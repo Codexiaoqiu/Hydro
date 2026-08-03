@@ -4,6 +4,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { type PageData, PageDataProvider } from '../context/page-data';
+import { PERM } from '../lib/perm-constants';
 import HomeworkFiles from './homework_files';
 
 function jsonResponse(body: unknown = {}, status = 200) {
@@ -66,6 +67,29 @@ describe('homework_files', () => {
     expect(screen.getByText('1.5 KiB')).toBeInTheDocument();
   });
 
+  it('hides the upload and delete controls for a non-owner viewer without PERM_EDIT_HOMEWORK', () => {
+    renderPage({
+      tdoc: { docId: 'hw1', title: 'Algebra', owner: 1, maintainer: [] },
+      files: [{ name: 'notes.pdf', size: 1024 }],
+      UserContext: { _id: 2, perm: 'BigInt::0', priv: 0 },
+    });
+
+    expect(screen.queryByRole('button', { name: '上传文件' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /删除/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole('checkbox', { name: '选择 notes.pdf' })).not.toBeInTheDocument();
+  });
+
+  it('shows upload and delete controls for an owner with only PERM_EDIT_HOMEWORK_SELF', () => {
+    renderPage({
+      tdoc: { docId: 'hw1', title: 'Algebra', owner: 1, maintainer: [] },
+      files: [{ name: 'notes.pdf', size: 1024 }],
+      UserContext: { _id: 1, perm: `BigInt::${PERM.PERM_EDIT_HOMEWORK_SELF}`, priv: 0 },
+    });
+
+    expect(screen.getByRole('button', { name: '上传文件' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '删除' })).toBeInTheDocument();
+  });
+
   it('deletes all selected files after inline confirmation', async () => {
     const fetchMock = vi.fn().mockResolvedValue(jsonResponse());
     vi.stubGlobal('fetch', fetchMock);
@@ -75,7 +99,7 @@ describe('homework_files', () => {
         { name: 'a.txt', size: 12 },
         { name: 'b.txt', size: 34 },
       ],
-      UserContext: { _id: 1, perm: 'BigInt::1125899906842624' },
+      UserContext: { _id: 1, perm: `BigInt::${PERM.PERM_EDIT_HOMEWORK_SELF}`, priv: 0 },
     });
 
     fireEvent.click(screen.getByLabelText('选择 a.txt'));

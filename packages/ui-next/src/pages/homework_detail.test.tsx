@@ -7,6 +7,7 @@ import { ToastProvider } from '../components/primitives/Toast';
 import { type PageData, PageDataProvider } from '../context/page-data';
 import * as routerMod from '../context/router';
 import { routeMapStore } from '../globals';
+import { PERM } from '../lib/perm-constants';
 import { ThemeProvider } from '../theme/ThemeProvider';
 import HomeworkDetail from './homework_detail';
 
@@ -100,6 +101,26 @@ describe('homework_detail', () => {
     expect(screen.getByRole('link', { name: 'P1 Sum' })).toHaveAttribute('href', '/p/1');
     expect(screen.getByRole('link', { name: 'Question' })).toHaveAttribute('href', '/discuss/d1');
     expect(screen.getByText(/alice/)).toBeInTheDocument();
+  });
+
+  it('hides the Edit link for a non-owner viewer without PERM_EDIT_HOMEWORK', () => {
+    renderPage({
+      tdoc: { docId: 'hw1', title: 'Algebra', owner: 1, pids: [] },
+      UserContext: { _id: 2, perm: 'BigInt::0', priv: 0 },
+    });
+
+    expect(screen.queryByRole('link', { name: '编辑' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: '文件' })).not.toBeInTheDocument();
+  });
+
+  it('shows Edit links for an owner with only PERM_EDIT_HOMEWORK_SELF', () => {
+    renderPage({
+      tdoc: { docId: 'hw1', title: 'Algebra', owner: 7, pids: [] },
+      UserContext: { _id: 7, perm: `BigInt::${PERM.PERM_EDIT_HOMEWORK_SELF}`, priv: 0 },
+    });
+
+    expect(screen.getByRole('link', { name: '编辑' })).toHaveAttribute('href', '/homework/hw1/edit');
+    expect(screen.getByRole('link', { name: '文件' })).toHaveAttribute('href', '/homework/hw1/file');
   });
 
   it('posts the attend operation for an eligible user', async () => {
