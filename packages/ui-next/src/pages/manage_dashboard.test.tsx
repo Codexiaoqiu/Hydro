@@ -17,6 +17,15 @@ function renderPage(args: Record<string, unknown> = {}) {
 }
 
 describe('manage_dashboard', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-08-03T12:00:00Z'));
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it('renders 4 stat cards (Users, Domains, Problems, Submissions)', () => {
     renderPage({
       domain: { _id: 'system', name: 'system' },
@@ -72,10 +81,7 @@ describe('manage_dashboard', () => {
   });
 
   it('renders a <time> element with dateTime attribute and relative text for older activity (5 days ago)', () => {
-    vi.useFakeTimers();
-    vi.setSystemTime(new Date('2026-08-03T12:00:00Z'));
-    const FIVE_DAYS_MS = 5 * 86_400_000;
-    const fiveDaysAgoIso = new Date(Date.now() - FIVE_DAYS_MS).toISOString(); // 2026-07-29T12:00:00.000Z
+    const fiveDaysAgoIso = new Date(Date.now() - 5 * 86_400_000).toISOString();
     const activities = [
       { id: 'a1', type: 'user', content: 'Alice signed up', time: fiveDaysAgoIso },
     ];
@@ -84,7 +90,6 @@ describe('manage_dashboard', () => {
       element.tagName === 'TIME' && content === '5天前'
     ));
     expect(timeEl).toHaveAttribute('dateTime', fiveDaysAgoIso);
-    vi.useRealTimers();
   });
 
   it('renders a <time> element with dateTime attribute for a very recent activity (< 60s)', () => {
