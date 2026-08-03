@@ -71,6 +71,32 @@ describe('manage_dashboard', () => {
     expect(screen.getAllByRole('listitem')).toHaveLength(2);
   });
 
+  it('renders a <time> element with dateTime attribute and relative text for recent activity', () => {
+    // 1700000000 = 2023-11-14T17:33:20Z — more than 2 years ago from NOW=2026-07-08
+    const activities = [
+      { id: 'a1', type: 'user', content: 'Alice signed up', time: 1700000000 },
+    ];
+    renderPage({ domain: { _id: 'system', name: 'system' }, activities });
+    const timeEl = screen.getByText((content, element) => (
+      element.tagName === 'TIME' && /[秒分钟小时天月年]前/.test(content)
+    ));
+    expect(timeEl).toHaveAttribute('dateTime');
+    expect(timeEl.getAttribute('dateTime')).not.toMatch(/[秒分钟小时天月年]前/);
+  });
+
+  it('renders a <time> element with dateTime attribute for a very recent activity (< 60s)', () => {
+    const NOW = Date.now();
+    const recentIso = new Date(NOW - 5_000).toISOString(); // 5 seconds ago → "几秒前"
+    const activities = [
+      { id: 'a1', type: 'user', content: 'Recent action', time: recentIso },
+    ];
+    renderPage({ domain: { _id: 'system', name: 'system' }, activities });
+    const timeEl = screen.getByText((content, element) => (
+      element.tagName === 'TIME' && content === '几秒前'
+    ));
+    expect(timeEl).toHaveAttribute('dateTime', recentIso);
+  });
+
   it('renders empty state for activities when missing or empty', () => {
     renderPage({ domain: { _id: 'system', name: 'system' } });
     expect(screen.getByText(/no recent activity/i)).toBeInTheDocument();

@@ -1,6 +1,7 @@
 import { Button } from '../components/primitives/Button';
 import { Card } from '../components/primitives/Card';
 import { usePageData } from '../context/page-data';
+import { timeAgo } from '../lib/datetime';
 
 interface Message {
   id: string;
@@ -44,7 +45,7 @@ const STAT_CARDS: Array<{ key: keyof Stats, label: string }> = [
   { key: 'submissions', label: 'Submissions' },
 ];
 
-function formatActivityTime(time: string | number): string {
+function toIsoString(time: string | number): string {
   if (typeof time === 'number') {
     const ms = time < 1e12 ? time * 1000 : time;
     return new Date(ms).toISOString();
@@ -108,8 +109,8 @@ export default function ManageDashboardPage() {
           <ul className="manage-dashboard__activity-list">
             {activities.map((a) => (
               <li key={a.id} className="manage-dashboard__activity">
-                <time className="manage-dashboard__activity-time" dateTime={String(a.time)}>
-                  {formatActivityTime(a.time)}
+                <time className="manage-dashboard__activity-time" dateTime={toIsoString(a.time)}>
+                  {timeAgo(toIsoString(a.time))}
                 </time>
                 <span className="manage-dashboard__activity-type">{a.type}</span>
                 <span className="manage-dashboard__activity-content">{a.content}</span>

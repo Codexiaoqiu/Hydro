@@ -1,6 +1,7 @@
 import { Button } from '../components/primitives/Button';
 import { Card } from '../components/primitives/Card';
 import { usePageData } from '../context/page-data';
+import { timeAgo } from '../lib/datetime';
 
 interface Script {
   description?: string;
@@ -33,13 +34,17 @@ function toEntries(scripts: Record<string, Script> | ScriptEntry[] | undefined):
     .map(([id, s]) => ({ id, description: s.description, hidden: s.hidden, modified: s.modified }));
 }
 
-function formatModified(modified: string | number | undefined): string {
-  if (modified === undefined || modified === null || modified === '') return '—';
-  if (typeof modified === 'number') {
-    const ms = modified < 1e12 ? modified * 1000 : modified;
+function toIso(value: string | number): string {
+  if (typeof value === 'number') {
+    const ms = value < 1e12 ? value * 1000 : value;
     return new Date(ms).toISOString();
   }
-  return modified;
+  return value;
+}
+
+function formatModified(modified: string | number | undefined): string | undefined {
+  if (modified === undefined || modified === null || modified === '') return undefined;
+  return toIso(modified);
 }
 
 export default function ManageScriptPage() {
@@ -84,7 +89,12 @@ export default function ManageScriptPage() {
                   {entry.description || 'None'}
                 </td>
                 <td className="manage-script__cell manage-script__cell--modified">
-                  {formatModified(entry.modified)}
+                  {(() => {
+                    const iso = formatModified(entry.modified);
+                    return iso ? (
+                      <time dateTime={iso}>{timeAgo(iso)}</time>
+                    ) : '—';
+                  })()}
                 </td>
                 <td className="manage-script__cell manage-script__cell--action">
                   {/*

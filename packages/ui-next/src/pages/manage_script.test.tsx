@@ -80,13 +80,30 @@ describe('manage_script', () => {
     expect(screen.getByText('—')).toBeInTheDocument();
   });
 
-  it('renders the modified timestamp when provided', () => {
+  it('renders the modified timestamp in a <time> element with dateTime and relative text', () => {
     const scripts = {
       rp: { description: 'Reputation recalculation', modified: '2026-01-15T10:30:00.000Z' },
     };
     renderPage({ scripts });
-    expect(screen.getByText('2026-01-15T10:30:00.000Z')).toBeInTheDocument();
+    // Use a predicate to find TIME elements only — avoids matching the TD ancestor
+    const timeEl = screen.getByText((content, element) => (
+      element.tagName === 'TIME' && /[秒分钟小时天月年]前/.test(content)
+    ));
+    expect(timeEl).toHaveAttribute('dateTime', '2026-01-15T10:30:00.000Z');
     expect(screen.queryByText('—')).not.toBeInTheDocument();
+  });
+
+  it('renders the <time> element with a numeric epoch (seconds) normalized to ISO in dateTime', () => {
+    // 1700000000 s → 1700000000000 ms → 2023-11-14T22:13:20.000Z
+    // The <1e12 heuristic correctly identifies this as seconds and scales it.
+    const scripts = {
+      rp: { description: 'Reputation recalculation', modified: 1700000000 },
+    };
+    renderPage({ scripts });
+    const timeEl = screen.getByText((content, element) => (
+      element.tagName === 'TIME' && /[秒分钟小时天月年]前/.test(content)
+    ));
+    expect(timeEl).toHaveAttribute('dateTime', '2023-11-14T22:13:20.000Z');
   });
 
   it('renders column headers: ID, Description, Modified, Action', () => {
