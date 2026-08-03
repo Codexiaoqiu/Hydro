@@ -17,35 +17,36 @@ export interface TwoFactorDialogProps {
   /** Whether the account has a TFA secret. Defaults to true for compatibility with the login response. */
   tfa?: boolean;
   onSuccess: (result: TwoFactorResult) => void;
-  onError: (message: string) => void;
 }
 
 function errorMessage(error: unknown) {
   return error instanceof Error ? error.message : String(error);
 }
 
-export function TwoFactorDialog({ uname, authn = false, tfa = true, onSuccess, onError }: TwoFactorDialogProps) {
+export function TwoFactorDialog({ uname, authn = false, tfa = true, onSuccess }: TwoFactorDialogProps) {
   const translate = useTranslate();
   const [code, setCode] = useState('');
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
   const reportError = (err: unknown) => {
-    const message = errorMessage(err);
-    setError(message);
-    onError(message);
+    setError(errorMessage(err));
   };
 
   const verifyWebAuthn = async () => {
     setError('');
     setSubmitting(true);
     try {
+      // The backend's POST `/user/webauthn` (handlers/user.ts:188-225) does not
+      // return a challenge — it either sets `response.redirect` (login flow) or
+      // calls `this.back()` (sudo flow), yielding an empty body. The challenge
+      // is the one issued alongside the `authOptions` in the GET response, so
+      // we pass that straight back to the caller after the assertion succeeds.
       const authnInfo = await request.get<{ authOptions?: PublicKeyCredentialRequestOptionsJSON }>('/user/webauthn', { uname });
-      if (!authnInfo?.authOptions) throw new Error(translate('Failed to fetch registration data.'));
+      if (!authnInfo?.authOptions?.challenge) throw new Error(translate('Failed to fetch registration data.'));
       const result = await startAuthentication({ optionsJSON: authnInfo.authOptions });
-      const verified = await request.post<{ challenge?: string }>('/user/webauthn', { result });
-      if (!verified?.challenge) throw new Error(translate('Failed to verify authenticator.'));
-      onSuccess({ authnChallenge: verified.challenge });
+      await request.post('/user/webauthn', { result });
+      onSuccess({ authnChallenge: authnInfo.authOptions.challenge });
     } catch (err) {
       reportError(err);
     } finally {

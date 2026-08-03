@@ -29,8 +29,13 @@ export interface LoginFormProps {
    * Called when the server signals the user must complete 2FA (HTTP 403
    * ValidationError '2FA' / 'Authn'). The form stays mounted so the caller
    * can drive the challenge submission (TFA code or WebAuthn) and retry.
+   *
+   * The callback receives a snapshot of the current `password` / `rememberme`
+   * (so the page can re-POST `/login` with the challenge without fishing them
+   * out of the DOM) plus the most recent `tfaInfo` probe — `null` when the
+   * username was unknown or the probe failed.
    */
-  onTwoFactorRequired?: (uname: string) => void;
+  onTwoFactorRequired?: (uname: string, ctx: { password: string, rememberme: boolean, info: TfaInfo | null }) => void;
   /** Apply the auth-shell-styled full-width variant. */
   wide?: boolean;
 }
@@ -121,7 +126,7 @@ export function LoginForm({
       if (err instanceof HydroClientError) {
         setError(err);
         if (onTwoFactorRequired && err.code === 403 && err.rawMessage?.startsWith('Field 2FA')) {
-          onTwoFactorRequired(uname);
+          onTwoFactorRequired(uname, { password, rememberme, info: tfaInfo });
         }
       }
     } finally {

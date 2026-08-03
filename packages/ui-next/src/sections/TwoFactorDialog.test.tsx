@@ -27,16 +27,26 @@ afterEach(() => {
 
 describe('twoFactorDialog', () => {
   it('shows both verification methods and has no cancel control', () => {
-    render(<TwoFactorDialog uname="alice" authn tfa onSuccess={vi.fn()} onError={vi.fn()} />);
+    render(<TwoFactorDialog uname="alice" authn tfa onSuccess={vi.fn()} />);
 
     expect(screen.getByRole('button', { name: 'Use Authenticator' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Use TFA Code' })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /close|cancel/i })).not.toBeInTheDocument();
   });
 
+  it('hides methods that the backend did not advertise', () => {
+    const { rerender } = render(<TwoFactorDialog uname="alice" authn={false} tfa onSuccess={vi.fn()} />);
+    expect(screen.queryByRole('button', { name: 'Use Authenticator' })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Use TFA Code' })).toBeInTheDocument();
+
+    rerender(<TwoFactorDialog uname="alice" authn tfa={false} onSuccess={vi.fn()} />);
+    expect(screen.getByRole('button', { name: 'Use Authenticator' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Use TFA Code' })).not.toBeInTheDocument();
+  });
+
   it('returns a TFA code to the caller after selection', async () => {
     const onSuccess = vi.fn();
-    render(<TwoFactorDialog uname="alice" tfa onSuccess={onSuccess} onError={vi.fn()} />);
+    render(<TwoFactorDialog uname="alice" tfa onSuccess={onSuccess} />);
 
     const form = document.querySelector('form')!;
     const codeInput = screen.getByLabelText('6-Digit Code') as HTMLInputElement;
@@ -47,43 +57,42 @@ describe('twoFactorDialog', () => {
     expect(request.post).not.toHaveBeenCalled();
   });
 
-  it('verifies with WebAuthn and returns the backend challenge', async () => {
+  it('verifies with WebAuthn and returns the GET-issued challenge', async () => {
     const onSuccess = vi.fn();
     vi.mocked(request.get).mockResolvedValue({ authOptions: { challenge: 'options-challenge' } });
     vi.mocked(startAuthentication).mockResolvedValue({ id: 'credential-id' } as never);
-    vi.mocked(request.post).mockResolvedValue({ challenge: 'verified-challenge' });
+    // Backend POST `/user/webauthn` yields an empty body; the contract is to
+    // pass back the challenge from the GET response.
+    vi.mocked(request.post).mockResolvedValue({});
 
-    render(<TwoFactorDialog uname="alice" authn tfa={false} onSuccess={onSuccess} onError={vi.fn()} />);
+    render(<TwoFactorDialog uname="alice" authn tfa={false} onSuccess={onSuccess} />);
     fireEvent.click(screen.getByRole('button', { name: 'Use Authenticator' }));
 
-    await waitFor(() => expect(onSuccess).toHaveBeenCalledWith({ authnChallenge: 'verified-challenge' }));
+    await waitFor(() => expect(onSuccess).toHaveBeenCalledWith({ authnChallenge: 'options-challenge' }));
     expect(request.get).toHaveBeenCalledWith('/user/webauthn', { uname: 'alice' });
     expect(request.post).toHaveBeenCalledWith('/user/webauthn', { result: { id: 'credential-id' } });
   });
 
   it('reports WebAuthn failures and remains open for retry', async () => {
-    const onError = vi.fn();
     vi.mocked(request.get).mockRejectedValue(new Error('verification failed'));
 
-    render(<TwoFactorDialog uname="alice" authn tfa={false} onSuccess={vi.fn()} onError={onError} />);
+    render(<TwoFactorDialog uname="alice" authn tfa={false} onSuccess={vi.fn()} />);
     fireEvent.click(screen.getByRole('button', { name: 'Use Authenticator' }));
 
-    await waitFor(() => expect(onError).toHaveBeenCalledWith('verification failed'));
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('verification failed'));
     expect(screen.getByRole('dialog')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Use Authenticator' })).toBeInTheDocument();
-    expect(screen.getByRole('alert')).toHaveTextContent('verification failed');
   });
 
   it('reports an invalid TFA code without closing', () => {
-    const onError = vi.fn();
-    render(<TwoFactorDialog uname="alice" tfa onSuccess={vi.fn()} onError={onError} />);
+    render(<TwoFactorDialog uname="alice" tfa onSuccess={vi.fn()} />);
 
     const form = document.querySelector('form')!;
     const codeInput = screen.getByLabelText('6-Digit Code') as HTMLInputElement;
     fireEvent.change(codeInput, { target: { value: '123' } });
     fireEvent.submit(form);
 
-    expect(onError).toHaveBeenCalled();
     expect(screen.getByRole('dialog')).toBeInTheDocument();
+    expect(screen.getByRole('alert')).toHaveTextContent('Please enter a 6-digit code.');
   });
 });

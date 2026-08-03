@@ -15,50 +15,62 @@ interface UserLoginArgs {
   UserContext?: { _id?: number, uname?: string };
 }
 
+interface TwoFactorCallbackCtx {
+  password: string;
+  rememberme: boolean;
+  info: { tfa: boolean, authn?: boolean } | null;
+}
+
+interface TwoFactorState {
+  uname: string;
+  password: string;
+  rememberme: boolean;
+  /** Backend-reported availability flags (probed via `/user/tfa`). */
+  authn: boolean;
+  tfa: boolean;
+}
+
 export default function UserLoginPage() {
   const { args } = usePageData() as unknown as { args: UserLoginArgs };
   const { builtInLogin = true, loginMethods = [], redirect, UserContext } = args ?? {};
   const isLoggedIn = !!UserContext?._id;
   const t = useTranslate();
   const redirectApi = usePostLoginRedirect();
-  const [twoFactor, setTwoFactor] = useState<{ uname: string, password: string, rememberme: boolean } | null>(null);
-  const [, setTwoFactorError] = useState('');
+  const [twoFactor, setTwoFactor] = useState<TwoFactorState | null>(null);
 
-  const submitChallenge = useCallback(async (uname: string, password: string, rememberme: boolean, challenge: TwoFactorResult) => {
+  const submitChallenge = useCallback(async (state: TwoFactorState, challenge: TwoFactorResult) => {
     const formData = new URLSearchParams();
-    formData.set('uname', uname);
-    formData.set('password', password);
+    formData.set('uname', state.uname);
+    formData.set('password', state.password);
     formData.set('login_submit', t('Auth.SubmitLogin'));
-    if (rememberme) formData.set('rememberme', 'on');
+    if (state.rememberme) formData.set('rememberme', 'on');
     if (challenge.tfa) formData.set('tfa', challenge.tfa);
     if (challenge.authnChallenge) formData.set('authnChallenge', challenge.authnChallenge);
-    try {
-      await request.post('/login', formData);
-      if (typeof window !== 'undefined') {
-        window.location.href = redirect || redirectApi.target;
-      }
-    } catch (err) {
-      setTwoFactor(null);
-      throw err;
+    // On failure the dialog stays open so the user can retry; the parent
+    // <LoginForm /> still owns the inline error surface and will show whatever
+    // HydroClientError message comes back from the next POST. We only tear
+    // down the dialog when the re-POST actually succeeds (see handleTwoFactorSuccess).
+    await request.post('/login', formData);
+    if (typeof window !== 'undefined') {
+      window.location.href = redirect || redirectApi.target;
     }
   }, [redirect, redirectApi.target, t]);
 
-  const handleTwoFactor = useCallback((uname: string) => {
-    const form = (document.activeElement instanceof HTMLInputElement && document.activeElement.form)
-      ? document.activeElement.form
-      : document.querySelector('form');
-    const passwordInput = form?.elements.namedItem('password') as HTMLInputElement | null;
-    const rememberInput = form?.elements.namedItem('rememberme') as HTMLInputElement | null;
+  const handleTwoFactor = useCallback((uname: string, ctx: TwoFactorCallbackCtx) => {
     setTwoFactor({
       uname,
-      password: passwordInput?.value ?? '',
-      rememberme: rememberInput?.checked ?? false,
+      password: ctx.password,
+      rememberme: ctx.rememberme,
+      // Default both methods on if the probe failed (e.g. user not found) so
+      // the dialog is still usable; the probe only refines the buttons shown.
+      authn: ctx.info?.authn ?? true,
+      tfa: ctx.info?.tfa ?? true,
     });
   }, []);
 
   const handleTwoFactorSuccess = useCallback(async (challenge: TwoFactorResult) => {
     if (!twoFactor) return;
-    await submitChallenge(twoFactor.uname, twoFactor.password, twoFactor.rememberme, challenge);
+    await submitChallenge(twoFactor, challenge);
     setTwoFactor(null);
   }, [twoFactor, submitChallenge]);
 
@@ -89,10 +101,9 @@ export default function UserLoginPage() {
           {twoFactor && (
             <TwoFactorDialog
               uname={twoFactor.uname}
-              authn
-              tfa
+              authn={twoFactor.authn}
+              tfa={twoFactor.tfa}
               onSuccess={handleTwoFactorSuccess}
-              onError={setTwoFactorError}
             />
           )}
         </>
