@@ -1,6 +1,6 @@
 /* @vitest-environment happy-dom */
 import { render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { type PageData, PageDataProvider } from '../context/page-data';
 import ManageDashboardPage from './manage_dashboard';
 
@@ -71,17 +71,20 @@ describe('manage_dashboard', () => {
     expect(screen.getAllByRole('listitem')).toHaveLength(2);
   });
 
-  it('renders a <time> element with dateTime attribute and relative text for recent activity', () => {
-    // 1700000000 = 2023-11-14T17:33:20Z — more than 2 years ago from NOW=2026-07-08
+  it('renders a <time> element with dateTime attribute and relative text for older activity (5 days ago)', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-08-03T12:00:00Z'));
+    const FIVE_DAYS_MS = 5 * 86_400_000;
+    const fiveDaysAgoIso = new Date(Date.now() - FIVE_DAYS_MS).toISOString(); // 2026-07-29T12:00:00.000Z
     const activities = [
-      { id: 'a1', type: 'user', content: 'Alice signed up', time: 1700000000 },
+      { id: 'a1', type: 'user', content: 'Alice signed up', time: fiveDaysAgoIso },
     ];
     renderPage({ domain: { _id: 'system', name: 'system' }, activities });
     const timeEl = screen.getByText((content, element) => (
-      element.tagName === 'TIME' && /[秒分钟小时天月年]前/.test(content)
+      element.tagName === 'TIME' && content === '5天前'
     ));
-    expect(timeEl).toHaveAttribute('dateTime');
-    expect(timeEl.getAttribute('dateTime')).not.toMatch(/[秒分钟小时天月年]前/);
+    expect(timeEl).toHaveAttribute('dateTime', fiveDaysAgoIso);
+    vi.useRealTimers();
   });
 
   it('renders a <time> element with dateTime attribute for a very recent activity (< 60s)', () => {
