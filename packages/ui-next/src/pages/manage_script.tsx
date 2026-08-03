@@ -36,6 +36,7 @@ function toEntries(scripts: Record<string, Script> | ScriptEntry[] | undefined):
 
 function toIso(value: string | number): string {
   if (typeof value === 'number') {
+    // 1e12 ms ≈ year 2001; values below are seconds, values above are milliseconds.
     const ms = value < 1e12 ? value * 1000 : value;
     return new Date(ms).toISOString();
   }

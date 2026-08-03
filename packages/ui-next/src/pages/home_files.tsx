@@ -18,7 +18,7 @@ export interface Args {
 
 export default function HomeFilesPage() {
   const { args } = usePageData();
-  const [files, setFiles] = useState(args.files ?? []);
+  const [files, setFiles] = useState(args.files);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);

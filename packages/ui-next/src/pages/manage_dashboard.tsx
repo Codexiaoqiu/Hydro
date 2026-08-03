@@ -47,6 +47,7 @@ const STAT_CARDS: Array<{ key: keyof Stats, label: string }> = [
 
 function toIsoString(time: string | number): string {
   if (typeof time === 'number') {
+    // 1e12 ms ≈ year 2001; values below are seconds, values above are milliseconds.
     const ms = time < 1e12 ? time * 1000 : time;
     return new Date(ms).toISOString();
   }

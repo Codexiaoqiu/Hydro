@@ -196,6 +196,7 @@ export default function TrainingDetail() {
                   key={node._id}
                   className={`${styles.node} ${locked ? styles.nodeLocked : ''}`}
                   data-node-id={node._id}
+                  data-testid={`node-${node._id}`}
                   data-node-state={
                     ns.isDone ? 'done'
                       : ns.isProgress ? 'progress'
@@ -250,12 +251,12 @@ export default function TrainingDetail() {
                     </thead>
                     <tbody>
                       {(node.pids || []).map((pid) => {
-                        const pdoc = pdict[String(pid)] || pdict[pid as unknown as string];
+                        const pdoc = pdict[String(pid)];
                         const invalid = locked || !isEnrolled;
                         const title = pdoc?.title ?? `题目 #${pid}`;
                         const displayPid = pdoc?.pid || String(pid);
                         return (
-                          <tr key={pid} data-pid={pid}>
+                          <tr key={pid} data-pid={pid} data-testid={`pid-${pid}`}>
                             <td className={styles.colName}>
                               {invalid || !pdoc ? (
                                 <span className={styles.problemNameLocked}>{title}</span>

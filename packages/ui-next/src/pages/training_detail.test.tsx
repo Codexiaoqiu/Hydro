@@ -126,10 +126,9 @@ describe('training_detail', () => {
     expect(screen.getByText('章节 1. 基础')).toBeInTheDocument();
     expect(screen.getByText('章节 2. 进阶')).toBeInTheDocument();
     // Three problem rows
-    const pids = ['1', '2', '3'].map((pid) =>
-      document.querySelector(`[data-pid="${pid}"]`),
-    );
-    expect(pids.every(Boolean)).toBe(true);
+    expect(screen.getByTestId('pid-1')).toBeInTheDocument();
+    expect(screen.getByTestId('pid-2')).toBeInTheDocument();
+    expect(screen.getByTestId('pid-3')).toBeInTheDocument();
   });
 
   it('marks a node invalid (locked) when its requireNids are not done', () => {
@@ -161,7 +160,7 @@ describe('training_detail', () => {
     });
 
     // The advanced node is invalid until basic is done.
-    const advanced = document.querySelector('[data-node-id="2"]') as HTMLElement;
+    const advanced = screen.getByTestId('node-2');
     expect(advanced.dataset.nodeState).toBe('invalid');
     expect(advanced.className).toMatch(/nodeLocked/);
     expect(advanced.textContent).toContain('本章节当前无法挑战');
