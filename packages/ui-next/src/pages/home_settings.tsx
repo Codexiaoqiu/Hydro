@@ -14,6 +14,7 @@ import { useToast } from '../components/primitives/use-toast';
 import { usePageData } from '../context/page-data';
 import { request } from '../hooks/use-api';
 import { useTranslate } from '../lib/i18n';
+import { PreferenceSection } from '../sections/PreferenceSection';
 
 // Mirrors packages/hydrooj/src/model/setting.ts::_Setting. Only the fields we
 // actually render are typed here; the rest are forwarded as-is to the server.
@@ -64,12 +65,18 @@ function Field({ s, value, onChange }: { s: SettingRow, value: unknown, onChange
   if (s.type === 'select') {
     return (
       <select
+        // `name` attribute lets the preference helper (P1-1: home_preference
+        // pjax hooks) target font + code-font selects by name for canvas-based
+        // font support detection. Native form submit is not used in this
+        // page (state is captured by `values`) so the `name` is *only* for
+        // querying by `[name=...]` — it does not appear in the POST body.
+        name={s.key}
         value={String(value ?? '')}
         onChange={(e) => onChange(e.currentTarget.value)}
         style={{ padding: 'var(--space-2)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)', minWidth: 200 }}
       >
         {Object.entries(s.range ?? {}).map(([k, label]) => (
-          <option key={k} value={k}>{label}</option>
+          <option key={k} value={k} style={{ fontFamily: String(k) }}>{label}</option>
         ))}
       </select>
     );
@@ -181,6 +188,14 @@ export default function HomeSettingsPage() {
       <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-2xl)', margin: '0 0 var(--space-4)' }}>
         {t(`HomeSettings.Title.${args.category}`)}
       </h1>
+
+      {/* P1-1: home_preference pjax hooks restoration.
+          When the user navigates to `/home/settings?category=preference`,
+          ui-default ran `initCodeLangHelper` (fancy multi-select) +
+          `supportFontFamily` (canvas-based font detection). ui-next is
+          SPA-rendered so we mount <PreferenceSection/> once the form is in
+          the DOM. It is a no-op for `account` / `domain` categories. */}
+      {args.category === 'preference' && <PreferenceSection />}
 
       {error && <Alert variant="error" message={error} />}
 

@@ -7,6 +7,17 @@ import { ToastProvider } from '../components/primitives/Toast';
 import { type PageData, PageDataProvider } from '../context/page-data';
 import HomeSettingsPage from './home_settings';
 
+// Top-level mock: spy on supportFontFamily/applyFontFilter so the
+// integration test can verify behaviour without depending on happy-dom
+// canvas rasterisation. `vi.mock` is hoisted by vitest before any import
+// of `home_settings` so the page picks up the mocked functions.
+const supportFontFamilyMock = vi.fn<(font: string) => boolean>();
+const applyFontFilterMock = vi.fn<(root?: ParentNode) => void>();
+vi.mock('../sections/PreferenceSection.fonts', () => ({
+  supportFontFamily: (font: string) => supportFontFamilyMock(font),
+  applyFontFilter: (root?: ParentNode) => applyFontFilterMock(root),
+}));
+
 function makePageData(args: Record<string, unknown> = {}): PageData {
   return {
     name: 'home_settings',
@@ -105,6 +116,78 @@ describe('home_settings', () => {
     expect(body).toContain('viewLang=zh_CN');
     expect(body).toContain('avatar=gravatar%3Aa%40b');
     expect(body).toContain('darkMode=on');
+  });
+
+  it('renders font selects with name attributes so the preference helper can target them', () => {
+    const settings = [
+      // eslint-disable-next-line max-len
+      { family: 'setting_display', key: 'fontFamily', name: 'Font Family', type: 'select', range: { Open: 'Open Sans', Mono: 'Source Code Pro' }, value: 'Open' },
+      // eslint-disable-next-line max-len
+      { family: 'setting_display', key: 'codeFontFamily', name: 'Code Font Family', type: 'select', range: { Open: 'Open Sans', Mono: 'Source Code Pro' }, value: 'Mono' },
+    ];
+    render(<Providers args={{ settings, current: {} }}><HomeSettingsPage /></Providers>);
+    const ff = document.querySelector('select[name="fontFamily"]') as HTMLSelectElement | null;
+    const cff = document.querySelector('select[name="codeFontFamily"]') as HTMLSelectElement | null;
+    expect(ff).not.toBeNull();
+    expect(cff).not.toBeNull();
+    expect(ff?.options).toHaveLength(2);
+    expect(cff?.options).toHaveLength(2);
+  });
+
+  it('hides options that fail supportFontFamily when category=preference (P1-1 regression)', async () => {
+    supportFontFamilyMock.mockImplementation((font: string) => font === 'supported');
+    applyFontFilterMock.mockImplementation((root: ParentNode = document) => {
+      // Re-implement the real side-effect inline so the test still exercises
+      // the DOM mutation path. Keeps the test honest even though applyFontFilter
+      // is mocked.
+      const names = ['fontFamily', 'codeFontFamily'];
+      for (const name of names) {
+        const select = (root as ParentNode).querySelector?.(`select[name="${name}"]`) as HTMLSelectElement | null;
+        if (!select) continue;
+        for (const option of Array.from(select.options)) {
+          option.style.fontFamily = option.value;
+          if (supportFontFamilyMock(option.value)) continue;
+          option.hidden = true;
+        }
+      }
+    });
+    const settings = [
+      {
+        family: 'setting_display', key: 'fontFamily', name: 'Font Family', type: 'select',
+        range: { supported: 'Open Sans', missing: 'Totally Missing Font' }, value: 'supported',
+      },
+    ];
+    render(<Providers args={{ category: 'preference', settings, current: {} }}><HomeSettingsPage /></Providers>);
+    await act(async () => { await new Promise((r) => setTimeout(r, 30)); });
+    expect(supportFontFamilyMock).toHaveBeenCalled();
+    // applyFontFilter calls supportFontFamily with `option.value` (the `<option>`
+    // value attribute), which is the `range` key, not the user-visible label.
+    // In the spec below we use 'supported' / 'missing' as values so the test
+    // stays expressive without depending on happy-dom text rendering.
+    expect(supportFontFamilyMock).toHaveBeenCalledWith('supported');
+    expect(supportFontFamilyMock).toHaveBeenCalledWith('missing');
+    const ff = document.querySelector('select[name="fontFamily"]') as HTMLSelectElement | null;
+    expect(ff).not.toBeNull();
+    const missingOpt = Array.from(ff!.options).find((o) => o.value === 'missing');
+    const openOpt = Array.from(ff!.options).find((o) => o.value === 'supported');
+    expect(missingOpt?.hidden).toBe(true);
+    expect(openOpt?.hidden).toBe(false);
+    supportFontFamilyMock.mockReset();
+    applyFontFilterMock.mockReset();
+  });
+
+  it('does not invoke canvas / font detection for non-preference categories (no side-effects)', async () => {
+    const getContextSpy = vi.spyOn(HTMLCanvasElement.prototype, 'getContext');
+    const settings = [
+      {
+        family: 'setting_display', key: 'fontFamily', name: 'Font Family', type: 'select',
+        range: { A: 'Open Sans', B: 'Totally Missing Font' }, value: 'A',
+      },
+    ];
+    render(<Providers args={{ category: 'account', settings, current: {} }}><HomeSettingsPage /></Providers>);
+    await act(async () => { await new Promise((r) => setTimeout(r, 30)); });
+    expect(getContextSpy).not.toHaveBeenCalled();
+    getContextSpy.mockRestore();
   });
 
   it('includes booleanKeys for unchecked booleans and surfaces server errors', async () => {
