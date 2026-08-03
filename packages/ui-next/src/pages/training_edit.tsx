@@ -6,13 +6,6 @@ import { usePageData } from '../context/page-data';
 import { request } from '../hooks/use-api';
 import styles from './training_edit.module.css';
 
-// Response body from `TrainingEditHandler.get`
-// (packages/hydrooj/src/handler/training.ts:189-208).
-//   - `page_name` is 'training_edit' for an existing training, 'training_create' for new
-//   - `tdoc` is only present in the edit case (handler sets it on `this.tdoc`)
-//   - `dag` is a stringified, pretty-printed JSON of `tdoc.dag`; it must be
-//     round-tripped verbatim on save (the handler's `_parseDagJson` re-parses
-//     and validates the same shape).
 interface Tdoc {
   docId: string;
   title?: string;
@@ -45,8 +38,7 @@ const DEFAULT_DAG = `[
 ]`;
 
 export default function TrainingEdit() {
-  const pageData = usePageData() as unknown as { args: Args };
-  const { args } = pageData;
+  const args = usePageData().args as unknown as Args;
   const isEdit = args?.page_name === 'training_edit';
   const tdoc = args?.tdoc;
 

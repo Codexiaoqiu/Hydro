@@ -9,10 +9,6 @@ import { useBuildUrl } from '../hooks/use-build-url';
 import { hasPerm } from '../lib/perms';
 import styles from './training_main.module.css';
 
-// Response shape from `TrainingMainHandler.get`
-// (packages/hydrooj/src/handler/training.ts:60-95). `tsdict` and `tdict` are
-// keyed by `tdoc.docId.toHexString()`. `nsdict` is not injected for this
-// endpoint — progress is derived from `tsdict[docId].donePids.length` instead.
 interface Tdoc {
   _id?: string;
   docId: string;
@@ -50,8 +46,7 @@ function totalPids(tdoc: Tdoc | undefined): number {
 }
 
 export default function TrainingMain() {
-  const pageData = usePageData() as unknown as { args: Args };
-  const { args } = pageData;
+  const args = usePageData().args as unknown as Args;
   const tdocs = args?.tdocs ?? [];
   const tsdict = args?.tsdict ?? {};
   const tdict = args?.tdict ?? {};
@@ -79,10 +74,6 @@ export default function TrainingMain() {
     return buildUrl('training_main', {}, params);
   };
 
-  // Mirrors ui-default's sidebar gate: only users with PERM_CREATE_TRAINING
-  // see the "New Training Plan" entry point. PERM_CREATE_TRAINING is the
-  // bit at 1n<<47 (packages/common/permission.ts:81). We compare the parsed
-  // bitmask against the user perm string.
   const canCreate = hasPerm(user as never, 1n << 47n);
 
   return (

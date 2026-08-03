@@ -6,14 +6,6 @@ import { formatFileSize } from '../lib/format';
 import { own } from '../lib/perms';
 import styles from './training_files.module.css';
 
-// Response body from `TrainingFilesHandler.get`
-// (packages/hydrooj/src/handler/training.ts:237-259).
-// - `files` is sorted via `sortFiles(tdoc.files)` (filename ascending).
-// - `urlForFile(name)` returns the download route URL the same way the
-//   handler injects it (a function from `this.url('training_file_download', ...)`).
-// - `tdoc` carries the training docId for the download route.
-// - `tsdoc` is the per-user status doc; we don't need to read it for the
-//   file-management surface but keep the field for parity.
 interface FileEntry {
   _id?: string;
   name: string;
@@ -37,8 +29,7 @@ interface Args {
 }
 
 export default function TrainingFiles() {
-  const pageData = usePageData() as unknown as { args: Args };
-  const args = pageData.args ?? ({} as Args);
+  const args = usePageData().args as unknown as Args;
   const tdoc = args.tdoc;
   const initialUrlForFile = args.urlForFile ?? ((name: string) => `/training/${tdoc?.docId}/file/${encodeURIComponent(name)}`);
   const [files, setFiles] = useState<FileEntry[]>(args.files ?? []);
@@ -47,8 +38,6 @@ export default function TrainingFiles() {
   const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Mirrors ui-default: only the owner (with PERM_EDIT_TRAINING_SELF) or a
-  // user with PERM_EDIT_TRAINING can mutate files. We check both gates.
   const canEdit = !!tdoc && !!(
     (args.UserContext?._id && own(args.UserContext as never, tdoc, 1n << 49n))
     || (args.UserContext as { hasPerm?: (b: bigint) => boolean } | undefined)?.hasPerm?.(1n << 48n)

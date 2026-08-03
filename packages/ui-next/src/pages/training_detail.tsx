@@ -7,10 +7,6 @@ import { request } from '../hooks/use-api';
 import { own } from '../lib/perms';
 import styles from './training_detail.module.css';
 
-// Response body from `TrainingDetailHandler.get`
-// (packages/hydrooj/src/handler/training.ts:99-167). The backend re-writes
-// `tdoc.description` so that any `file://` reference is rewritten to
-// `./<tid>/file/<filename>`, so we can render the markdown as-is.
 interface DagNode {
   _id: number;
   title: string;
@@ -101,8 +97,7 @@ function statusClass(node: Nsdoc): string {
 }
 
 export default function TrainingDetail() {
-  const pageData = usePageData() as unknown as { args: Args };
-  const { args } = pageData;
+  const args = usePageData().args as unknown as Args;
   const tdoc = args?.tdoc;
   const tsdoc = args?.tsdoc;
   const ndict = args?.ndict ?? {};
@@ -137,12 +132,6 @@ export default function TrainingDetail() {
     setEnrolling(true);
     try {
       await request.post(`/training/${tdoc.docId}`, { operation: 'enroll' });
-      // After a successful enroll, do a full-page reload so the server
-      // re-renders the training with the new tsdoc (enroll=1). We use a
-      // hard navigation rather than `navigate()` because the data the
-      // page renders (e.g. nsdict, the enroll button visibility) is
-      // server-computed and the SPA cache cannot update it without a
-      // round-trip.
       if (typeof window !== 'undefined') {
         window.location.href = `/training/${tdoc.docId}`;
       }
@@ -152,9 +141,6 @@ export default function TrainingDetail() {
     }
   };
 
-  // Render the markdown description as plain text in this skeleton. A future
-  // pass can wire up the shared Markdown renderer; for now we surface the
-  // title/content sections.
   const totalPids = tdoc.dag.reduce(
     (acc, node) => acc + new Set(node.pids || []).size,
     0,
