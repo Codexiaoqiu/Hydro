@@ -67,7 +67,7 @@ interface Udoc {
   avatar?: string;
 }
 
-interface Args {
+export interface Args {
   tdoc?: Tdoc;
   tsdoc?: Tsdoc;
   ndict?: Record<string, DagNode>;
@@ -97,7 +97,7 @@ function statusClass(node: Nsdoc): string {
 }
 
 export default function TrainingDetail() {
-  const args = usePageData().args as unknown as Args;
+  const { args } = usePageData();
   const tdoc = args?.tdoc;
   const tsdoc = args?.tsdoc;
   const ndict = args?.ndict ?? {};

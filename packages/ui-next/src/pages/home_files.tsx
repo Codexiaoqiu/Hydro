@@ -11,13 +11,13 @@ interface FileEntry {
   lastModified?: string | number | Date;
   etag?: string;
 }
-interface Args {
+export interface Args {
   files: FileEntry[];
   urlForFile: (filename: string) => string;
 }
 
 export default function HomeFilesPage() {
-  const { args } = usePageData() as unknown as { args: Args };
+  const { args } = usePageData();
   const [files, setFiles] = useState(args.files ?? []);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [busy, setBusy] = useState(false);

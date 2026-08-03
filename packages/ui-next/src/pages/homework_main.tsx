@@ -21,7 +21,7 @@ interface Tdoc {
   assign?: string[];
 }
 
-interface Args {
+export interface Args {
   tdocs?: Tdoc[];
   calendar?: Tdoc[];
   tpcount?: number;
@@ -34,7 +34,7 @@ interface Args {
 }
 
 export default function HomeworkMain() {
-  const args = usePageData().args as unknown as Args;
+  const { args } = usePageData();
   const tdocs = args?.tdocs ?? [];
   const page = Math.max(1, args?.page ?? 1);
   const total = Math.max(0, args?.tpcount ?? 0);

@@ -15,7 +15,7 @@ interface Tdoc {
   langs?: string[];
 }
 
-interface Args {
+export interface Args {
   tdoc?: Tdoc;
   dateBeginText?: string;
   timeBeginText?: string;
@@ -28,7 +28,7 @@ interface Args {
 }
 
 export default function HomeworkEdit() {
-  const args = usePageData().args as unknown as Args;
+  const { args } = usePageData();
   const edit = args?.page_name === 'homework_edit' || !!args?.tdoc?.docId;
   const [form, setForm] = useState({
     title: args?.tdoc?.title ?? '',

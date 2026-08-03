@@ -28,7 +28,7 @@ interface Tsdoc {
   doneNids?: number[];
 }
 
-interface Args {
+export interface Args {
   tdocs?: Tdoc[];
   page?: number;
   tpcount?: number;
@@ -46,7 +46,7 @@ function totalPids(tdoc: Tdoc | undefined): number {
 }
 
 export default function TrainingMain() {
-  const args = usePageData().args as unknown as Args;
+  const { args } = usePageData();
   const tdocs = args?.tdocs ?? [];
   const tsdict = args?.tsdict ?? {};
   const tdict = args?.tdict ?? {};

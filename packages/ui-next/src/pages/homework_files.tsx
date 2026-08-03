@@ -19,7 +19,7 @@ interface Tdoc {
   maintainer?: number[];
 }
 
-interface Args {
+export interface Args {
   tdoc?: Tdoc;
   files?: FileEntry[];
   urlForFile?: (name: string) => string;
@@ -27,7 +27,7 @@ interface Args {
 }
 
 export default function HomeworkFiles() {
-  const args = usePageData().args as unknown as Args;
+  const { args } = usePageData();
   const tdoc = args?.tdoc;
   const [files, setFiles] = useState(args?.files ?? []);
   const [selected, setSelected] = useState<Set<string>>(new Set());

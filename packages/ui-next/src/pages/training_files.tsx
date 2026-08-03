@@ -21,7 +21,7 @@ interface Tdoc {
   maintainer?: number[];
 }
 
-interface Args {
+export interface Args {
   tdoc?: Tdoc;
   files?: FileEntry[];
   urlForFile?: (filename: string) => string;
@@ -29,7 +29,7 @@ interface Args {
 }
 
 export default function TrainingFiles() {
-  const args = usePageData().args as unknown as Args;
+  const { args } = usePageData();
   const tdoc = args.tdoc;
   const initialUrlForFile = args.urlForFile ?? ((name: string) => `/training/${tdoc?.docId}/file/${encodeURIComponent(name)}`);
   const [files, setFiles] = useState<FileEntry[]>(args.files ?? []);

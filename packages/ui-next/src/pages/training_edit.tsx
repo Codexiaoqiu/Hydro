@@ -15,7 +15,7 @@ interface Tdoc {
   dag?: unknown[];
 }
 
-interface Args {
+export interface Args {
   page_name?: 'training_edit' | 'training_create';
   tdoc?: Tdoc;
   dag?: string;
@@ -38,7 +38,7 @@ const DEFAULT_DAG = `[
 ]`;
 
 export default function TrainingEdit() {
-  const args = usePageData().args as unknown as Args;
+  const { args } = usePageData();
   const isEdit = args?.page_name === 'training_edit';
   const tdoc = args?.tdoc;
 

@@ -43,7 +43,7 @@ interface Udoc {
   uname?: string;
 }
 
-interface Args {
+export interface Args {
   tdoc?: Tdoc;
   tsdoc?: { attend?: number, startAt?: string };
   udict?: Record<string, Udoc>;
@@ -58,7 +58,7 @@ interface Args {
 }
 
 export default function HomeworkDetail() {
-  const args = usePageData().args as unknown as Args;
+  const { args } = usePageData();
   const tdoc = args?.tdoc;
   const buildUrl = useBuildUrl();
   const [busy, setBusy] = useState(false);
