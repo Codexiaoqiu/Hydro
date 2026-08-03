@@ -140,6 +140,7 @@ class SystemSettingHandler extends SystemHandler {
         this.response.template = 'manage_setting.html';
         this.response.body.current = {};
         this.response.body.settings = setting.SYSTEM_SETTINGS;
+        this.response.body.current.ui_next = system.get('ui_next');
         for (const s of this.response.body.settings) {
             this.response.body.current[s.key] = system.get(s.key);
         }
@@ -158,14 +159,14 @@ class SystemSettingHandler extends SystemHandler {
                         tasks.push(system.set(`${key}.${subkey}`, val));
                     }
                 }
-            }
+            } else if (key === 'ui_next') tasks.push(system.set(key, args[key] === 'true'));
         }
         for (const key in booleanKeys) {
             if (typeof booleanKeys[key] === 'object') {
                 for (const subkey in booleanKeys[key]) {
                     if (!args[key]?.[subkey]) tasks.push(system.set(`${key}.${subkey}`, false));
                 }
-            }
+            } else if (key === 'ui_next' && !args[key]) tasks.push(system.set(key, false));
         }
         await Promise.all(tasks);
         this.ctx.broadcast('system/setting', args);

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Button } from '../components/primitives/Button';
 import { Card } from '../components/primitives/Card';
 import { usePageData } from '../context/page-data';
+import { canEditSystem } from '../lib/perms';
 
 interface SystemSetting {
   key: string;
@@ -48,6 +49,27 @@ export default function ManageSettingPage() {
   const { args } = usePageData() as unknown as { args: Args };
   const settings = args?.settings ?? [];
   const current = args?.current ?? {};
+  const showUiRenderer = canEditSystem(args?.UserContext);
+
+  const uiRenderer = showUiRenderer ? (
+    <form method="post" action="/manage/setting" className="manage-setting__renderer-form">
+      <fieldset className="manage-setting__renderer">
+        <legend>UI Renderer</legend>
+        <label>
+          <input
+            type="checkbox"
+            name="ui_next"
+            value="true"
+            defaultChecked={Boolean(current.ui_next)}
+          />
+          <span>Enable UI Renderer</span>
+          {current.ui_next ? <span>(Active)</span> : null}
+        </label>
+        <input type="hidden" name="booleanKeys.ui_next" value="true" />
+        <Button variant="primary" type="submit">Switch UI</Button>
+      </fieldset>
+    </form>
+  ) : null;
 
   // `editingKey` is null when no dialog is open. When non-null it holds the
   // SystemSettings.key for the row currently being edited.
@@ -61,6 +83,7 @@ export default function ManageSettingPage() {
     return (
       <div className="manage-setting">
         <Card variant="default" header={<h1 className="manage-setting__title">Settings</h1>}>
+          {uiRenderer}
           <p className="manage-setting__empty" role="status">
             No settings available.
           </p>
@@ -72,6 +95,7 @@ export default function ManageSettingPage() {
   return (
     <div className="manage-setting">
       <Card variant="default" header={<h1 className="manage-setting__title">Settings</h1>}>
+        {uiRenderer}
         <table className="manage-setting__table data-table">
           <colgroup>
             <col className="manage-setting__col-key" />

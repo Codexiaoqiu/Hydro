@@ -7,7 +7,7 @@ import ManageSettingPage from './manage_setting';
 function renderPage(args: Record<string, unknown> = {}) {
   const initial: PageData = {
     name: 'manage_setting', template: 'manage_setting.html', url: '/manage/setting',
-    args: { UserContext: {}, UiContext: {}, ...args } as PageData['args'],
+    args: { UserContext: { _id: 1, priv: 1 }, UiContext: {}, ...args } as PageData['args'],
   };
   return render(
     <PageDataProvider initial={initial}>
@@ -17,6 +17,33 @@ function renderPage(args: Record<string, unknown> = {}) {
 }
 
 describe('manage_setting', () => {
+  it('renders a UI Renderer toggle using the manage-setting boolean contract', () => {
+    const { container } = renderPage({ settings: [], current: { ui_next: true } });
+
+    const section = screen.getByRole('group', { name: 'UI Renderer' });
+    const checkbox = screen.getByRole('checkbox', { name: /enable ui renderer/i });
+    expect(section).toContainElement(checkbox);
+    expect(checkbox).toHaveAttribute('name', 'ui_next');
+    expect(checkbox).toHaveAttribute('value', 'true');
+    expect(checkbox).toBeChecked();
+    expect(screen.getByText('(Active)')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Switch UI' })).toBeInTheDocument();
+    expect(section.closest('form')).toHaveAttribute('action', '/manage/setting');
+    expect(container.querySelector('input[type="hidden"][name="booleanKeys.ui_next"]'))
+      .toHaveAttribute('value', 'true');
+  });
+
+  it('hides the UI Renderer toggle without system-edit privilege', () => {
+    renderPage({
+      UserContext: { _id: 2, priv: 0 },
+      settings: [{ key: 'site_name', name: 'Site Name', value: 'Hydro', type: 'text' }],
+      current: { ui_next: false },
+    });
+
+    expect(screen.queryByRole('group', { name: 'UI Renderer' })).not.toBeInTheDocument();
+    expect(screen.getByText('site_name')).toBeInTheDocument();
+  });
+
   it('shows the empty-state message when settings is missing', () => {
     renderPage();
     expect(screen.getByText(/no settings/i)).toBeInTheDocument();
