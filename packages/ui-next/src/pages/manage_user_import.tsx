@@ -9,10 +9,6 @@ interface PreviewSummary {
   invalid: number;
 }
 
-interface LocalPreview {
-  count: number;
-}
-
 interface ProgressInfo {
   current: number;
   total: number;
@@ -30,8 +26,8 @@ interface Args {
   preview?: PreviewSummary;
   progress?: ProgressInfo;
   // Server populates these after a POST round-trip on `SystemUserImportHandler.post`.
-  // Each entry is the parsed user payload; we surface the validation messages
-  // alongside the local preview rather than running validation client-side.
+  // Each entry is the parsed user payload; the validation messages are
+  // rendered in the Messages card below.
   users?: Array<{
     email?: string;
     username?: string;
@@ -41,10 +37,6 @@ interface Args {
   messages?: Message[];
 }
 
-function countNonEmptyLines(value: string): number {
-  return value.split('\n').filter((line) => line.trim().length > 0).length;
-}
-
 export default function ManageUserImportPage() {
   const { args } = usePageData() as unknown as { args: Args };
   const preview = args?.preview;
@@ -52,13 +44,7 @@ export default function ManageUserImportPage() {
   const messages = args?.messages ?? [];
 
   const [users, setUsers] = useState<string>('');
-  const [localPreview, setLocalPreview] = useState<LocalPreview | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
-
-  const handleLocalPreview = () => {
-    const total = countNonEmptyLines(users);
-    setLocalPreview({ count: total });
-  };
 
   // Submit the import form with a given `draft` value.
   //   - `draft=true`  → server parses + validates each row but does NOT
@@ -79,11 +65,9 @@ export default function ManageUserImportPage() {
     form.submit();
   };
 
-  const isServerPreview = Boolean(preview);
-  const visiblePreview = preview ?? localPreview;
-  const previewCount = visiblePreview?.count ?? 0;
-  const previewValid = (preview && preview.valid) ?? 0;
-  const previewInvalid = (preview && preview.invalid) ?? 0;
+  const previewCount = preview?.count ?? 0;
+  const previewValid = preview?.valid ?? 0;
+  const previewInvalid = preview?.invalid ?? 0;
 
   return (
     <div className="manage-user-import">
@@ -130,13 +114,7 @@ export default function ManageUserImportPage() {
             <Button
               variant="primary"
               type="button"
-              onClick={() => {
-                // Pure-client preview line count (no server round-trip);
-                // the labelled "Preview" submit button below drives the
-                // server-side validation preview.
-                handleLocalPreview();
-                submitAs('true');
-              }}
+              onClick={() => submitAs('true')}
               aria-label="Preview"
             >
               Preview
@@ -155,30 +133,21 @@ export default function ManageUserImportPage() {
 
       <Card variant="default" header={<h2 className="manage-user-import__subtitle">Preview</h2>}>
         <section className="manage-user-import__preview" aria-label="Import preview">
-          {visiblePreview ? (
-            isServerPreview ? (
-              <dl className="manage-user-import__preview-list">
-                <div className="manage-user-import__preview-row">
-                  <dt className="manage-user-import__preview-key">Total</dt>
-                  <dd className="manage-user-import__preview-value">{previewCount}</dd>
-                </div>
-                <div className="manage-user-import__preview-row">
-                  <dt className="manage-user-import__preview-key">Valid</dt>
-                  <dd className="manage-user-import__preview-value">{previewValid}</dd>
-                </div>
-                <div className="manage-user-import__preview-row">
-                  <dt className="manage-user-import__preview-key">Invalid</dt>
-                  <dd className="manage-user-import__preview-value">{previewInvalid}</dd>
-                </div>
-              </dl>
-            ) : (
-              <p
-                className="manage-user-import__preview-local"
-                role="status"
-              >
-                Detected: {previewCount} line{previewCount === 1 ? '' : 's'} (validation requires server preview).
-              </p>
-            )
+          {preview ? (
+            <dl className="manage-user-import__preview-list">
+              <div className="manage-user-import__preview-row">
+                <dt className="manage-user-import__preview-key">Total</dt>
+                <dd className="manage-user-import__preview-value">{previewCount}</dd>
+              </div>
+              <div className="manage-user-import__preview-row">
+                <dt className="manage-user-import__preview-key">Valid</dt>
+                <dd className="manage-user-import__preview-value">{previewValid}</dd>
+              </div>
+              <div className="manage-user-import__preview-row">
+                <dt className="manage-user-import__preview-key">Invalid</dt>
+                <dd className="manage-user-import__preview-value">{previewInvalid}</dd>
+              </div>
+            </dl>
           ) : (
             <p className="manage-user-import__preview-empty" role="status">
               No preview available.

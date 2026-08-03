@@ -1,5 +1,5 @@
 /* @vitest-environment happy-dom */
-import { fireEvent, render, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { type PageData, PageDataProvider } from '../context/page-data';
 import ManageUserImportPage from './manage_user_import';
@@ -53,19 +53,6 @@ describe('manage_user_import', () => {
     expect(screen.getByText('5')).toBeInTheDocument();
     expect(screen.getByText('4')).toBeInTheDocument();
     expect(screen.getByText('1')).toBeInTheDocument();
-  });
-
-  it('computes a local preview count from the textarea when Preview is clicked', () => {
-    renderPage();
-    const textarea = screen.getAllByRole('textbox').find((el) => el.getAttribute('name') === 'users');
-    expect(textarea).toBeDefined();
-    fireEvent.change(textarea as HTMLElement, { target: { value: 'a@b.c\nd@e.f\n\ng@h.i' } });
-    fireEvent.click(screen.getByRole('button', { name: /preview/i }));
-    // Local preview is honest: only the detected line count is shown.
-    // No Valid/Invalid breakdown since the page never validates anything client-side.
-    expect(screen.getByText(/detected: 3 lines/i)).toBeInTheDocument();
-    expect(screen.queryByText('Valid')).not.toBeInTheDocument();
-    expect(screen.queryByText('Invalid')).not.toBeInTheDocument();
   });
 
   it('renders a progress placeholder when no progress is provided', () => {

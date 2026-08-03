@@ -249,9 +249,18 @@ class SystemUserImportHandler extends SystemHandler {
         const messages = [];
         const mapping = Object.create(null);
         const groups: Record<string, string[]> = Object.create(null);
+        // Tally used to populate `response.body.preview` for the ui-next
+        // `manage_user_import` page (Total / Valid / Invalid summary).
+        // Incremented alongside each `messages.push(...)` to avoid a second
+        // pass over the `messages` array — which would be polluted by the
+        // `"N users found."` summary and any `e.message` errors pushed
+        // during the `if (!draft)` create phase.
+        let totalCount = 0;
+        let invalidCount = 0;
         for (const i in users) {
             const u = users[i];
             if (!u.trim()) continue;
+            totalCount++;
             let [email, username, password, displayName, extra] = u.split('\t').map((t) => t.trim());
             if (!email || !username || !password) {
                 const data = u.split(',').map((t) => t.trim());
@@ -259,12 +268,20 @@ class SystemUserImportHandler extends SystemHandler {
                 if (data.length > 5) extra = data.slice(4).join(',');
             }
             if (email && username && password) {
-                if (!Types.Email[1](email)) messages.push(`Line ${+i + 1}: Invalid email.`);
-                else if (!Types.Username[1](username)) messages.push(`Line ${+i + 1}: Invalid username`);
-                else if (!Types.Password[1](password)) messages.push(`Line ${+i + 1}: Invalid password`);
-                else if (udocs.find((t) => t.email === email) || await user.getByEmail('system', email)) {
+                if (!Types.Email[1](email)) {
+                    invalidCount++;
+                    messages.push(`Line ${+i + 1}: Invalid email.`);
+                } else if (!Types.Username[1](username)) {
+                    invalidCount++;
+                    messages.push(`Line ${+i + 1}: Invalid username`);
+                } else if (!Types.Password[1](password)) {
+                    invalidCount++;
+                    messages.push(`Line ${+i + 1}: Invalid password`);
+                } else if (udocs.find((t) => t.email === email) || await user.getByEmail('system', email)) {
+                    invalidCount++;
                     messages.push(`Line ${+i + 1}: Email ${email} already exists.`);
                 } else if (udocs.find((t) => t.username === username) || await user.getByUname('system', username)) {
+                    invalidCount++;
                     messages.push(`Line ${+i + 1}: Username ${username} already exists.`);
                 } else {
                     const payload: any = {};
@@ -282,7 +299,10 @@ class SystemUserImportHandler extends SystemHandler {
                     await this.ctx.serial('user/import/parse', payload, messages);
                     udocs.push(payload);
                 }
-            } else messages.push(`Line ${+i + 1}: Input invalid.`);
+            } else {
+                invalidCount++;
+                messages.push(`Line ${+i + 1}: Input invalid.`);
+            }
         }
         messages.push(`${udocs.length} users found.`);
         if (!draft) {
@@ -305,6 +325,11 @@ class SystemUserImportHandler extends SystemHandler {
                 if (uids.length) await user.updateGroup(domainId, name, Array.from(new Set([...current, ...uids])));
             }
         }
+        this.response.body.preview = {
+            count: totalCount,
+            valid: udocs.length,
+            invalid: invalidCount,
+        };
         this.response.body.users = udocs;
         this.response.body.messages = messages;
     }
