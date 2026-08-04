@@ -184,3 +184,9 @@
   color: var(--text-mute);
   line-height: var(--leading-snug);
 }
+
+.sidebarMeta {
+  color: var(--text-soft);
+  font-size: var(--text-sm);
+  margin: 0;
+}

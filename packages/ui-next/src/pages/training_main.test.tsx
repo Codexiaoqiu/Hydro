@@ -202,4 +202,35 @@ describe('training_main', () => {
     });
     expect(screen.getByRole('link', { name: /新建训练计划/ })).toBeInTheDocument();
   });
+
+  it('renders a download link to /training/:tid/code when user is the owner', () => {
+    renderPage({
+      tdocs: [
+        { docId: 'tid1', title: 'My Training', dag: [{ _id: 1, pids: [1] }], owner: 7 },
+      ],
+      tdict: {
+        tid1: { docId: 'tid1', title: 'My Training', dag: [{ _id: 1, pids: [1] }], owner: 7 },
+      },
+      page: 1,
+      tpcount: 1,
+      UserContext: { _id: 7, uname: 'me', perm: 'BigInt::288230376151711744' },
+    });
+    const link = screen.getByRole('link', { name: /download.*submissions|submissions.*zip/i });
+    expect(link.getAttribute('href')).toBe('/training/tid1/code?all=1');
+  });
+
+  it('hides the link when user is not the owner', () => {
+    renderPage({
+      tdocs: [
+        { docId: 'tid1', title: 'Other Training', dag: [{ _id: 1, pids: [1] }], owner: 7 },
+      ],
+      tdict: {
+        tid1: { docId: 'tid1', title: 'Other Training', dag: [{ _id: 1, pids: [1] }], owner: 7 },
+      },
+      page: 1,
+      tpcount: 1,
+      UserContext: { _id: 99, uname: 'other', priv: 0 },
+    });
+    expect(screen.queryByRole('link', { name: /download.*submissions|submissions.*zip/i })).not.toBeInTheDocument();
+  });
 });

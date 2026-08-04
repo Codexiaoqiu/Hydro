@@ -6,7 +6,8 @@ import { Paginator } from '../components/primitives/Paginator';
 import { usePageData } from '../context/page-data';
 import { useNavigate } from '../context/router';
 import { useBuildUrl } from '../hooks/use-build-url';
-import { hasPerm } from '../lib/perms';
+import { PERM } from '../lib/perm-constants';
+import { hasPerm, own } from '../lib/perms';
 import styles from './training_main.module.css';
 
 interface Tdoc {
@@ -189,6 +190,23 @@ export default function TrainingMain() {
           </Card>
         </aside>
       ) : null}
+      {tdocs.map((tdoc) => {
+        const tid = tdoc.docId;
+        const fullTdoc = tdict[tid] ?? tdoc;
+        if (!own(user as never, fullTdoc, PERM.PERM_EDIT_TRAINING_SELF)) return null;
+        return (
+          <aside key={tid} className={styles.sidebar}>
+            <Card variant="side">
+              <a
+                href={`/training/${tid}/code?all=1`}
+                className={styles.sidebarMeta}
+              >
+                Download submissions (zip)
+              </a>
+            </Card>
+          </aside>
+        );
+      })}
     </div>
   );
 }
