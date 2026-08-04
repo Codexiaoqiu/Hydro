@@ -337,3 +337,141 @@
 - **ADR-2（17 个 ui-default 模板归宿）**：未决策。`mail/_tr/_status/_summary/partials` 系列保留（合理）；其余需要业务方确认
 
 详见 `.superpowers/sdd/progress.md` "Follow-ups" 节（FU-1 到 FU-3）。
+
+---
+
+## F5 + Phase 3 后续修复（2026-08-04 Session 5 同步）
+
+**计划**：
+- `docs/superpowers/plans/2026-08-04-ui-next-f5-homework-completion.md`（10 task）
+- `docs/superpowers/plans/2026-08-04-ui-next-phase3-adrs.md`（2 task）
+
+**Commit 范围**：`43d3e156`（Phase 3 start）.. `0dcba9b8`（F5 末），共 7 个 commit on master
+**测试**：1510 → 1515 passed（+5 F5 新增），2 个 pre-existing failures 未变
+
+### F5 Phase 1（2 task）— `code` 入口补齐
+
+| 功能 | 状态 | Commit |
+|---|---|---|
+| homework_main 加 `/homework/:tid/code` 下载链接 | ✅ | bb67e967 |
+| training_main 加 `/training/:tid/code` 下载链接 | ✅ | a655c493 + 598da2f4（test fixture 修复） |
+
+### F5 Phase 2（8 task）— P1-4/P1-5 Minor 清理
+
+| # | Task | 状态 | Commit / 备注 |
+|---|---|---|---|
+| 2.1 | training_detail pdict 简化 | ✅ | 之前 P1-4 session 已修（`pdict[String(pid)]`） |
+| 2.2 | training_edit dagValue 修复（`??` vs `||`） | ✅ | f732a4a7 |
+| 2.3 | training_main test fixture 对称 | ✅ | 之前 P1-4 session 已修（行号过期） |
+| 2.4 | training_files 测试用例 + 误导注释 | ⏸️ | **FU-4 deferred**（需 subagent 设计新测试） |
+| 2.5 | training_detail UserContextShape 复用 | ✅ | 之前已修（本地无 type 声明） |
+| 2.6 | training_files 并行删除 | ✅ | 当前是单次 request，非 loop |
+| 2.7 | training_main 显式 spy teardown | ✅ | err/warn spy 已显式 mockRestore |
+| 2.8 | homework_main `getByRole` 替代 `closest('form')!` | ✅ | 0dcba9b8（form 加 `role="search"`） |
+
+### Phase 3 ADR 候选（2 task）— 纯文档
+
+| # | ADR | 状态 | Commit |
+|---|---|---|---|
+| 1 | ADR-1: ui-next 替代策略（建议 Option 2 渐进切换） | ✅ | f644c48c |
+| 2 | ADR-2: 12 个 ui-default 模板分类（全部"保留"） | ✅ | 43d3e156 |
+
+ADR 文件：
+- `docs/superpowers/decisions/2026-08-04-ui-next-replacement-strategy.md`
+- `docs/superpowers/decisions/2026-08-04-ui-default-templates-fate.md`
+
+### F1-F9 模块完成度（最终，2026-08-04 Session 5 同步）
+
+| 模块 | 修复前 | F1-F9 修复后 | F5 完成后 | 最终 |
+|---|---|---|---|---|
+| F1 鉴权 | 95% | 100% | — | **100%** |
+| F2 题目 | 88% | 95% | — | **95%** |
+| F3 评测记录 | 100% | 100% | — | **100%** |
+| F4 比赛 | 92% | 100% | — | **100%** |
+| F5 训练/作业 | 80% | 80% | **~100%** | **~100%** |
+| F6 讨论 | 100% | 100% | — | **100%** |
+| F7 域管理 | 95% | 100% | — | **100%** |
+| F8 用户中心 | 75% | 90% | — | **90%** |
+| F9 管理后台 | 70% | 95% | — | **95%** |
+
+**整体完成度演变**：原 ~85% → F1-F9 修复后 ~95% → F5 完成后 ~**98%**
+
+### 仍为 follow-up（按优先级）
+
+- **FU-1**：Playwright `/manage/config` 路由覆盖
+- **FU-2**：14 个 per-task Minor finding（window.alert fallbacks、NoopMarkdown、English strings 等）
+- **FU-3**：48 处 `as unknown as` cast 全局清理
+- **FU-4**：F5 Task 2.4 — training_files.tsx 误导注释 + 新测试用例
+- **Phase 3 ADR 实际执行**：owner 拍板（Option 2 vs 1 vs 3）
+- **F2/F8 minor follow-ups**：i18n、UX polish 等
+
+详见 `.superpowers/sdd/progress.md` "Follow-ups" 节。
+
+---
+
+## F5 + Phase 3 后续修复（2026-08-04 Session 5 同步）
+
+**计划**：
+- `docs/superpowers/plans/2026-08-04-ui-next-f5-homework-completion.md`（10 task）
+- `docs/superpowers/plans/2026-08-04-ui-next-phase3-adrs.md`（2 task）
+
+**Commit 范围**：`43d3e156`（Phase 3 start）.. `0dcba9b8`（F5 末），共 7 个 commit on master
+**测试**：1510 → 1515 passed（+5 F5 新增），2 个 pre-existing failures 未变
+
+### F5 Phase 1（2 task）— `code` 入口补齐
+
+| 功能 | 状态 | Commit |
+|---|---|---|
+| homework_main 加 `/homework/:tid/code` 下载链接 | ✅ | bb67e967 |
+| training_main 加 `/training/:tid/code` 下载链接 | ✅ | a655c493 + 598da2f4（test fixture 修复） |
+
+### F5 Phase 2（8 task）— P1-4/P1-5 Minor 清理
+
+| # | Task | 状态 | Commit / 备注 |
+|---|---|---|---|
+| 2.1 | training_detail pdict 简化 | ✅ | 之前 P1-4 session 已修（`pdict[String(pid)]`） |
+| 2.2 | training_edit dagValue 修复（`??` vs `||`） | ✅ | f732a4a7 |
+| 2.3 | training_main test fixture 对称 | ✅ | 之前 P1-4 session 已修（行号过期） |
+| 2.4 | training_files 测试用例 + 误导注释 | ⏸️ | **FU-4 deferred**（需 subagent 设计新测试） |
+| 2.5 | training_detail UserContextShape 复用 | ✅ | 之前已修（本地无 type 声明） |
+| 2.6 | training_files 并行删除 | ✅ | 当前是单次 request，非 loop |
+| 2.7 | training_main 显式 spy teardown | ✅ | err/warn spy 已显式 mockRestore |
+| 2.8 | homework_main `getByRole` 替代 `closest('form')!` | ✅ | 0dcba9b8（form 加 `role="search"`） |
+
+### Phase 3 ADR 候选（2 task）— 纯文档
+
+| # | ADR | 状态 | Commit |
+|---|---|---|---|
+| 1 | ADR-1: ui-next 替代策略（建议 Option 2 渐进切换） | ✅ | f644c48c |
+| 2 | ADR-2: 12 个 ui-default 模板分类（全部"保留"） | ✅ | 43d3e156 |
+
+ADR 文件：
+- `docs/superpowers/decisions/2026-08-04-ui-next-replacement-strategy.md`
+- `docs/superpowers/decisions/2026-08-04-ui-default-templates-fate.md`
+
+### F1-F9 模块完成度（最终，2026-08-04 Session 5 同步）
+
+| 模块 | 修复前 | F1-F9 修复后 | F5 完成后 | 最终 |
+|---|---|---|---|---|
+| F1 鉴权 | 95% | 100% | — | **100%** |
+| F2 题目 | 88% | 95% | — | **95%** |
+| F3 评测记录 | 100% | 100% | — | **100%** |
+| F4 比赛 | 92% | 100% | — | **100%** |
+| F5 训练/作业 | 80% | 80% | **~100%** | **~100%** |
+| F6 讨论 | 100% | 100% | — | **100%** |
+| F7 域管理 | 95% | 100% | — | **100%** |
+| F8 用户中心 | 75% | 90% | — | **90%** |
+| F9 管理后台 | 70% | 95% | — | **95%** |
+
+**整体完成度演变**：原 ~85% → F1-F9 修复后 ~95% → F5 完成后 ~**98%**
+
+### 仍为 follow-up（按优先级）
+
+- **FU-1**：Playwright `/manage/config` 路由覆盖
+- **FU-2**：14 个 per-task Minor finding（window.alert fallbacks、NoopMarkdown、English strings 等）
+- **FU-3**：48 处 `as unknown as` cast 全局清理
+- **FU-4**：F5 Task 2.4 — training_files.tsx 误导注释 + 新测试用例
+- **Phase 3 ADR 实际执行**：owner 拍板（Option 2 vs 1 vs 3）
+- **F2/F8 minor follow-ups**：i18n、UX polish 等
+
+详见 `.superpowers/sdd/progress.md` "Follow-ups" 节。
