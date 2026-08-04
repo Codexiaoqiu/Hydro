@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
 import { STATUS } from '@hydrooj/common';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Article } from '../components/article/Article';
 import { Link } from '../components/link';
 import { Alert, Chip, Eyebrow } from '../components/primitives';
@@ -235,6 +235,15 @@ export default function ProblemDetailPage() {
     ...htdocs.map((h) => ({ title: h.title, emoji: '📝', date: '' })),
   ], [ctdocs, tdocs, htdocs]);
 
+  const [categoriesVisible, setCategoriesVisible] = useState(false);
+  const categories = pdoc.tag ?? [];
+  const showCategories = useCallback(() => setCategoriesVisible((visible) => !visible), []);
+  const onCopy = useCallback(() => {
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      void navigator.clipboard.writeText(window.location.href);
+    }
+  }, []);
+
   if (isScratchpad && canSubmit) {
     // Mirror the same ws:// / wss:// promotion as the UiContext path so the
     // scratchpad `<ScratchpadPanel>` can open the pretest stream directly.
@@ -258,8 +267,25 @@ export default function ProblemDetailPage() {
     );
   }
 
+  const [categoriesVisible, setCategoriesVisible] = useState(false);
+  const categories = pdoc.tag ?? [];
+  const showCategories = useCallback(() => setCategoriesVisible((visible) => !visible), []);
+  const onCopy = useCallback(() => {
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      void navigator.clipboard.writeText(window.location.href);
+    }
+  }, []);
   const sidebarContext = {
-    pdoc, tdoc, UserContext, buildUrl, discussionCount, solutionCount, psdoc,
+    pdoc,
+    tdoc,
+    psdoc,
+    UserContext,
+    buildUrl,
+    discussionCount,
+    solutionCount,
+    categories,
+    showCategories,
+    onCopy,
   } as ProblemSidebarContext;
 
   const loggedIn = isLoggedIn(UserContext);
@@ -323,6 +349,14 @@ export default function ProblemDetailPage() {
                 </div>
               )}
               <ProblemSidebar context={sidebarContext} mode={mode} />
+              {categories.length > 0 && (
+                <details open={categoriesVisible} onToggle={(event) => {
+                  setCategoriesVisible((event.currentTarget as HTMLDetailsElement).open);
+                }}>
+                  <summary>{t('Problem.Categories') || 'Categories'}</summary>
+                  <ul>{categories.map((category) => <li key={category}>{category}</li>)}</ul>
+                </details>
+              )}
             </div>
 
             {ownerUdoc && (
@@ -429,6 +463,14 @@ export default function ProblemDetailPage() {
         <aside className={styles.sidebar}>
           <div className={styles.sidebarCard}>
             <ProblemSidebar context={sidebarContext} mode={mode} />
+            {categories.length > 0 && (
+              <details open={categoriesVisible} onToggle={(event) => {
+                setCategoriesVisible((event.currentTarget as HTMLDetailsElement).open);
+              }}>
+                <summary>{t('Problem.Categories') || 'Categories'}</summary>
+                <ul>{categories.map((category) => <li key={category}>{category}</li>)}</ul>
+              </details>
+            )}
           </div>
           {(tdocs.length > 0 || ctdocs.length > 0 || htdocs.length > 0) && (
             // eslint-disable-next-line ts/no-use-before-define

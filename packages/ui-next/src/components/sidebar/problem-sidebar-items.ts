@@ -51,6 +51,7 @@ interface UserCtx {
 export interface ProblemSidebarContext {
   pdoc: Pdoc;
   tdoc?: Tdoc;
+  psdoc?: Psdoc;
   UserContext?: UserCtx;
   buildUrl: (name: string, params?: Record<string, unknown>, query?: Record<string, string>) => string;
   discussionCount: number;

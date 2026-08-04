@@ -1,10 +1,12 @@
 /* @vitest-environment happy-dom */
-import { describe, expect, it } from 'vitest';
+import { fireEvent, render } from '@testing-library/react';
+import { describe, expect, it, vi } from 'vitest';
 import {
   getTidQuery,
   pickSidebarItems,
   type ProblemSidebarContext,
 } from './problem-sidebar-items';
+import { Menu } from './Menu';
 
 const t = (key: string) => key;
 const buildUrl = (name: string, params?: Record<string, unknown>, query?: Record<string, string>) => (
@@ -43,6 +45,29 @@ describe('problemSidebar', () => {
     expect(rejudge?.confirm).toBe('Confirm rejudge this problem?');
   });
 
+  it('calls window.confirm before submitting a form row with a confirm message', () => {
+    Object.defineProperty(window, 'confirm', { value: vi.fn(), writable: true, configurable: true });
+    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true);
+    const { container } = render(
+      <Menu items={[{ key: 'rejudge', title: 'Rejudge', form: true, action: '/x', postBody: { operation: 'rejudge' }, confirm: 'Are you sure?' }]} />,
+    );
+    fireEvent.click(container.querySelector('button[type="submit"]')!);
+    expect(confirmSpy).toHaveBeenCalledWith('Are you sure?');
+    confirmSpy.mockRestore();
+  });
+
+  it('prevents default when window.confirm returns false', () => {
+    Object.defineProperty(window, 'confirm', { value: vi.fn(), writable: true, configurable: true });
+    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(false);
+    const { container } = render(
+      <Menu items={[{ key: 'rejudge', title: 'Rejudge', form: true, action: '/x', postBody: { operation: 'rejudge' }, confirm: 'Are you sure?' }]} />,
+    );
+    const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
+    container.querySelector('form')?.dispatchEvent(submitEvent);
+    expect(confirmSpy).toHaveBeenCalledWith('Are you sure?');
+    expect(submitEvent.defaultPrevented).toBe(true);
+    confirmSpy.mockRestore();
+  });
   it('builds no tid query outside a contest or homework', () => {
     expect(getTidQuery()).toEqual({});
   });

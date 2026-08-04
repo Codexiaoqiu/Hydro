@@ -55,6 +55,7 @@ export interface MenuItem {
   /** Confirmation message shown before submitting the form. */
   confirm?: string;
   /** Render as a thin divider instead of a row. */
+  separator?: boolean;
   /** Non-interactive; renders as a <span> with no href/onClick/form. */
   disabled?: boolean;
 }
