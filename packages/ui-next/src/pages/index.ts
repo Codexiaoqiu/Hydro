@@ -40,6 +40,7 @@ registerPage('user_lostpass', () => import('./user_lostpass'), { layout: 'auth' 
 registerPage('user_lostpass_with_code', () => import('./user_lostpass_with_code'), { layout: 'auth' });
 registerPage('user_logout', () => import('./user_logout'), { layout: 'auth' });
 registerPage('user_sudo', () => import('./user_sudo'), { layout: 'auth' });
+registerPage('user_delete', () => import('./user_delete'));
 registerPage('problem_create', () => import('./problem_create'));
 registerPage('problem_edit', () => import('./problem_edit'));
 registerPage('problem_import', () => import('./problem_import'));

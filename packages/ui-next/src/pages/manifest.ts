@@ -47,6 +47,7 @@ export const NEXT_PAGES = {
   user_lostpass_with_code: ['user_lostpass_with_code.html'],
   user_logout: ['user_logout.html'],
   user_sudo: ['user_sudo.html'],
+  user_delete: ['user_delete_pending.html'],
   problem_create: ['problem_edit.html'], // shared template
   problem_edit: ['problem_edit.html'],
   problem_import: ['problem_import.html'],
