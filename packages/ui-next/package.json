@@ -52,6 +52,7 @@
     "remark-gfm": "^4.0.1",
     "remark-highlight-mark": "^1.4.0",
     "remark-math": "^6.0.0",
+    "schemastery": "^3.18.0",
     "schemastery-react": "^0.1.5"
   },
   "devDependencies": {
