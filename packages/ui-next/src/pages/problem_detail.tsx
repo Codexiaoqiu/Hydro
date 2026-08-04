@@ -267,14 +267,6 @@ export default function ProblemDetailPage() {
     );
   }
 
-  const [categoriesVisible, setCategoriesVisible] = useState(false);
-  const categories = pdoc.tag ?? [];
-  const showCategories = useCallback(() => setCategoriesVisible((visible) => !visible), []);
-  const onCopy = useCallback(() => {
-    if (typeof navigator !== 'undefined' && navigator.clipboard) {
-      void navigator.clipboard.writeText(window.location.href);
-    }
-  }, []);
   const sidebarContext = {
     pdoc,
     tdoc,
