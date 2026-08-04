@@ -213,7 +213,7 @@ describe('training_main', () => {
       },
       page: 1,
       tpcount: 1,
-      UserContext: { _id: 7, uname: 'me', perm: 'BigInt::288230376151711744' },
+      UserContext: { _id: 7, uname: 'me', perm: '562949953421312' },
     });
     const link = screen.getByRole('link', { name: /download.*submissions|submissions.*zip/i });
     expect(link.getAttribute('href')).toBe('/training/tid1/code?all=1');
