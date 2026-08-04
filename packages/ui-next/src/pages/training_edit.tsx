@@ -53,7 +53,7 @@ export default function TrainingEdit() {
 
   // If this is the create flow, seed dag with the default plan the
   // ui-default template uses (see partials/training_default.json).
-  const dagValue = dag || (isEdit ? '' : DEFAULT_DAG);
+  const dagValue = dag ?? (isEdit ? '' : DEFAULT_DAG);
 
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
