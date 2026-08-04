@@ -423,6 +423,18 @@ export default function HomeSecurityPage() {
           </div>
         </form>
       </Modal>
+
+      <form
+        role="form"
+        aria-label="Upload avatar"
+        action="/home/avatar"
+        method="post"
+        enctype="multipart/form-data"
+        style={{ marginTop: 'var(--space-4)' }}
+      >
+        <input type="file" name="file" accept="image/png,image/jpeg" />
+        <button type="submit">Upload avatar image</button>
+      </form>
     </main>
   );
 }
