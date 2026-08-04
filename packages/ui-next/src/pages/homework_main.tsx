@@ -61,7 +61,7 @@ export default function HomeworkMain() {
     <div className={styles.shell}>
       <main>
         <Card header={<h1 className={styles.title}>作业 {total ? `(${total})` : ''}</h1>}>
-          <form className={styles.toolbar} onSubmit={submit}>
+          <form className={styles.toolbar} role="search" onSubmit={submit}>
             <label className={styles.search}>
               <span aria-hidden>⌕</span>
               <input

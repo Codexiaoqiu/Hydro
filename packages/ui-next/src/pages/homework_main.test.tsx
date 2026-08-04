@@ -97,7 +97,7 @@ describe('homework_main', () => {
 
     fireEvent.change(screen.getByLabelText('搜索作业'), { target: { value: 'graph' } });
     fireEvent.change(screen.getByLabelText('作业分组'), { target: { value: 'B' } });
-    fireEvent.submit(screen.getByLabelText('搜索作业').closest('form')!);
+    fireEvent.submit(screen.getByRole('search'));
     expect(navigateSpy).toHaveBeenCalledWith('/homework?q=graph&group=B');
 
     const nav = screen.getByRole('navigation', { name: '作业分页' });
