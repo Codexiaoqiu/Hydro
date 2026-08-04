@@ -52,8 +52,9 @@ export interface MenuItem {
   method?: 'POST' | 'GET';
   /** Top-level fallback for `form.csrf` when `form: true`. */
   csrf?: boolean;
+  /** Confirmation message shown before submitting the form. */
+  confirm?: string;
   /** Render as a thin divider instead of a row. */
-  separator?: boolean;
   /** Non-interactive; renders as a <span> with no href/onClick/form. */
   disabled?: boolean;
 }
@@ -117,7 +118,7 @@ function MenuRow({ item: it }: { item: MenuItem }) {
   }
   if (formConfig) {
     // eslint-disable-next-line ts/no-use-before-define
-    return <FormRow form={formConfig} body={body} />;
+    return <FormRow form={formConfig} body={body} confirm={it.confirm} />;
   }
   if (it.href) {
     return (
@@ -136,14 +137,17 @@ function MenuRow({ item: it }: { item: MenuItem }) {
   return <span className={styles.row}>{body}</span>;
 }
 
-function FormRow({ form, body }: { form: MenuItemForm, body: ReactNode }) {
+function FormRow({ form, body, confirm }: { form: MenuItemForm, body: ReactNode, confirm?: string }) {
   // Read the CSRF token once on mount. Browsers cache `<meta>` and `<input>`
   // contents for the lifetime of the page, so re-reading on every render
   // would just churn React state for no benefit.
   const csrf = useMemo(() => (form.csrf ? readCsrfToken() : undefined), [form.csrf]);
   const fields = form.body ?? {};
   return (
-    <form action={form.action} method={form.method ?? 'POST'} className={styles.form}>
+    <form action={form.action} method={form.method ?? 'POST'} className={styles.form}
+      onSubmit={(event) => {
+        if (confirm && !window.confirm(confirm)) event.preventDefault();
+      }}>
       {csrf && <input type="hidden" name="_csrf" value={csrf} />}
       {Object.entries(fields).map(([k, v]) => (
         <input key={k} type="hidden" name={k} value={v} />

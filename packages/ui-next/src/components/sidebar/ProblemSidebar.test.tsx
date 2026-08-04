@@ -19,6 +19,30 @@ const base: ProblemSidebarContext = {
 };
 
 describe('problemSidebar', () => {
+  it('exposes a show-category menu item when categories are provided', () => {
+    const showCategories = () => {};
+    const items = pickSidebarItems({ ...base, categories: ['A', 'B'], showCategories }, 'normal', t);
+    const show = items.find((it) => it.key === 'show-category');
+    expect(show?.onClick).toBe(showCategories);
+  });
+
+  it('exposes a copy menu item when onCopy is provided', () => {
+    const onCopy = () => {};
+    const items = pickSidebarItems({ ...base, onCopy }, 'normal', t);
+    const copy = items.find((it) => it.key === 'copy');
+    expect(copy?.onClick).toBe(onCopy);
+  });
+
+  it('attaches a confirm prompt to the rejudge form menu item', () => {
+    const items = pickSidebarItems(
+      { ...base, UserContext: { _id: 2, perm: (1n << 13n).toString(), priv: 0 } },
+      'normal',
+      t,
+    );
+    const rejudge = items.find((it) => it.key === 'rejudge');
+    expect(rejudge?.confirm).toBe('Confirm rejudge this problem?');
+  });
+
   it('builds no tid query outside a contest or homework', () => {
     expect(getTidQuery()).toEqual({});
   });

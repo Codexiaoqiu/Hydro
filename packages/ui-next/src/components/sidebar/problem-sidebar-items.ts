@@ -55,7 +55,10 @@ export interface ProblemSidebarContext {
   buildUrl: (name: string, params?: Record<string, unknown>, query?: Record<string, string>) => string;
   discussionCount: number;
   solutionCount: number;
-  psdoc?: Psdoc;
+  /** Optional category disclosure and copy hooks supplied by the page renderer. */
+  categories?: string[];
+  onCopy?: () => void;
+  showCategories?: () => void;
 }
 
 type Mode = 'normal' | 'contest' | 'view' | 'correction';
@@ -98,6 +101,11 @@ export function getNormalMenu(ctx: ProblemSidebarContext, t: (k: string, a?: Rec
 
   items.push(buildSubmitItem(ctx, t));
 
+  if (ctx.categories?.length && ctx.showCategories) {
+    items.push({ key: 'show-category', title: t('Problem.ShowCategories'), onClick: ctx.showCategories });
+  }
+  if (ctx.onCopy) items.push({ key: 'copy', title: t('Problem.Copy'), onClick: ctx.onCopy });
+
   if (showRejudge) {
     items.push({
       key: 'rejudge',
@@ -105,6 +113,7 @@ export function getNormalMenu(ctx: ProblemSidebarContext, t: (k: string, a?: Rec
       form: true,
       action: '',
       postBody: { operation: 'rejudge' },
+      confirm: t('Confirm rejudge this problem?'),
     });
   }
 
