@@ -117,4 +117,21 @@ describe('homework_main', () => {
 
     expect(screen.queryByText('创建作业')).not.toBeInTheDocument();
   });
+
+  it('renders a download link to /homework/:tid/code when user is the owner', () => {
+    renderPage({
+      tsdoc: { docId: 'h1', owner: 7 },
+      UserContext: { _id: 7, uname: 'me', perm: 'BigInt::288230376151711744' },
+    });
+    const link = screen.getByRole('link', { name: /download.*submissions|submissions.*zip/i });
+    expect(link.getAttribute('href')).toBe('/homework/h1/code?all=1');
+  });
+
+  it('hides the link when user is not the owner and lacks PERM_VIEW_HOMEWORK', () => {
+    renderPage({
+      tsdoc: { docId: 'h1', owner: 7 },
+      UserContext: { _id: 99, uname: 'other', priv: 0 },
+    });
+    expect(screen.queryByRole('link', { name: /download.*submissions/i })).not.toBeInTheDocument();
+  });
 });

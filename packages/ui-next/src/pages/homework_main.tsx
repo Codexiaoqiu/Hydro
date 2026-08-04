@@ -7,7 +7,7 @@ import { usePageData } from '../context/page-data';
 import { useNavigate } from '../context/router';
 import { useBuildUrl } from '../hooks/use-build-url';
 import { PERM } from '../lib/perm-constants';
-import { hasPerm } from '../lib/perms';
+import { hasPerm, own } from '../lib/perms';
 import styles from './homework_main.module.css';
 
 interface Tdoc {
@@ -22,6 +22,7 @@ interface Tdoc {
 }
 
 export interface Args {
+  tsdoc?: Tdoc & { owner?: number };
   tdocs?: Tdoc[];
   calendar?: Tdoc[];
   tpcount?: number;
@@ -113,6 +114,18 @@ export default function HomeworkMain() {
           <Card variant="side">
             <h2>创建作业</h2>
             <Link to="homework_create">＋ 新建作业</Link>
+          </Card>
+        </aside>
+      )}
+      {args?.tsdoc && own(args?.UserContext as never, args.tsdoc, PERM.PERM_EDIT_HOMEWORK_SELF) && (
+        <aside>
+          <Card variant="side">
+            <a
+              href={`/homework/${args.tsdoc?.docId}/code?all=1`}
+              className={styles.sidebarMeta}
+            >
+              Download submissions (zip)
+            </a>
           </Card>
         </aside>
       )}
