@@ -49,4 +49,16 @@ describe('about', () => {
     );
     expect(screen.queryByRole('heading')).toBeNull();
   });
+
+  // Finding 2: defensive default — handler may omit `sections` entirely.
+  it('does not throw when `sections` is omitted from args', () => {
+    expect(() => {
+      render(
+        <Providers args={{}}>
+          <AboutPage />
+        </Providers>,
+      );
+    }).not.toThrow();
+    expect(screen.getByText(/no content/i)).toBeInTheDocument();
+  });
 });

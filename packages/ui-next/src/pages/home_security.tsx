@@ -68,6 +68,34 @@ export interface Args {
 type DialogKind = null | 'changeMail' | 'tfa' | 'webauthn' | 'webauthn-name';
 
 /**
+ * Read a CSRF token from `<meta name="csrf-token">` (preferred) or
+ * `<input name="_csrf">` (fallback). Returns `null` when running on the
+ * server (no `document`) or when no token is present in the DOM — in
+ * which case the avatar form simply omits the hidden field, matching
+ * `Menu.tsx::FormRow` behavior.
+ */
+function readCsrfToken(): string | null {
+  if (typeof document === 'undefined') return null;
+  const meta = document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement | null;
+  if (meta?.content) return meta.content;
+  const input = document.querySelector('input[name="_csrf"]') as HTMLInputElement | null;
+  if (input?.value) return input.value;
+  return null;
+}
+
+function CsrfInput() {
+  // Read the CSRF token once. happy-dom + the production DOM both
+  // surface the token synchronously via `<meta>` or `<input>`, so
+  // there is no async wait — `useState` with a lazy initializer pulls
+  // it in a single render. A const would also work, but useState
+  // matches the pattern in `Menu.tsx::FormRow` (which uses useMemo for
+  // the same reason).
+  const [token] = useState<string | null>(() => readCsrfToken());
+  if (!token) return null;
+  return <input type="hidden" name="_csrf" value={token} />;
+}
+
+/**
  * Tiny canvas wrapper that re-renders the QR code whenever `data` changes.
  * Kept inline (not exported) because the TOTP flow is the only caller.
  * Defined before `HomeSecurityPage` so the JSX inside the TOTP modal can
@@ -432,7 +460,14 @@ export default function HomeSecurityPage() {
         enctype="multipart/form-data"
         style={{ marginTop: 'var(--space-4)' }}
       >
-        <input type="file" name="file" accept="image/png,image/jpeg" />
+        {/* CSRF: matches the pattern used by `Menu.tsx::FormRow` (read
+            `<meta name="csrf-token">` first, then `<input name="_csrf">`).
+            Hydro's framework relies on Referer-based CSRF checks for
+            same-origin POSTs, but some sites enforce a token check on
+            top — including the hidden field unconditionally keeps the
+            form in step with the rest of the SPA. */}
+        <CsrfInput />
+        <input type="file" name="file" accept="image/png,image/jpeg" required />
         <button type="submit">Upload avatar image</button>
       </form>
     </main>

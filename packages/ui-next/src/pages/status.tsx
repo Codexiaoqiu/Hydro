@@ -1,11 +1,13 @@
 import { usePageData } from '../context/page-data';
 
 export interface Journal { time: number, level: 'info' | 'warn' | 'error' | string, message: string }
-export interface Args { journals: Journal[] }
+export interface Args { journals?: Journal[] }
 
 export default function StatusPage() {
   const { args } = usePageData();
-  const sorted = [...args.journals].sort((a, b) => b.time - a.time);
+  // Defensive default: handler may omit `journals` when log is empty.
+  const journals = args.journals ?? [];
+  const sorted = [...journals].sort((a, b) => b.time - a.time);
   return (
     <div className="section">
       <div className="section__header">

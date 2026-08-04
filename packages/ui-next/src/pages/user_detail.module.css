@@ -3,4 +3,7 @@
 .side { align-self: start; display: flex; flex-direction: column; gap: var(--space-3, 12px); }
 .side > * { padding: var(--space-3, 12px); border: 1px solid var(--border, rgba(0,0,0,0.08)); border-radius: var(--radius-md, 12px); background: var(--surface-1, #fff); }
 .tagBox h3 { font-family: var(--font-display, system-ui); font-size: var(--text-lg, 1.125rem); margin: 0 0 var(--space-2, 8px); }
+.accountSwitch { display: flex; align-items: center; justify-content: center; }
+.accountSwitchLink { color: var(--accent, #2563eb); text-decoration: none; font-size: var(--text-sm, 0.875rem); }
+.accountSwitchLink:hover { text-decoration: underline; }
 @media (max-width: 768px) { .layout { grid-template-columns: 1fr; } .side { display: none; } }

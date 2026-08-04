@@ -83,4 +83,49 @@ describe('userDetail', () => {
     expect(screen.getByText('5')).toBeInTheDocument();
     expect(screen.getByText('2')).toBeInTheDocument();
   });
+
+  // --- Finding 3: account-switch link ---------------------------------
+  // The link to /account/:uid must be visible only for admins (those with
+  // PRIV_EDIT_SYSTEM) viewing a *different* user's profile. It must NOT
+  // appear for the user themselves or for non-admin viewers.
+  it('hides the account-switch link for non-admin viewers', () => {
+    render(<Providers args={{
+      isSelfProfile: false,
+      // Non-admin: hasPerm/hasPriv return false for every mask.
+      UserContext: { _id: 1, hasPerm: () => false, hasPriv: () => false, priv: 0 },
+      udoc: { _id: 7, uname: 'alice', avatar: '', bio: '', nSubmit: 0, nAccept: 0, nLiked: 0 },
+      sdoc: undefined, pdocs: [], tags: [],
+    }}>
+      <UserDetail />
+    </Providers>);
+    expect(screen.queryByTestId('account-switch-link')).toBeNull();
+  });
+
+  it('hides the account-switch link on the user\'s own profile even for admins', () => {
+    // Admin viewing their own profile — self-switch is meaningless.
+    render(<Providers args={{
+      isSelfProfile: true,
+      UserContext: { _id: 7, hasPerm: () => true, hasPriv: () => true, priv: 1 },
+      udoc: { _id: 7, uname: 'admin', avatar: '', bio: '', nSubmit: 0, nAccept: 0, nLiked: 0 },
+      sdoc: undefined, pdocs: [], tags: [],
+    }}>
+      <UserDetail />
+    </Providers>);
+    expect(screen.queryByTestId('account-switch-link')).toBeNull();
+  });
+
+  it('shows the account-switch link to admins viewing another user', () => {
+    // Admin (_id: 1) viewing user 7. priv: 1 = PRIV_EDIT_SYSTEM.
+    render(<Providers args={{
+      isSelfProfile: false,
+      UserContext: { _id: 1, hasPerm: () => true, hasPriv: (p: number) => p === 1, priv: 1 },
+      udoc: { _id: 7, uname: 'alice', avatar: '', bio: '', nSubmit: 0, nAccept: 0, nLiked: 0 },
+      sdoc: undefined, pdocs: [], tags: [],
+    }}>
+      <UserDetail />
+    </Providers>);
+    const link = screen.getByTestId('account-switch-link');
+    expect(link).toBeInTheDocument();
+    expect(link.getAttribute('href')).toBe('/account/7');
+  });
 });
