@@ -15,6 +15,7 @@ export interface ContestManagePageArgs {
   pdict?: Record<string, SerializedPdoc>;
   files?: Array<{ name: string, size: number }>;
   privateFiles?: Array<{ name: string, size: number }>;
+  perm?: { PERM_READ_RECORD_CODE?: boolean };
 }
 
 export interface ContestManagePageProps {
@@ -114,6 +115,14 @@ export default function ContestManagePage({ _pageData }: ContestManagePageProps 
         <aside className={styles.sidebar}>
           <h3 className={styles.sidebarTitle}>{tdoc.title}</h3>
           <p className={styles.sidebarMeta}>{t('ContestManage.ManageHint')}</p>
+          {args.perm?.PERM_READ_RECORD_CODE && (
+            <a
+              href={`/contest/${tdoc._id}/code?all=1`}
+              className={styles.sidebarMeta}
+            >
+              Download all submissions (zip)
+            </a>
+          )}
         </aside>
       </div>
     </div>
